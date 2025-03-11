@@ -1,7 +1,7 @@
 // src/components/Home.js
 import React from 'react';
 import Header from './Header';
-import ProductList from './ProductList';
+import AuctionListPage from './auctions/AuctionListPage';
 
 const Home = () => {
     return (
@@ -19,7 +19,7 @@ const Home = () => {
                         background: '#fff',
                     }}
                 >
-                    <ProductList />
+                    <AuctionListPage />
                 </main>
             </div>
         </div>

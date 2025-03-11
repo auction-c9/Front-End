@@ -1,24 +1,21 @@
-import axios from 'axios';
 import apiConfig from '../config/apiConfig';
+import axios from 'axios';
 
-const getAllProducts = async () => {
-    const response = await axios.get(apiConfig.products);
+const getProductById = async (id) => {
+    const response = await axios.get(`${apiConfig.products}/${id}`);
     return response.data;
 };
 
-const createProduct = async (productData) => {
-    const formData = new FormData();
-    for (const key in productData) {
-        formData.append(key, productData[key]);
-    }
+const createProduct = async (formData) => {
     const response = await axios.post(apiConfig.products, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data;
 };
 
-export default {
-    getAllProducts,
+const productService = {
+    getProductById,
     createProduct,
-    // Các hàm khác...
 };
+
+export default productService;
