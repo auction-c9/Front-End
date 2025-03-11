@@ -4,4 +4,5 @@ export default {
     products: `${API_BASE_URL}/products`,
     categories: `${API_BASE_URL}/categories`,
     bids: `${API_BASE_URL}/bids`,
+    auctions: `${API_BASE_URL}/auctions`,
 };
