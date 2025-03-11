@@ -3,6 +3,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import {useAuth} from "../context/AuthContext";
 
 const searchSchema = Yup.object().shape({
     query: Yup.string().required('Vui lòng nhập từ khóa tìm kiếm'),
@@ -10,6 +11,7 @@ const searchSchema = Yup.object().shape({
 
 const Header = () => {
     const navigate = useNavigate();
+    const { user, logout } = useAuth();
 
     const handleSearch = (values, { resetForm }) => {
         console.log('Searching for:', values.query);
@@ -50,11 +52,26 @@ const Header = () => {
                     <Link to="/support">Hỗ trợ</Link>
                 </div>
                 <div className="auth-links">
-                    <button className="sign-in">Đăng nhập</button>
-                    <button className="register-now">Đăng ký</button>
-                    <Link to="/add-product">
-                        <button className="register-now">Thêm sản phẩm</button>
-                    </Link>
+                    {user ? (
+                        // Hiển thị tên người dùng và nút đăng xuất nếu đã đăng nhập
+                        <div className="user-info">
+                            <span>Xin chào, {user.username}</span>
+                            <button onClick={logout}>Đăng xuất</button>
+                        </div>
+                    ) : (
+                        // Hiển thị nút đăng nhập và đăng ký nếu chưa đăng nhập
+                        <>
+                            <button className="sign-in" onClick={() => navigate('/login')}>
+                                Đăng nhập
+                            </button>
+                            <button className="register-now" onClick={() => navigate('/register')}>
+                                Đăng ký
+                            </button>
+                            <Link to="/add-product">
+                                <button className="register-now">Thêm sản phẩm</button>
+                            </Link>
+                        </>
+                    )}
                 </div>
             </div>
 
