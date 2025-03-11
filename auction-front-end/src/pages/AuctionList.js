@@ -1,10 +1,10 @@
-// src/components/Search.js
+// src/components/AuctionList.js
 import React from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
-import ProductList from './ProductList';
+import AuctionListPage from './auctions/AuctionListPage';
 
-const Search = () => {
+const AuctionList = () => {
     return (
         <div>
             <Header />
@@ -21,11 +21,11 @@ const Search = () => {
                         background: '#fff',
                     }}
                 >
-                    <ProductList />
+                    <AuctionListPage />
                 </main>
             </div>
         </div>
     );
 };
 
-export default Search;
+export default AuctionList

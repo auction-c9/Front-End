@@ -78,14 +78,14 @@ const Header = () => {
             {/* Header bên dưới (danh sách danh mục) */}
             <div className="bottom-header">
                 <nav className="category-nav">
-                    <Link to="/products">Tất cả sản phẩm</Link>
+                    <Link to="/auctions">Tất cả sản phẩm</Link>
                     <Link to="/category/appliances">Thiết bị gia dụng</Link>
                     <Link to="/category/mobile">Điện thoại di động</Link>
                     <Link to="/categories">Tất cả danh mục</Link>
                     <Link to="/brand/samsung">Samsung</Link>
                     <Link to="/sellers">Tất cả người bán</Link>
                     <Link to="/auctions/live">Đang diễn ra</Link>
-                    <Link to="/products/new">Hàng mới</Link>
+                    <Link to="/auctions/new">Hàng mới</Link>
                     <Link to="/status">Tất cả tình trạng</Link>
                     <Link to="/region/northeast">Miền Đông Bắc</Link>
                     <Link to="/region/central-west">Miền Trung Tây</Link>

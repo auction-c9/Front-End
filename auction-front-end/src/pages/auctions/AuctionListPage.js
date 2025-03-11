@@ -22,11 +22,12 @@ const AuctionListPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {auctions.map(auction => (
                         <div key={auction.auctionId} className="border p-4 rounded shadow">
-                            <h3 className="font-semibold text-lg">{auction.product.productName}</h3>
+                            <h3 className="font-semibold text-lg">{auction.product.name}</h3>
                             <p>Giá hiện tại: {auction.currentPrice} VND</p>
                             <p>Thời gian kết thúc: {new Date(auction.auctionEndTime).toLocaleString()}</p>
                             <p>Trạng thái: {auction.status}</p>
-                            <Link to={`/auction/${auction.auctionId}`} className="text-blue-500 mt-2 block">Xem chi tiết & Đấu giá</Link>
+                            <Link to={`/auction/${auction.auctionId}`} className="text-blue-500 mt-2 block">Xem chi tiết
+                                & Đấu giá</Link>
                         </div>
                     ))}
                 </div>

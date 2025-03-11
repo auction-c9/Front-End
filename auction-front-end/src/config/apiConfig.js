@@ -11,6 +11,7 @@ export default {
         profile: `${API_BASE_URL}/auth/profile`,
         refresh: `${API_BASE_URL}/auth/refresh`
     },
+    auctions: `${API_BASE_URL}/auctions`,
 };
 
 export const api = axios.create({

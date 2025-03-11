@@ -104,9 +104,6 @@ const Sidebar = () => {
                     <label>
                         <input type="checkbox" name="category" value="Books, Movies & Music" /> Sách, Phim & Nhạc
                     </label>
-                    <label>
-                        <input type="checkbox" name="category" value="Building & Industrial" /> Xây dựng & Công nghiệp
-                    </label>
                     <ToggleSection>
                         <>
                             <label>
