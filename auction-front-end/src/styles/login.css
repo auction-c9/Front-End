@@ -1,0 +1,144 @@
+/* Trang login: canh ngang, đẩy form lên trên một chút */
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start; /* Nằm phía trên thay vì giữa */
+    justify-content: center;
+    background-color: #f8f9fa;
+    padding-top: 40px; /* Tùy chỉnh để form cao hơn */
+}
+
+/* Container giới hạn chiều rộng */
+.login-container {
+    max-width: 420px;
+}
+
+/* Card login */
+.login-card {
+    border: none;
+    border-radius: 10px;
+    padding: 30px 25px;
+    background-color: #fff;
+}
+
+/* Icon user */
+.login-avatar {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Tiêu đề - cách icon 10px */
+.login-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-top: 10px;  /* cách icon 10px */
+    margin-bottom: 0;
+}
+
+/* Ô nhập username - cách tiêu đề 10px (dùng class .username-group) */
+.username-group {
+    margin-top: 10px;
+}
+
+/* Ô nhập password - cách ô username 10px */
+.password-group {
+    margin-top: 10px;
+}
+
+/* Form Control full chiều ngang */
+.form-control {
+    width: 100%;
+    font-size: 14px;
+    height: 44px;
+    border-radius: 6px;
+}
+
+/* Checkbox "Ghi nhớ tôi" - cách ô password 10px */
+.remember-me-container {
+    margin-top: 10px;
+}
+
+.remember-me-checkbox {
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* Nút Đăng nhập (center) - cách checkbox 15px */
+.login-button-container {
+    margin-top: 15px;
+    text-align: center;
+}
+
+/* Style nút Đăng nhập */
+.login-btn {
+    background-color: #007bff;
+    border: none;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 8px 24px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+}
+
+.login-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Quên mật khẩu? (trái) + Đăng ký ngay (phải) - cách nút Đăng nhập 10px */
+.forgot-register-container {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Link chung */
+.forgot-password,
+.register-link {
+    font-size: 14px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.forgot-password:hover,
+.register-link:hover {
+    text-decoration: underline;
+}
+
+/* Nút Google - cách cặp link trên 15px */
+.google-button-container {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center; /* Căn giữa theo chiều ngang */
+}
+
+/* Style nút Google */
+.google-login-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ddd;
+    font-weight: 500;
+    border-radius: 6px;
+    padding: 10px 0;
+    transition: background-color 0.3s ease;
+}
+
+.google-login-btn:hover {
+    background-color: #f2f2f2;
+}
+
+/* Icon Google */
+.google-logo {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+/* Alert lỗi */
+.alert {
+    font-size: 14px;
+    margin-top: 10px;
+}
