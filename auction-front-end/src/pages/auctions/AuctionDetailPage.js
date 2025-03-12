@@ -1,3 +1,4 @@
+// AuctionDetailPage.js
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -6,15 +7,18 @@ import PlaceBid from "./PlaceBid";
 import Header from "../../pages/Header";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
+import { useAuth } from "../../context/AuthContext";
 
 const AuctionDetailPage = () => {
     const { id } = useParams();
+    const { token, user } = useAuth(); // Lấy thông tin token và user từ AuthContext
+    const customerId = user?.id; // Hoặc tạm thời mock const customerId = 1;
+
     const [auction, setAuction] = useState(null);
     const [currentPrice, setCurrentPrice] = useState(0);
-    const [highestBidder, setHighestBidder] = useState(""); // Người đấu giá cao nhất
-    const [bidHistory, setBidHistory] = useState([]); // Lịch sử đấu giá
-    const [timeLeft, setTimeLeft] = useState(""); // Đồng hồ đếm ngược
-    const customerId = 1; // Giả định người dùng hiện tại
+    const [highestBidder, setHighestBidder] = useState("");
+    const [bidHistory, setBidHistory] = useState([]);
+    const [timeLeft, setTimeLeft] = useState("");
     const [stompClient, setStompClient] = useState(null);
 
     // Kết nối WebSocket
@@ -25,38 +29,35 @@ const AuctionDetailPage = () => {
             onConnect: () => {
                 console.log("Connected to WebSocket");
 
-                // Đăng ký lắng nghe kênh đấu giá
+                // Subscribe vào topic auction
                 client.subscribe(`/topic/auction/${id}`, (message) => {
                     const bidUpdate = JSON.parse(message.body);
                     console.log("Received bid update: ", bidUpdate);
-                    setCurrentPrice(bidUpdate.currentPrice); // Cập nhật giá hiện tại
-                    setHighestBidder(bidUpdate.highestBidder); // Cập nhật người đấu giá cao nhất
-                    setBidHistory(bidUpdate.bidHistory); // Cập nhật lịch sử đấu giá
+                    setCurrentPrice(bidUpdate.currentPrice);
+                    setHighestBidder(bidUpdate.highestBidder);
+                    setBidHistory(bidUpdate.bidHistory);
                 });
             },
-            onStompError: (error) => {
-                console.error("WebSocket error: ", error);
-            },
+            onStompError: (error) => console.error("WebSocket error: ", error),
         });
 
         client.activate();
         setStompClient(client);
 
-        return () => {
-            if (client) client.deactivate(); // Ngắt kết nối khi rời trang
-        };
+        return () => client.deactivate();
     }, [id]);
 
-    // Fetch dữ liệu ban đầu
+    // Fetch thông tin đấu giá ban đầu
     useEffect(() => {
         axios
             .get(`${apiConfig.auctions}/${id}`)
             .then((response) => {
-                setAuction(response.data);
-                setCurrentPrice(response.data.currentPrice); // Set giá khởi đầu
-                setHighestBidder(response.data.highestBidder || "Chưa có");
-                setBidHistory(response.data.bidHistory || []);
-                updateTimeLeft(response.data.auctionEndTime);
+                const data = response.data;
+                setAuction(data);
+                setCurrentPrice(data.currentPrice);
+                setHighestBidder(data.highestBidder || "Chưa có");
+                setBidHistory(data.bidHistory || []);
+                updateTimeLeft(data.auctionEndTime);
             })
             .catch((error) => console.error("Lỗi khi lấy chi tiết phiên đấu giá:", error));
     }, [id]);
@@ -65,9 +66,7 @@ const AuctionDetailPage = () => {
     useEffect(() => {
         let interval;
         if (auction?.auctionEndTime) {
-            interval = setInterval(() => {
-                updateTimeLeft(auction.auctionEndTime);
-            }, 1000);
+            interval = setInterval(() => updateTimeLeft(auction.auctionEndTime), 1000);
         }
         return () => clearInterval(interval);
     }, [auction]);
@@ -95,23 +94,19 @@ const AuctionDetailPage = () => {
             <div style={{ maxWidth: "900px", margin: "0 auto", padding: "1rem" }}>
                 <h2>{auction.product?.name || "Chưa có tên sản phẩm"}</h2>
                 <div>
-                    <div>
-                        <span>Giá hiện tại: </span>
-                        <strong>{currentPrice} VNĐ</strong>
-                    </div>
-                    <div>
-                        <span>Người đấu giá cao nhất: </span>
-                        <strong style={{ color: "blue" }}>{highestBidder}</strong>
-                    </div>
-                    <div>
-                        <span>Bước giá: </span>
-                        <strong>{auction.bidStep} VNĐ</strong>
-                    </div>
-                    <div>
-                        <span>Thời gian còn lại: </span>
-                        <strong style={{ color: "red" }}>{timeLeft}</strong>
-                    </div>
-                    <PlaceBid auctionId={auction.auctionId} customerId={customerId} />
+                    <div><span>Giá hiện tại: </span><strong>{currentPrice} VNĐ</strong></div>
+                    <div><span>Người đấu giá cao nhất: </span><strong style={{ color: "blue" }}>{highestBidder}</strong></div>
+                    <div><span>Bước giá: </span><strong>{auction.bidStep} VNĐ</strong></div>
+                    <div><span>Thời gian còn lại: </span><strong style={{ color: "red" }}>{timeLeft}</strong></div>
+
+                    {/* Truyền dữ liệu sang PlaceBid */}
+                    <PlaceBid
+                        auctionId={auction.auctionId}
+                        currentPrice={currentPrice}
+                        bidStep={auction.bidStep}
+                        token={token}
+                        customerId={customerId}
+                    />
                 </div>
 
                 {/* Lịch sử đấu giá */}
