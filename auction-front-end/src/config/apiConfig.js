@@ -6,87 +6,104 @@ const api = axios.create({
     baseURL: API_BASE_URL,
     headers: {
         "Content-Type": "application/json",
-    }
+    },
+    withCredentials: true
 });
 
-// Lấy access token từ localStorage
+// Hàm kiểm tra route không yêu cầu token
+const isUnauthorizedRoute = (url) => {
+    const unauthorizedRoutes = [
+        '/auth/login',
+        '/auth/register',
+        '/auth/refresh',
+        '/auth/register-question' // Đảm bảo đúng chính tả
+    ];
+    return unauthorizedRoutes.some(route => url?.includes(route));
+};
+
+// ========== Các hàm quản lý token ==========
 const getAccessToken = () => localStorage.getItem("accessToken");
-
-// Lấy refresh token từ localStorage
 const getRefreshToken = () => localStorage.getItem("refreshToken");
-
-// Set access token vào localStorage
 const setAccessToken = (token) => localStorage.setItem("accessToken", token);
-
-// Set refresh token vào localStorage
 const setRefreshToken = (token) => localStorage.setItem("refreshToken", token);
-
-// Xóa token khi đăng xuất hoặc lỗi
 const clearTokens = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
 };
 
-// Gắn token vào request tự động
+// ========== Interceptor Request ==========
 api.interceptors.request.use(
     (config) => {
-        const token = getAccessToken();
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+        // Chỉ thêm token khi không phải route unauthorized
+        if (!isUnauthorizedRoute(config.url)) {
+            const token = getAccessToken();
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
         }
         return config;
     },
     (error) => Promise.reject(error)
 );
 
-// Xử lý tự động refresh token nếu accessToken hết hạn
+// ========== Interceptor Response ==========
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
+
+        // Bỏ qua xử lý refresh token cho các route không yêu cầu auth
+        if (isUnauthorizedRoute(originalRequest.url)) {
+            return Promise.reject(error);
+        }
+
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
-            const refreshToken = getRefreshToken();
 
-            if (refreshToken) {
-                try {
-                    // Gửi yêu cầu refresh token
-                    const res = await axios.post(`${API_BASE_URL}/auth/refresh`, {}, {
-                        headers: { Authorization: `Bearer ${refreshToken}` }
-                    });
+            try {
+                // Sử dụng instance api đã cấu hình thay vì axios raw
+                const res = await api.post('/auth/refresh', {}, {
+                    headers: {
+                        Authorization: `Bearer ${getRefreshToken()}`
+                    }
+                });
 
-                    const { accessToken: newAccessToken } = res.data;
+                const newAccessToken = res.data.token;
+                setAccessToken(newAccessToken);
 
-                    // Cập nhật accessToken mới
-                    setAccessToken(newAccessToken);
-
-                    // Gắn accessToken mới vào headers và gửi lại request ban đầu
-                    originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-                    return api(originalRequest);
-                } catch (refreshError) {
-                    console.error("Refresh token failed", refreshError);
-                    clearTokens(); // Xóa token nếu refresh thất bại
-                    window.location.href = "/login"; // Chuyển về trang login
-                }
-            } else {
-                clearTokens(); // Xóa token nếu không có refresh token
+                // Retry request với token mới
+                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                return api(originalRequest);
+            } catch (refreshError) {
+                console.error("Refresh token failed:", refreshError);
+                clearTokens();
                 window.location.href = "/login";
             }
         }
+
         return Promise.reject(error);
     }
 );
 
+// ========== Export ==========
 export default {
     products: `${API_BASE_URL}/products`,
     categories: `${API_BASE_URL}/categories`,
     bids: `${API_BASE_URL}/bids`,
     auth: {
         login: `${API_BASE_URL}/auth/login`,
+        register: `${API_BASE_URL}/auth/register`,
         profile: `${API_BASE_URL}/auth/profile`,
-        refresh: `${API_BASE_URL}/auth/refresh`
+        refresh: `${API_BASE_URL}/auth/refresh`,
+        registerQuestion: `${API_BASE_URL}/auth/register-question`
     },
     auctions: `${API_BASE_URL}/auctions`,
 };
 
-export { api, getAccessToken, setAccessToken, setRefreshToken, clearTokens };
+export {
+    api,
+    getAccessToken,
+    setAccessToken,
+    setRefreshToken,
+    clearTokens
+};
