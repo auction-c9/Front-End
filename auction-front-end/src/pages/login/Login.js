@@ -18,7 +18,7 @@ export default function Login() {
         e.preventDefault();
         try {
             await login(credentials); // Gọi login context (có lưu token + refresh token)
-            navigate('/profile'); // Điều hướng về trang profile sau login
+            navigate('/'); // Điều hướng về trang profile sau login
         } catch (err) {
             setError('Đăng nhập thất bại. Vui lòng kiểm tra tài khoản và mật khẩu');
         }
