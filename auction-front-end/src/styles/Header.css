@@ -1,0 +1,29 @@
+.top-header {
+    background-color: #fff;
+    border-bottom: 1px solid #eee;
+}
+
+.logo-text {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.nav-link {
+    color: #333;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    color: #007bff;
+}
+
+.category-nav .nav-link {
+    font-size: 0.9rem;
+}
+
+.auth-links button {
+    margin-left: 0.5rem;
+}

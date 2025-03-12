@@ -1,42 +1,59 @@
-// src/components/auctions/PlaceBid.js
-import React, { useState } from 'react';
-import axios from 'axios';
-import apiConfig from '../../config/apiConfig';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import apiConfig from "../../config/apiConfig";
+import { useAuth } from "../../context/AuthContext";
 
-const PlaceBid = ({ auctionId, customerId }) => {
-    const [amount, setAmount] = useState('');
+const PlaceBid = ({ auctionId }) => {
+    const [bidAmount, setBidAmount] = useState("");
+    const [error, setError] = useState("");
+    const [minBid, setMinBid] = useState(0);
+    const { token } = useAuth();
+
+    useEffect(() => {
+        axios.get(`${apiConfig.auctions}/${auctionId}`)
+            .then(({ data }) => {
+                setMinBid(data.currentPrice + data.bidStep);
+            })
+            .catch(() => setError("Không thể tải thông tin đấu giá."));
+    }, [auctionId]);
 
     const handleBidSubmit = async (e) => {
         e.preventDefault();
+        const numericBid = parseFloat(bidAmount);
 
-        const bidDTO = {
-            amount: parseFloat(amount),
-            auctionId: auctionId,
-            customerId: customerId
-        };
+        if (!token) {
+            setError("Bạn cần đăng nhập để đấu giá.");
+            return;
+        }
+
+        if (isNaN(numericBid) || numericBid < minBid) {
+            setError(`Giá phải lớn hơn hoặc bằng ${minBid.toLocaleString()} VNĐ.`);
+            return;
+        }
 
         try {
-            const response = await axios.post(`${apiConfig.bids}`, bidDTO);
-            alert(response.data.message); // Thông báo khi đấu giá thành công
-        } catch (error) {
-            alert(error.response?.data?.message || 'Đấu giá thất bại');
+            await axios.post(`${apiConfig.bids}`, { auctionId, bidAmount: numericBid }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setBidAmount("");
+            setError("");
+            alert("Đặt giá thành công!");
+        } catch {
+            setError("Gửi giá đấu thất bại. Vui lòng thử lại.");
         }
     };
 
     return (
-        <form onSubmit={handleBidSubmit} className="mt-4">
+        <form onSubmit={handleBidSubmit}>
             <input
                 type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="Nhập số tiền muốn đấu giá"
-                className="border p-2 rounded w-full"
-                required
-                min="1"
+                placeholder={`Nhập từ ${minBid.toLocaleString()} VNĐ`}
+                value={bidAmount}
+                onChange={(e) => setBidAmount(e.target.value)}
+                min={minBid}
             />
-            <button type="submit" className="mt-2 bg-blue-500 text-white px-4 py-2 rounded">
-                Đặt giá
-            </button>
+            <button type="submit">Đặt giá</button>
+            {error && <p style={{ color: "red" }}>{error}</p>}
         </form>
     );
 };
