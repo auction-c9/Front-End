@@ -7,6 +7,8 @@ import AuctionList from "./pages/AuctionList";
 import AddProduct from './pages/AddProduct';
 
 import AuctionDetailPage from './pages/auctions/AuctionDetailPage';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 import Login from "./pages/login/Login";
 import { AuthProvider } from './context/AuthContext';
 import TestProduct from "./pages/Test";

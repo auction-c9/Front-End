@@ -1,16 +1,16 @@
+// src/components/AddProduct.js
 import React, { useEffect, useState } from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
+import { Container, Row, Col, Form, Button, Image } from 'react-bootstrap';
 import productService from '../services/productService';
 import categoryService from '../services/categoryService';
 import 'react-toastify/dist/ReactToastify.css';
 
 const ProductSchema = Yup.object().shape({
     name: Yup.string().required('Tên sản phẩm là bắt buộc'),
-    // Sử dụng transform: nếu giá trị là chuỗi rỗng thì chuyển thành undefined
-    // Nếu có giá trị thì ép sang số.
     categoryId: Yup.number()
         .transform((value, originalValue) =>
             originalValue === "" ? undefined : Number(originalValue)
@@ -63,12 +63,11 @@ const AddProduct = () => {
     };
 
     return (
-        <div style={{ padding: '20px' }}>
-            <h2>Thêm sản phẩm mới</h2>
+        <Container className="py-4">
+            <h2 className="mb-4">Thêm sản phẩm mới</h2>
             <Formik
                 initialValues={{
                     name: '',
-                    // Khởi tạo categoryId dưới dạng chuỗi rỗng để không gây lỗi giá trị
                     categoryId: '',
                     description: '',
                     basePrice: '',
@@ -81,7 +80,6 @@ const AddProduct = () => {
                 validationSchema={ProductSchema}
                 onSubmit={async (values, { setSubmitting, resetForm }) => {
                     try {
-                        // Trong onSubmit, nếu cần, chuyển categoryId về kiểu số
                         const formData = new FormData();
                         formData.append('name', values.name);
                         formData.append('categoryId', Number(values.categoryId));
@@ -109,137 +107,122 @@ const AddProduct = () => {
             >
                 {({ isSubmitting, setFieldValue, values }) => (
                     <Form>
-                        <div style={{marginBottom: '10px'}}>
-                            <label>Tên sản phẩm:</label>
-                            <Field type="text" name="name"/>
-                            <ErrorMessage name="name" component="div" style={{color: 'red'}}/>
-                        </div>
+                        <Form.Group className="mb-3" controlId="formProductName">
+                            <Form.Label>Tên sản phẩm:</Form.Label>
+                            <Field name="name" as={Form.Control} type="text" placeholder="Nhập tên sản phẩm" />
+                            <ErrorMessage name="name" component="div" className="text-danger" />
+                        </Form.Group>
 
-                        <div style={{marginBottom: '10px'}}>
-                            <label>Danh mục:</label>
+                        <Form.Group className="mb-3" controlId="formCategory">
+                            <Form.Label>Danh mục:</Form.Label>
                             <Field
-                                as="select"
+                                as={Form.Select}
                                 name="categoryId"
                                 onChange={(e) => {
                                     console.log('Selected category:', e.target.value);
-                                    // Giữ giá trị dưới dạng chuỗi, Yup sẽ chuyển đổi nếu cần
                                     setFieldValue('categoryId', e.target.value);
                                 }}
                             >
-                                {/* Default option với value là chuỗi rỗng */}
-                                <option key="default" value="">
-                                    -- Chọn danh mục --
-                                </option>
+                                <option value="">-- Chọn danh mục --</option>
                                 {categories.length > 0 ? (
                                     categories.map((category) => (
-                                        <option
-                                            key={category.categoryId}
-                                            value={String(category.categoryId)}
-                                        >
+                                        <option key={category.categoryId} value={String(category.categoryId)}>
                                             {category.name}
                                         </option>
                                     ))
                                 ) : (
-                                    <option key="no-category" disabled>
-                                        Không có danh mục nào
-                                    </option>
+                                    <option disabled>Không có danh mục nào</option>
                                 )}
                             </Field>
-                            <ErrorMessage name="categoryId" component="div" style={{color: 'red'}}/>
-                            {/* Debug: hiển thị giá trị đã chọn */}
-                            <div style={{marginTop: '5px', color: 'blue'}}>
-                                <strong>Giá trị đã chọn: </strong>
-                                {values.categoryId}
-                            </div>
-                        </div>
+                            <ErrorMessage name="categoryId" component="div" className="text-danger" />
+                        </Form.Group>
 
+                        <Form.Group className="mb-3" controlId="formDescription">
+                            <Form.Label>Mô tả:</Form.Label>
+                            <Field as="textarea" name="description" className="form-control" placeholder="Nhập mô tả sản phẩm" />
+                            <ErrorMessage name="description" component="div" className="text-danger" />
+                        </Form.Group>
 
-                        <div style={{marginBottom: '10px'}}>
-                            <label>Mô tả:</label>
-                            <Field as="textarea" name="description"/>
-                            <ErrorMessage name="description" component="div" style={{color: 'red'}}/>
-                        </div>
+                        <Row>
+                            <Col md={6}>
+                                <Form.Group className="mb-3" controlId="formBasePrice">
+                                    <Form.Label>Giá khởi điểm:</Form.Label>
+                                    <Field name="basePrice" as={Form.Control} type="number" placeholder="Nhập giá khởi điểm" />
+                                    <ErrorMessage name="basePrice" component="div" className="text-danger" />
+                                </Form.Group>
+                            </Col>
+                            <Col md={6}>
+                                <Form.Group className="mb-3" controlId="formBidStep">
+                                    <Form.Label>Bước giá:</Form.Label>
+                                    <Field name="bidStep" as={Form.Control} type="number" placeholder="Nhập bước giá" />
+                                    <ErrorMessage name="bidStep" component="div" className="text-danger" />
+                                </Form.Group>
+                            </Col>
+                        </Row>
 
-                        <div style={{marginBottom: '10px'}}>
-                            <label>Giá khởi điểm:</label>
-                            <Field type="number" name="basePrice"/>
-                            <ErrorMessage name="basePrice" component="div" style={{color: 'red'}}/>
-                        </div>
+                        <Row>
+                            <Col md={6}>
+                                <Form.Group className="mb-3" controlId="formAuctionStartTime">
+                                    <Form.Label>Thời gian bắt đầu đấu giá:</Form.Label>
+                                    <Field name="auctionStartTime" as={Form.Control} type="datetime-local" />
+                                    <ErrorMessage name="auctionStartTime" component="div" className="text-danger" />
+                                </Form.Group>
+                            </Col>
+                            <Col md={6}>
+                                <Form.Group className="mb-3" controlId="formAuctionEndTime">
+                                    <Form.Label>Thời gian kết thúc đấu giá:</Form.Label>
+                                    <Field name="auctionEndTime" as={Form.Control} type="datetime-local" />
+                                    <ErrorMessage name="auctionEndTime" component="div" className="text-danger" />
+                                </Form.Group>
+                            </Col>
+                        </Row>
 
-                        <div style={{marginBottom: '10px'}}>
-                            <label>Bước giá:</label>
-                            <Field type="number" name="bidStep"/>
-                            <ErrorMessage name="bidStep" component="div" style={{color: 'red'}}/>
-                        </div>
-
-                        <div style={{marginBottom: '10px'}}>
-                            <label>Thời gian bắt đầu đấu giá:</label>
-                            <Field type="datetime-local" name="auctionStartTime"/>
-                            <ErrorMessage name="auctionStartTime" component="div" style={{color: 'red'}}/>
-                        </div>
-
-                        <div style={{marginBottom: '10px'}}>
-                            <label>Thời gian kết thúc đấu giá:</label>
-                            <Field type="datetime-local" name="auctionEndTime"/>
-                            <ErrorMessage name="auctionEndTime" component="div" style={{color: 'red'}}/>
-                        </div>
-
-                        <div style={{marginBottom: '10px'}}>
-                            <label>Ảnh đại diện sản phẩm:</label>
-                            <input
+                        <Form.Group className="mb-3" controlId="formImageFile">
+                            <Form.Label>Ảnh đại diện sản phẩm:</Form.Label>
+                            <Form.Control
                                 type="file"
-                                name="imageFile"
                                 accept="image/*"
                                 onChange={(e) => handleImageFileChange(e, setFieldValue)}
                             />
                             {imagePreview && (
-                                <img
-                                    src={imagePreview}
-                                    alt="Preview"
-                                    style={{maxWidth: '200px', marginTop: '10px'}}
-                                />
+                                <div className="mt-2">
+                                    <Image src={imagePreview} alt="Preview" thumbnail style={{ maxWidth: '200px' }} />
+                                </div>
                             )}
-                            <ErrorMessage name="imageFile" component="div" style={{color: 'red'}}/>
-                        </div>
+                            <ErrorMessage name="imageFile" component="div" className="text-danger" />
+                        </Form.Group>
 
-                        <div style={{marginBottom: '10px'}}>
-                            <label>Ảnh chi tiết sản phẩm (nhiều ảnh):</label>
-                            <input
+                        <Form.Group className="mb-3" controlId="formImageFiles">
+                            <Form.Label>Ảnh chi tiết sản phẩm (nhiều ảnh):</Form.Label>
+                            <Form.Control
                                 type="file"
-                                name="imageFiles"
                                 accept="image/*"
                                 multiple
                                 onChange={(e) => handleImageFilesChange(e, setFieldValue)}
                             />
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    gap: '10px',
-                                    marginTop: '10px',
-                                    flexWrap: 'wrap'
-                                }}
-                            >
+                            <div className="d-flex flex-wrap gap-2 mt-2">
                                 {imageDetailPreviews.map((src, index) => (
-                                    <img
+                                    <Image
                                         key={index}
                                         src={src}
                                         alt={`Detail ${index}`}
-                                        style={{width: '100px', height: '100px', objectFit: 'cover'}}
+                                        thumbnail
+                                        style={{ width: '100px', height: '100px', objectFit: 'cover' }}
                                     />
                                 ))}
                             </div>
-                            <ErrorMessage name="imageFiles" component="div" style={{color: 'red'}}/>
-                        </div>
+                            <ErrorMessage name="imageFiles" component="div" className="text-danger" />
+                        </Form.Group>
 
-                        <button type="submit" disabled={isSubmitting}>
+                        <Button variant="primary" type="submit" disabled={isSubmitting}>
                             {isSubmitting ? 'Đang xử lý...' : 'Thêm sản phẩm'}
-                        </button>
+                        </Button>
                     </Form>
                 )}
             </Formik>
 
-            <ToastContainer position="top-right" autoClose={2000}/>
-        </div>
+            <ToastContainer position="top-right" autoClose={2000} />
+        </Container>
     );
 };
 
