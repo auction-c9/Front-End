@@ -57,12 +57,12 @@ const PlaceBid = ({ auctionId, currentPrice, bidStep, token: propToken, customer
             return;
         }
 
-        console.log("🔄 [DEBUG] Gửi bid:", { auctionId, bidAmount: numericBid, customerId, token });
+        console.log("🔄 [DEBUG] Gửi bid:", { auctionId, currentPrice: numericBid, customerId, token });
 
         try {
             await axios.post(
                 `${apiConfig.bids}`,
-                { auctionId, bidAmount: numericBid, customerId },
+                { auctionId, currentPrice: numericBid, customerId },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 

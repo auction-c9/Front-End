@@ -4,7 +4,7 @@ import * as AuthService from '../../services/AuthService';
 import { Container, Card, Spinner, Alert } from 'react-bootstrap';
 
 export default function Profile() {
-    const { user, loading } = useAuth(); // Lấy user từ context
+    const {loading } = useAuth(); // Lấy user từ context
     const [profile, setProfile] = useState(null);
     const [error, setError] = useState('');
 

@@ -1,4 +1,3 @@
-// src/components/ToggleSection.js
 import React, { useState } from 'react';
 
 const ToggleSection = ({
@@ -16,9 +15,9 @@ const ToggleSection = ({
     return (
         <>
             {isExpanded && <div>{children}</div>}
-            <a href="#" className="see-all" onClick={toggle}>
+            <button type="button" className="see-all" onClick={toggle}>
                 {isExpanded ? linkTextExpanded : linkTextCollapsed}
-            </a>
+            </button>
         </>
     );
 };

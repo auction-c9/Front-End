@@ -140,11 +140,12 @@ const AuctionDetailPage = () => {
                             {auction.product?.image ? (
                                 <motion.img
                                     src={auction.product.image}
-                                    alt={auction.product.name}
-                                    onError={(e) => { e.target.src = "/default-image.jpg"; }}
+                                    alt={auction.product.name || 'Sản phẩm'}
+                                    onError={(e) => { e.target.src = '/default-image.jpg'; }}
+                                    className="product-image"
                                 />
                             ) : (
-                                <img src="/default-image.jpg" alt="No Image Available" />
+                                <img src="/default-image.jpg" alt="Sản phẩm" className="product-image" />
                             )}
                         </AnimatePresence>
                     </div>

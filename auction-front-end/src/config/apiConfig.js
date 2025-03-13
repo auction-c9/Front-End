@@ -1,11 +1,11 @@
-import axios from "axios";
+import axios from 'axios';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
     headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
     },
     withCredentials: true
 });
@@ -27,11 +27,11 @@ const getRefreshToken = () => localStorage.getItem("refreshToken");
 const setAccessToken = (token) => localStorage.setItem("accessToken", token);
 const setRefreshToken = (token) => localStorage.setItem("refreshToken", token);
 const clearTokens = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
 };
 
-// ========== Interceptor Request ==========
+// Gắn token vào request tự động
 api.interceptors.request.use(
     (config) => {
         // Chỉ thêm token khi không phải route unauthorized
@@ -46,7 +46,7 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-// ========== Interceptor Response ==========
+// Xử lý tự động refresh token nếu accessToken hết hạn
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
@@ -80,7 +80,6 @@ api.interceptors.response.use(
                 window.location.href = "/login";
             }
         }
-
         return Promise.reject(error);
     }
 );
