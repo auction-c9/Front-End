@@ -23,7 +23,6 @@ const isUnauthorizedRoute = (url) => {
 
 // ========== Các hàm quản lý token ==========
 const getAccessToken = () => localStorage.getItem("accessToken");
-const getRefreshToken = () => localStorage.getItem("refreshToken");
 const setAccessToken = (token) => localStorage.setItem("accessToken", token);
 const setRefreshToken = (token) => localStorage.setItem("refreshToken", token);
 const clearTokens = () => {
@@ -46,44 +45,7 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-// ========== Interceptor Response ==========
-api.interceptors.response.use(
-    (response) => response,
-    async (error) => {
-        const originalRequest = error.config;
 
-        // Bỏ qua xử lý refresh token cho các route không yêu cầu auth
-        if (isUnauthorizedRoute(originalRequest.url)) {
-            return Promise.reject(error);
-        }
-
-        if (error.response?.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
-
-            try {
-                // Sử dụng instance api đã cấu hình thay vì axios raw
-                const res = await api.post('/auth/refresh', {}, {
-                    headers: {
-                        Authorization: `Bearer ${getRefreshToken()}`
-                    }
-                });
-
-                const newAccessToken = res.data.token;
-                setAccessToken(newAccessToken);
-
-                // Retry request với token mới
-                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-                return api(originalRequest);
-            } catch (refreshError) {
-                console.error("Refresh token failed:", refreshError);
-                clearTokens();
-                window.location.href = "/login";
-            }
-        }
-
-        return Promise.reject(error);
-    }
-);
 
 // ========== Export ==========
 export default {

@@ -14,6 +14,8 @@ import Logout from "./pages/auth/Logout";
 import Register from "./pages/login/Register";
 import AuctionListPage from "./pages/auctions/AuctionListPage";
 
+import ChatComponent from "./components/ChatComponent";
+
 const App = () => {
     return (
         <Router>
@@ -28,6 +30,9 @@ const App = () => {
                     <Route path="/logout" element={<Logout />} />
                     <Route path="/profile" element={<Profile />} />
                     {/*<Route path="/register-question" element={ } />*/}
+
+                    <Route path="/" element={<ChatComponent />
+                    } />
                 </Routes>
             </AuthProvider>
         </Router>
