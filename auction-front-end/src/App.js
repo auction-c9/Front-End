@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './styles/main.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
@@ -12,27 +12,24 @@ import { AuthProvider } from './context/AuthContext';
 import Profile from "./pages/profile/Profile";
 import Logout from "./pages/auth/Logout";
 import Register from "./pages/login/Register";
-import AuctionListPage from "./pages/auctions/AuctionListPage";
-
-import ChatComponent from "./components/ChatComponent";
 
 const App = () => {
+    useEffect(() => {
+        localStorage.removeItem('refreshToken');
+    }, []);
+
     return (
         <Router>
             <AuthProvider>
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/auctions" element={<AuctionList />} />
-                    <Route path="/add-product" element={<AddProduct />} />
+                    <Route path="/product/add" element={<AddProduct />} />
                     <Route path="/auction/:id" element={<AuctionDetailPage />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/logout" element={<Logout />} />
                     <Route path="/profile" element={<Profile />} />
-                    {/*<Route path="/register-question" element={ } />*/}
-
-                    <Route path="/" element={<ChatComponent />
-                    } />
                 </Routes>
             </AuthProvider>
         </Router>

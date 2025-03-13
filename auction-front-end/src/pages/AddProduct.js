@@ -4,7 +4,14 @@ import { Formik, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
-import { Container, Row, Col, Form, Button, Image } from 'react-bootstrap';
+import {
+    Container,
+    Row,
+    Col,
+    Form,      // QUAN TRỌNG: giữ nguyên import Form từ 'react-bootstrap'
+    Button,
+    Image
+} from 'react-bootstrap';
 import productService from '../services/productService';
 import categoryService from '../services/categoryService';
 import 'react-toastify/dist/ReactToastify.css';
@@ -40,7 +47,7 @@ const AddProduct = () => {
         const fetchCategories = async () => {
             try {
                 const data = await categoryService.getAllCategories();
-                console.log('Categories fetched:', data); // Debug: kiểm tra dữ liệu danh mục
+                console.log('Categories fetched:', data);
                 setCategories(data);
             } catch (error) {
                 console.error('Lỗi khi tải danh mục:', error);
@@ -65,6 +72,7 @@ const AddProduct = () => {
     return (
         <Container className="py-4">
             <h2 className="mb-4">Thêm sản phẩm mới</h2>
+
             <Formik
                 initialValues={{
                     name: '',
@@ -105,8 +113,9 @@ const AddProduct = () => {
                     }
                 }}
             >
-                {({ isSubmitting, setFieldValue, values }) => (
-                    <Form>
+                {({ isSubmitting, setFieldValue, handleSubmit }) => (
+                    // Sử dụng Form của react-bootstrap, gắn onSubmit = Formik's handleSubmit
+                    <Form noValidate onSubmit={handleSubmit}>
                         <Form.Group className="mb-3" controlId="formProductName">
                             <Form.Label>Tên sản phẩm:</Form.Label>
                             <Field name="name" as={Form.Control} type="text" placeholder="Nhập tên sản phẩm" />
@@ -139,7 +148,12 @@ const AddProduct = () => {
 
                         <Form.Group className="mb-3" controlId="formDescription">
                             <Form.Label>Mô tả:</Form.Label>
-                            <Field as="textarea" name="description" className="form-control" placeholder="Nhập mô tả sản phẩm" />
+                            <Field
+                                as="textarea"
+                                name="description"
+                                className="form-control"
+                                placeholder="Nhập mô tả sản phẩm"
+                            />
                             <ErrorMessage name="description" component="div" className="text-danger" />
                         </Form.Group>
 
@@ -147,14 +161,24 @@ const AddProduct = () => {
                             <Col md={6}>
                                 <Form.Group className="mb-3" controlId="formBasePrice">
                                     <Form.Label>Giá khởi điểm:</Form.Label>
-                                    <Field name="basePrice" as={Form.Control} type="number" placeholder="Nhập giá khởi điểm" />
+                                    <Field
+                                        name="basePrice"
+                                        as={Form.Control}
+                                        type="number"
+                                        placeholder="Nhập giá khởi điểm"
+                                    />
                                     <ErrorMessage name="basePrice" component="div" className="text-danger" />
                                 </Form.Group>
                             </Col>
                             <Col md={6}>
                                 <Form.Group className="mb-3" controlId="formBidStep">
                                     <Form.Label>Bước giá:</Form.Label>
-                                    <Field name="bidStep" as={Form.Control} type="number" placeholder="Nhập bước giá" />
+                                    <Field
+                                        name="bidStep"
+                                        as={Form.Control}
+                                        type="number"
+                                        placeholder="Nhập bước giá"
+                                    />
                                     <ErrorMessage name="bidStep" component="div" className="text-danger" />
                                 </Form.Group>
                             </Col>
@@ -164,14 +188,22 @@ const AddProduct = () => {
                             <Col md={6}>
                                 <Form.Group className="mb-3" controlId="formAuctionStartTime">
                                     <Form.Label>Thời gian bắt đầu đấu giá:</Form.Label>
-                                    <Field name="auctionStartTime" as={Form.Control} type="datetime-local" />
+                                    <Field
+                                        name="auctionStartTime"
+                                        as={Form.Control}
+                                        type="datetime-local"
+                                    />
                                     <ErrorMessage name="auctionStartTime" component="div" className="text-danger" />
                                 </Form.Group>
                             </Col>
                             <Col md={6}>
                                 <Form.Group className="mb-3" controlId="formAuctionEndTime">
                                     <Form.Label>Thời gian kết thúc đấu giá:</Form.Label>
-                                    <Field name="auctionEndTime" as={Form.Control} type="datetime-local" />
+                                    <Field
+                                        name="auctionEndTime"
+                                        as={Form.Control}
+                                        type="datetime-local"
+                                    />
                                     <ErrorMessage name="auctionEndTime" component="div" className="text-danger" />
                                 </Form.Group>
                             </Col>
