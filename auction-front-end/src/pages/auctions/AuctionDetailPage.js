@@ -126,9 +126,7 @@ const AuctionDetailPage = () => {
                         <div><strong>Người đấu giá cao nhất:</strong> <span style={{ color: 'blue' }}>{highestBidder}</span></div>
                         <div><strong>Bước giá:</strong> {formatCurrency(auction.bidStep)}</div>
                         <div><strong>Thời gian còn lại:</strong> <span style={{ color: 'red' }}>{timeLeft}</span></div>
-                        const customerId = localStorage.getItem("customerId");
-                        console.log("🔍 [DEBUG] customerId từ Local Storage:", customerId);
-
+                        
                         <PlaceBid
                             auctionId={auction.auctionId}
                             currentPrice={currentPrice}
