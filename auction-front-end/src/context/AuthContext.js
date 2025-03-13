@@ -15,7 +15,7 @@ export function AuthProvider({ children }) {
         if (savedToken) {
             try {
                 const decoded = jwtDecode(savedToken);
-                setUser({ username: decoded.sub }); // hoặc lấy các thông tin khác
+                setUser({ username: decoded.sub });
                 setToken(savedToken);
             } catch (err) {
                 logout(); // Token lỗi thì đăng xuất
@@ -27,8 +27,8 @@ export function AuthProvider({ children }) {
     // Hàm đăng nhập
     const login = async (credentials) => {
         try {
-            const { token } = await AuthService.login(credentials); // Gọi API login
-            localStorage.setItem('token', token); // Lưu vào localStorage
+            const { token } = await AuthService.login(credentials);
+            localStorage.setItem('token', token);
             const decoded = jwtDecode(token);
             setUser({ username: decoded.sub });
             setToken(token);
@@ -40,8 +40,10 @@ export function AuthProvider({ children }) {
     // Hàm đăng xuất
     const logout = () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('customerId'); // Nếu có lưu customerId
         setUser(null);
         setToken(null);
+        window.location.href = "/login"; // Điều hướng về login
     };
 
     return (

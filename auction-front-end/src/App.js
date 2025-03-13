@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './styles/main.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
@@ -13,9 +13,11 @@ import Profile from "./pages/profile/Profile";
 import Logout from "./pages/auth/Logout";
 import Register from "./pages/login/Register";
 
-
-
 const App = () => {
+    useEffect(() => {
+        localStorage.removeItem('refreshToken');
+    }, []);
+
     return (
         <Router>
             <AuthProvider>
@@ -28,8 +30,6 @@ const App = () => {
                     <Route path="/register" element={<Register />} />
                     <Route path="/logout" element={<Logout />} />
                     <Route path="/profile" element={<Profile />} />
-
-                    {/*<Route path="/register-question" element={ } />*/}
                 </Routes>
             </AuthProvider>
         </Router>

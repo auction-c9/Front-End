@@ -1,26 +1,25 @@
-// AuthService.js
-import { api, setAccessToken, setRefreshToken, clearTokens } from '../config/apiConfig';
+import { api, setToken, clearTokens } from '../config/apiConfig';
 import ENDPOINTS from '../config/apiConfig';
 
 /**
  * Đăng nhập vào hệ thống
  * @param {Object} credentials - Thông tin đăng nhập (username, password, …)
- * @returns {Promise<Object>} Dữ liệu phản hồi từ server (accessToken, refreshToken, customerId, …)
+ * @returns {Promise<Object>} Dữ liệu phản hồi từ server (token, customerId, …)
  */
 const login = async (credentials) => {
     try {
         console.log("Dữ liệu gửi lên server (credentials):", JSON.stringify(credentials, null, 2));
+
+        // Gọi API đăng nhập
         const response = await api.post(ENDPOINTS.auth.login, credentials);
         console.log("Phản hồi từ server:", response.data);
 
-        // Lấy accessToken, refreshToken và customerId từ phản hồi của API
-        const { accessToken, refreshToken, customerId } = response.data;
+        const { token, customerId } = response.data;
 
-        // Lưu accessToken và refreshToken vào localStorage thông qua hàm hỗ trợ
-        setAccessToken(accessToken);
-        setRefreshToken(refreshToken);
+        // Lưu token vào localStorage
+        setToken(token);
 
-        // Lưu customerId vào localStorage nếu có
+        // Lưu customerId nếu có
         if (customerId) {
             localStorage.setItem("customerId", customerId);
             console.log("✅ customerId đã được lưu:", customerId);
@@ -55,9 +54,12 @@ const getProfile = async () => {
  */
 const logout = () => {
     clearTokens();
-    // Xóa customerId khỏi localStorage khi đăng xuất
     localStorage.removeItem("customerId");
     window.location.href = "/login";
 };
 
-export { login, getProfile, logout };
+export {
+    login,
+    getProfile,
+    logout
+};
