@@ -34,17 +34,16 @@ export default function Login() {
 
     return (
         <div className="login-page">
+            <div className="background-image">
+                <img
+                    src="/static/breker_auctionteam_hero.jpg"
+                    alt="Background"
+                />
+            </div>
+
             <Container className="login-container">
                 <Row className="justify-content-center">
-                    <Col md={8} className="login-image-col">
-                        <img
-                            src="/static/breker_auctionteam_hero.jpg"
-                            alt="Login Background"
-                            className="login-image"
-                        />
-                    </Col>
-
-                    <Col md={4} className="login-form-col">
+                    <Col md={6} lg={4} className="login-form-col">
                         <Card className="login-card shadow">
                             <Card.Body>
                                 {/* Icon người */}
@@ -67,13 +66,12 @@ export default function Login() {
                                 <Form onSubmit={handleSubmit} className="mt-2">
                                     {/* Ô nhập tên đăng nhập (không có label) */}
                                     <Form.Group controlId="username" className="username-group">
-                                        <Form.Control
-                                            type="text"
-                                            name="username"
-                                            placeholder="Nhập tên đăng nhập"
-                                            value={credentials.username}
-                                            onChange={handleChange}
-                                            required
+                                        <Form.Control type="text"
+                                                      name="username"
+                                                      placeholder="Nhập tên đăng nhập"
+                                                      value={credentials.username}
+                                                      onChange={handleChange}
+                                                      required
                                         />
                                     </Form.Group>
 

@@ -1,25 +1,24 @@
-import { api, setToken, clearTokens } from '../config/apiConfig';
+// AuthService.js
+import { api, setAccessToken, clearTokens } from '../config/apiConfig';
 import ENDPOINTS from '../config/apiConfig';
 
 /**
  * Đăng nhập vào hệ thống
  * @param {Object} credentials - Thông tin đăng nhập (username, password, …)
- * @returns {Promise<Object>} Dữ liệu phản hồi từ server (token, customerId, …)
+ * @returns {Promise<Object>} Dữ liệu phản hồi từ server (accessToken, refreshToken, customerId, …)
  */
 const login = async (credentials) => {
     try {
         console.log("Dữ liệu gửi lên server (credentials):", JSON.stringify(credentials, null, 2));
-
-        // Gọi API đăng nhập
         const response = await api.post(ENDPOINTS.auth.login, credentials);
         console.log("Phản hồi từ server:", response.data);
 
+
         const { token, customerId } = response.data;
 
-        // Lưu token vào localStorage
-        setToken(token);
-
-        // Lưu customerId nếu có
+        // Lưu accessToken và refreshToken vào localStorage thông qua hàm hỗ trợ
+        setAccessToken(token);
+        // Lưu customerId vào localStorage nếu có
         if (customerId) {
             localStorage.setItem("customerId", customerId);
             console.log("✅ customerId đã được lưu:", customerId);
