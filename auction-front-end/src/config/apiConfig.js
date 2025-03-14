@@ -15,8 +15,9 @@ const isUnauthorizedRoute = (url) => {
     const unauthorizedRoutes = [
         '/auth/login',
         '/auth/register',
-        '/auth/register-question'
-    ];
+        '/auth/register-question',
+        '/api/auth/google'
+];
     return unauthorizedRoutes.some(route => url?.includes(route));
 };
 
@@ -66,10 +67,10 @@ export default {
         login: `${API_BASE_URL}/auth/login`,
         register: `${API_BASE_URL}/auth/register`,
         profile: `${API_BASE_URL}/auth/profile`,
-        registerQuestion: `${API_BASE_URL}/auth/register-question`
+        registerQuestion: `${API_BASE_URL}/auth/register-question`,
+        google: `${API_BASE_URL}/auth/google`
     },
     auctions: `${API_BASE_URL}/auctions`,
-    transactions: `${API_BASE_URL}/transactions`,
 };
 
 export {

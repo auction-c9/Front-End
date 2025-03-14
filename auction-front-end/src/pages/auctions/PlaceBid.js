@@ -1,14 +1,10 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import apiConfig from "../../config/apiConfig";
 
-const PlaceBid = ({auctionId, currentPrice, bidStep, token: propToken, customerId: propCustomerId}) => {
+const PlaceBid = ({ auctionId, currentPrice, bidStep, token: propToken, customerId: propCustomerId }) => {
     const [bidAmount, setBidAmount] = useState("");
-    const [bidAmountForPayment, setBidAmountForPayment] = useState(""); // Lưu giá trị để thanh toán
-
     const [error, setError] = useState("");
-    const [showPaymentOptions, setShowPaymentOptions] = useState(false); // 🆕 Hiển thị phương thức thanh toán
-
     const [token, setToken] = useState(propToken || localStorage.getItem("token"));
     const [customerId, setCustomerId] = useState(propCustomerId || localStorage.getItem("customerId"));
 
@@ -38,13 +34,12 @@ const PlaceBid = ({auctionId, currentPrice, bidStep, token: propToken, customerI
     }, [customerId, propCustomerId]);
 
     const handleBidSubmit = async (e) => {
-
         e.preventDefault();
         const numericBid = parseFloat(bidAmount);
 
         console.log("🚀 [DEBUG] Token trước khi gửi bid:", token);
         console.log("🚀 [DEBUG] customerId trước khi gửi bid:", customerId);
-        console.log("🚀 [DEBUG] Headers gửi đi:", {Authorization: `Bearer ${token}`});
+        console.log("🚀 [DEBUG] Headers gửi đi:", { Authorization: `Bearer ${token}` });
 
         if (!token) {
             setError("Bạn cần đăng nhập để đấu giá.");
@@ -62,108 +57,39 @@ const PlaceBid = ({auctionId, currentPrice, bidStep, token: propToken, customerI
             return;
         }
 
-        console.log("🔄 [DEBUG] Gửi bid:", {auctionId, bidAmount: numericBid, customerId, token});
+        console.log("🔄 [DEBUG] Gửi bid:", { auctionId, bidAmount: numericBid, customerId, token });
 
         try {
             await axios.post(
                 `${apiConfig.bids}`,
-                {auctionId, bidAmount: numericBid, customerId}, // Sửa key từ currentPrice -> bidAmount
-                {headers: {Authorization: `Bearer ${token}`}}
+                { auctionId, bidAmount: numericBid, customerId }, // Sửa key từ currentPrice -> bidAmount
+                { headers: { Authorization: `Bearer ${token}` } }
             );
-            // Lưu số tiền để thanh toán
-            setBidAmountForPayment(numericBid);
 
             setBidAmount("");
             setError("");
             alert("🎉 Đặt giá thành công!");
-            // 🆕 Hiển thị lựa chọn thanh toán sau khi đặt giá thành công
-            setShowPaymentOptions(true);
         } catch (err) {
             console.error("❌ [ERROR] Bid thất bại:", err.response?.data || err.message);
             setError(err.response?.data?.message || "Gửi giá đấu thất bại. Vui lòng thử lại.");
         }
     };
 
-    const handlePayment = async (method) => {
-
-        if (!auctionId) {
-            console.error("❌ [ERROR] auctionId bị undefined!");
-            setError("Lỗi: Không tìm thấy auctionId.");
-            return;
-        }
-
-        if (!bidAmountForPayment) {
-            console.error("❌ [ERROR] bidAmount cho thanh toán không có!");
-            setError("Lỗi: Không có số tiền thanh toán.");
-            return;
-        }
-
-        try {
-            const response = await axios.post(
-                `${apiConfig.transactions}/create`,
-                {
-                    customerId,
-                    auctionId,
-                    amount: parseFloat(bidAmountForPayment),
-                    paymentMethod: method
-                },
-                {headers: {Authorization: `Bearer ${token}`}}
-            );
-
-            const {redirectUrl} = response.data;
-            if (redirectUrl) {
-                window.location.href = redirectUrl; // Chuyển hướng đến trang thanh toán
-            } else {
-                alert("Không thể tạo giao dịch. Vui lòng thử lại!");
-            }
-        } catch (err) {
-            console.error("❌ [ERROR] Thanh toán thất bại:", err.response?.data || err.message);
-            setError("Thanh toán thất bại. Vui lòng thử lại.");
-        }
-    };
-
     return (
-        <>
-            <form onSubmit={handleBidSubmit} style={{marginTop: "1rem"}}>
-                <input
-                    type="number"
-                    placeholder={`Nhập từ ${minBid.toLocaleString()} VNĐ`}
-                    value={bidAmount}
-                    onChange={(e) => setBidAmount(e.target.value)}
-                    min={minBid}
-                    style={{padding: "0.5rem", marginRight: "0.5rem"}}
-                />
-                <button type="submit" style={{padding: "0.5rem 1rem"}}>
-                    Đặt giá
-                </button>
-                {error && <p style={{color: "red", marginTop: "0.5rem"}}>{error}</p>}
-            </form>
-
-            {showPaymentOptions && (
-                <div style={{marginTop: "1rem"}}>
-                    <h3>Chọn phương thức thanh toán:</h3>
-                    <button
-                        onClick={() => handlePayment("PAYPAL")}
-                        style={{
-                            padding: "0.5rem 1rem",
-                            marginRight: "0.5rem",
-                            backgroundColor: "#0070ba",
-                            color: "#fff"
-                        }}
-                    >
-                        Thanh toán bằng PayPal
-                    </button>
-                    <button
-                        onClick={() => handlePayment("VNPAY")}
-                        style={{padding: "0.5rem 1rem", backgroundColor: "#e41e25", color: "#fff"}}
-                    >
-                        Thanh toán bằng VNPAY
-                    </button>
-                </div>
-            )}
-        </>
-
-
+        <form onSubmit={handleBidSubmit} style={{ marginTop: "1rem" }}>
+            <input
+                type="number"
+                placeholder={`Nhập từ ${minBid.toLocaleString()} VNĐ`}
+                value={bidAmount}
+                onChange={(e) => setBidAmount(e.target.value)}
+                min={minBid}
+                style={{ padding: "0.5rem", marginRight: "0.5rem" }}
+            />
+            <button type="submit" style={{ padding: "0.5rem 1rem" }}>
+                Đặt giá
+            </button>
+            {error && <p style={{ color: "red", marginTop: "0.5rem" }}>{error}</p>}
+        </form>
     );
 };
 

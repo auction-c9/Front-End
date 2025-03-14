@@ -61,7 +61,7 @@ const Header = () => {
                         // Khi đã đăng nhập
                         <Dropdown>
                             <Dropdown.Toggle variant="light" id="dropdown-basic">
-                                Xin chào, {user.username}
+                                Xin chào, {user.username && user.username.includes('@') ? user.username.split('@')[0] : user.username}
                             </Dropdown.Toggle>
 
                             <Dropdown.Menu>

@@ -1,25 +1,24 @@
-import { api, setToken, clearTokens } from '../config/apiConfig';
+// AuthService.js
+import { api,setToken, clearTokens } from '../config/apiConfig';
 import ENDPOINTS from '../config/apiConfig';
 
 /**
  * Đăng nhập vào hệ thống
  * @param {Object} credentials - Thông tin đăng nhập (username, password, …)
- * @returns {Promise<Object>} Dữ liệu phản hồi từ server (token, customerId, …)
+ * @returns {Promise<Object>} Dữ liệu phản hồi từ server (token, setToken, customerId, …)
  */
 const login = async (credentials) => {
     try {
         console.log("Dữ liệu gửi lên server (credentials):", JSON.stringify(credentials, null, 2));
-
-        // Gọi API đăng nhập
         const response = await api.post(ENDPOINTS.auth.login, credentials);
         console.log("Phản hồi từ server:", response.data);
 
+
         const { token, customerId } = response.data;
 
-        // Lưu token vào localStorage
+        // Lưu accessToken và refreshToken vào localStorage thông qua hàm hỗ trợ
         setToken(token);
-
-        // Lưu customerId nếu có
+        // Lưu customerId vào localStorage nếu có
         if (customerId) {
             localStorage.setItem("customerId", customerId);
             console.log("✅ customerId đã được lưu:", customerId);
@@ -34,10 +33,6 @@ const login = async (credentials) => {
     }
 };
 
-/**
- * Lấy thông tin profile người dùng đang đăng nhập
- * @returns {Promise<Object>} Dữ liệu profile người dùng
- */
 const getProfile = async () => {
     try {
         const response = await api.get(ENDPOINTS.auth.profile);
@@ -49,17 +44,32 @@ const getProfile = async () => {
     }
 };
 
-/**
- * Đăng xuất khỏi hệ thống
- */
 const logout = () => {
     clearTokens();
     localStorage.removeItem("customerId");
     window.location.href = "/login";
 };
 
+const loginWithGoogle = async (googleToken) => {
+    try {
+        const response = await api.post(ENDPOINTS.auth.google, { token: googleToken });
+        const { token, customerId } = response.data;
+
+        setToken(token);
+        if (customerId) {
+            localStorage.setItem("customerId", customerId);
+        }
+
+        return response.data;
+    } catch (error) {
+        console.error("❌ Lỗi đăng nhập Google:", error.response?.data || error.message);
+        throw new Error(error.response?.data?.message || 'Đăng nhập bằng Google thất bại');
+    }
+};
+
 export {
     login,
     getProfile,
-    logout
+    logout,
+    loginWithGoogle
 };
