@@ -57,8 +57,26 @@ const logout = () => {
     window.location.href = "/login";
 };
 
+const loginWithGoogle = async (googleToken) => {
+    try {
+        const response = await api.post(ENDPOINTS.auth.google, { token: googleToken });
+        const { token, customerId } = response.data;
+
+        setToken(token);
+        if (customerId) {
+            localStorage.setItem("customerId", customerId);
+        }
+
+        return response.data;
+    } catch (error) {
+        console.error("❌ Lỗi đăng nhập Google:", error.response?.data || error.message);
+        throw new Error(error.response?.data?.message || 'Đăng nhập bằng Google thất bại');
+    }
+};
+
 export {
     login,
     getProfile,
-    logout
+    logout,
+    loginWithGoogle
 };

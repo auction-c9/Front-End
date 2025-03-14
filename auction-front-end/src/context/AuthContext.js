@@ -11,17 +11,21 @@ export function AuthProvider({ children }) {
 
     // Khi load lại trang, lấy token từ localStorage và decode
     useEffect(() => {
+        const initializeAuth = () => {
         const savedToken = localStorage.getItem('token');
+        const savedCustomerId = localStorage.getItem('customerId');
+
         if (savedToken) {
             try {
                 const decoded = jwtDecode(savedToken);
-                setUser({ username: decoded.sub });
+                setUser({ username: decoded.sub ,customerId: savedCustomerId});
                 setToken(savedToken);
             } catch (err) {
-                logout(); // Token lỗi thì đăng xuất
+                logout();
             }
         }
-        setLoading(false);
+        setLoading(false);};
+        initializeAuth();
     }, []);
 
     // Hàm đăng nhập
@@ -37,6 +41,20 @@ export function AuthProvider({ children }) {
         }
     };
 
+    const loginWithGoogle = async (googleToken) => {
+        try {
+            const { token, customerId } = await AuthService.loginWithGoogle(googleToken);
+            localStorage.setItem('token', token);
+            if (customerId) localStorage.setItem('customerId', customerId);
+
+            const decoded = jwtDecode(token);
+            setUser({ username: decoded.sub, customerId });
+            setToken(token);
+        } catch (error) {
+            throw new Error(error.message);
+        }
+    };
+
     // Hàm đăng xuất
     const logout = () => {
         localStorage.removeItem('token');
@@ -47,7 +65,7 @@ export function AuthProvider({ children }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, loading, login, logout }}>
+        <AuthContext.Provider value={{ user, token, loading, login: AuthService.login,loginWithGoogle , logout,setUser,setToken }}>
             {children}
         </AuthContext.Provider>
     );
