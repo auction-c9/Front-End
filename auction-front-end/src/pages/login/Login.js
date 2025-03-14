@@ -153,18 +153,6 @@ export default function Login() {
                                             </a>
                                         </div>
 
-                                        {/*<GoogleLogin*/}
-                                        {/*    onSuccess={handleGoogleSuccess}*/}
-                                        {/*    onError={() => setError('Lỗi xác thực Google')}*/}
-                                        {/*    useOneTap // Hiển thị nút "Tiếp tục với Google" tự động*/}
-                                        {/*    theme="filled_blue" // Hoặc 'outline'*/}
-                                        {/*    shape="rectangular"*/}
-                                        {/*    size="large"*/}
-                                        {/*    locale="vi"*/}
-                                        {/*    text="continue_with"*/}
-                                        {/*    width="350"*/}
-                                        {/*/>*/}
-
                                         <GoogleLogin
                                             onSuccess={async (credentialResponse) => {
                                                 try {

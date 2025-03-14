@@ -1,11 +1,11 @@
 // AuthService.js
-import { api, setAccessToken, clearTokens } from '../config/apiConfig';
+import { api,setToken, clearTokens } from '../config/apiConfig';
 import ENDPOINTS from '../config/apiConfig';
 
 /**
  * Đăng nhập vào hệ thống
  * @param {Object} credentials - Thông tin đăng nhập (username, password, …)
- * @returns {Promise<Object>} Dữ liệu phản hồi từ server (accessToken, refreshToken, customerId, …)
+ * @returns {Promise<Object>} Dữ liệu phản hồi từ server (token, setToken, customerId, …)
  */
 const login = async (credentials) => {
     try {
@@ -17,7 +17,7 @@ const login = async (credentials) => {
         const { token, customerId } = response.data;
 
         // Lưu accessToken và refreshToken vào localStorage thông qua hàm hỗ trợ
-        setAccessToken(token);
+        setToken(token);
         // Lưu customerId vào localStorage nếu có
         if (customerId) {
             localStorage.setItem("customerId", customerId);
@@ -33,10 +33,6 @@ const login = async (credentials) => {
     }
 };
 
-/**
- * Lấy thông tin profile người dùng đang đăng nhập
- * @returns {Promise<Object>} Dữ liệu profile người dùng
- */
 const getProfile = async () => {
     try {
         const response = await api.get(ENDPOINTS.auth.profile);
@@ -48,9 +44,6 @@ const getProfile = async () => {
     }
 };
 
-/**
- * Đăng xuất khỏi hệ thống
- */
 const logout = () => {
     clearTokens();
     localStorage.removeItem("customerId");
