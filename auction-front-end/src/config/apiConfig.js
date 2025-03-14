@@ -69,6 +69,7 @@ export default {
         registerQuestion: `${API_BASE_URL}/auth/register-question`
     },
     auctions: `${API_BASE_URL}/auctions`,
+    transactions: `${API_BASE_URL}/transactions`,
 };
 
 export {

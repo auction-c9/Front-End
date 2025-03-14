@@ -126,7 +126,7 @@ const AuctionDetailPage = () => {
                         <div><strong>Người đấu giá cao nhất:</strong> <span style={{ color: 'blue' }}>{highestBidder}</span></div>
                         <div><strong>Bước giá:</strong> {formatCurrency(auction.bidStep)}</div>
                         <div><strong>Thời gian còn lại:</strong> <span style={{ color: 'red' }}>{timeLeft}</span></div>
-
+                        
                         <PlaceBid
                             auctionId={auction.auctionId}
                             currentPrice={currentPrice}
@@ -134,6 +134,7 @@ const AuctionDetailPage = () => {
                             token={token}
                             customerId={customerId}
                         />
+
                     </div>
                     <div className="info-right">
                         <AnimatePresence>
