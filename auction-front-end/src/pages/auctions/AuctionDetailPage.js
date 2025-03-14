@@ -1,5 +1,4 @@
-// AuctionDetailPage.js
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import apiConfig from "../../config/apiConfig";
@@ -16,65 +15,49 @@ const AuctionDetailPage = () => {
     const customerId = user?.id;
 
     const [auction, setAuction] = useState(null);
-    const [currentPrice, setCurrentPrice] = useState(0);
-    const [priceUpdated, setPriceUpdated] = useState(false); // Hiệu ứng khi giá thay đổi
-    const startingPriceRef = useRef(null);
-    const [depositAmount, setDepositAmount] = useState(0);
+    // startingPrice: giá khởi điểm lấy từ Auction.currentPrice
+    const [startingPrice, setStartingPrice] = useState(null);
+    // currentBidPrice: giá hiện tại lấy từ Bid.bidAmount của bid cuối cùng
+    const [currentBidPrice, setCurrentBidPrice] = useState(null);
+    const [priceUpdated, setPriceUpdated] = useState(false);
     const [highestBidder, setHighestBidder] = useState("");
     const [bidHistory, setBidHistory] = useState([]);
     const [timeLeft, setTimeLeft] = useState("");
 
-    const formatCurrency = (value) => value?.toLocaleString('vi-VN') + ' VNĐ';
+    // Hàm định dạng tiền tệ
+    const formatCurrency = (value) =>
+        value !== null ? value.toLocaleString("vi-VN") + " VNĐ" : "Chưa có giá";
 
+    // Lấy dữ liệu phiên đấu giá từ backend
     useEffect(() => {
-        const socket = new SockJS('http://localhost:8080/ws-auction');
-        const client = new Client({
-            webSocketFactory: () => socket,
-            onConnect: () => {
-                console.log("Connected to WebSocket");
-                client.subscribe(`/topic/auction/${id}`, (message) => {
-                    const bidUpdate = JSON.parse(message.body);
-                    setCurrentPrice(bidUpdate.currentPrice);
-                    setHighestBidder(bidUpdate.highestBidder);
-                    setBidHistory(bidUpdate.bidHistory);
-                    setPriceUpdated(true);
-                    setTimeout(() => setPriceUpdated(false), 1000); // Hiệu ứng highlight trong 1s
-                });
-            },
-            onStompError: (error) => console.error("WebSocket error: ", error),
-        });
-        client.activate();
-        return () => client.deactivate();
-    }, [id]);
-
-    useEffect(() => {
-        const auctionId = parseInt(id, 10);  // Ép kiểu id thành số nguyên
-
-        if (isNaN(auctionId)) {
-            console.error("ID không hợp lệ:", id);
-            return;
-        }
         axios
             .get(`${apiConfig.auctions}/${id}`)
             .then((response) => {
                 const data = response.data;
-                console.log("Dữ liệu API trả về:", response.data);
-                console.log("Dữ liệu sản phẩm:", response.data.product);  // 🔍 Kiểm tra thông tin sản phẩm
-                console.log("Danh sách ảnh:", response.data.product?.images); // 🔍 Kiểm tra danh sách ảnh
                 setAuction(data);
-                setCurrentPrice(data.currentPrice);
-                setHighestBidder(data.highestBidder || "Chưa có");
-                setBidHistory(data.bidHistory || []);
-                if (startingPriceRef.current === null) {
-                    startingPriceRef.current = data.currentPrice;
-                    setDepositAmount(data.currentPrice * 0.05);
+
+                // Giá khởi điểm từ Auction.currentPrice
+                setStartingPrice(data.currentPrice);
+
+                // Nếu có lịch sử đấu giá, lấy bidAmount của bid cuối cùng làm "Giá hiện tại"
+                if (data.bidHistory && data.bidHistory.length > 0) {
+                    const latestBid = data.bidHistory[data.bidHistory.length - 1];
+                    setCurrentBidPrice(latestBid.bidAmount);
+                    setHighestBidder(latestBid.customerName || "Chưa có");
+                } else {
+                    // Nếu chưa có lượt đấu giá, currentBidPrice là null
+                    setCurrentBidPrice(null);
+                    setHighestBidder("Chưa có");
                 }
+                setBidHistory(data.bidHistory || []);
                 updateTimeLeft(data.auctionEndTime);
-                console.log("Danh sách ảnh:", data.product?.images);
             })
-            .catch((error) => console.error("Lỗi khi lấy chi tiết phiên đấu giá:", error));
+            .catch((error) =>
+                console.error("Lỗi khi lấy chi tiết phiên đấu giá:", error)
+            );
     }, [id]);
 
+    // Cập nhật thời gian còn lại cho phiên đấu giá
     useEffect(() => {
         let interval;
         if (auction?.auctionEndTime) {
@@ -83,6 +66,7 @@ const AuctionDetailPage = () => {
         return () => clearInterval(interval);
     }, [auction]);
 
+    // Hàm cập nhật thời gian còn lại
     function updateTimeLeft(endTime) {
         const now = new Date();
         const end = new Date(endTime);
@@ -96,6 +80,31 @@ const AuctionDetailPage = () => {
         const seconds = Math.floor((diff / 1000) % 60);
         setTimeLeft(`${hours > 0 ? `${hours}g ` : ""}${minutes}p ${seconds}s còn lại`);
     }
+
+    // Kết nối WebSocket để nhận cập nhật bid mới từ backend
+    useEffect(() => {
+        const socket = new SockJS("http://localhost:8080/ws-auction");
+        const client = new Client({
+            webSocketFactory: () => socket,
+            onConnect: () => {
+                console.log("Connected to WebSocket");
+                client.subscribe(`/topic/auction/${id}`, (message) => {
+                    const bidUpdate = JSON.parse(message.body);
+                    // Nếu thông điệp chứa bidAmount, cập nhật giá hiện tại từ Bid.bidAmount
+                    if (bidUpdate.bidAmount) {
+                        setCurrentBidPrice(bidUpdate.bidAmount);
+                        setHighestBidder(bidUpdate.customerName || bidUpdate.highestBidder || "Chưa có");
+                        setBidHistory(bidUpdate.bidHistory);
+                        setPriceUpdated(true);
+                        setTimeout(() => setPriceUpdated(false), 1000);
+                    }
+                });
+            },
+            onStompError: (error) => console.error("WebSocket error:", error),
+        });
+        client.activate();
+        return () => client.deactivate();
+    }, [id]);
 
     if (!auction) return <p>Đang tải dữ liệu...</p>;
 
@@ -114,39 +123,63 @@ const AuctionDetailPage = () => {
 
                 <div className="info-section">
                     <div className="info-left">
-                        <div><strong>Giá khởi điểm:</strong> {formatCurrency(startingPriceRef.current)}</div>
-                        <div><strong>Giá đặt cọc:</strong> {formatCurrency(depositAmount)}</div>
+                        <div>
+                            <strong>Giá khởi điểm:</strong>{" "}
+                            {startingPrice !== null ? formatCurrency(startingPrice) : "Đang tải..."}
+                        </div>
+                        <div>
+                            <strong>Giá đặt cọc:</strong>{" "}
+                            {startingPrice !== null ? formatCurrency(startingPrice * 0.1) : "Đang tải..."}
+                        </div>
+
                         <motion.div
-                            className={`current-price ${priceUpdated ? 'highlight' : ''}`}
+                            className={`current-price ${priceUpdated ? "highlight" : ""}`}
                             animate={{ scale: priceUpdated ? 1.1 : 1 }}
                             transition={{ type: "spring", stiffness: 300 }}
                         >
-                            <strong>Giá hiện tại:</strong> {formatCurrency(currentPrice)}
+                            <strong>Giá hiện tại:</strong>{" "}
+                            {currentBidPrice !== null
+                                ? formatCurrency(currentBidPrice)
+                                : "Chưa có lượt đấu giá"}
                         </motion.div>
-                        <div><strong>Người đấu giá cao nhất:</strong> <span style={{ color: 'blue' }}>{highestBidder}</span></div>
-                        <div><strong>Bước giá:</strong> {formatCurrency(auction.bidStep)}</div>
-                        <div><strong>Thời gian còn lại:</strong> <span style={{ color: 'red' }}>{timeLeft}</span></div>
-                        
+                        <div>
+                            <strong>Người đấu giá cao nhất:</strong>{" "}
+                            <span style={{ color: "blue" }}>{highestBidder}</span>
+                        </div>
+                        <div>
+                            <strong>Bước giá:</strong> {formatCurrency(auction.bidStep)}
+                        </div>
+                        <div>
+                            <strong>Thời gian còn lại:</strong>{" "}
+                            <span style={{ color: "red" }}>{timeLeft}</span>
+                        </div>
+
                         <PlaceBid
                             auctionId={auction.auctionId}
-                            currentPrice={currentPrice}
+                            // Truyền currentPrice dưới dạng currentBidPrice để PlaceBid tính minBid dựa trên bidAmount
+                            currentPrice={currentBidPrice}
                             bidStep={auction.bidStep}
                             token={token}
                             customerId={customerId}
                         />
-
                     </div>
                     <div className="info-right">
                         <AnimatePresence>
                             {auction.product?.image ? (
                                 <motion.img
                                     src={auction.product.image}
-                                    alt={auction.product.name || 'Sản phẩm'}
-                                    onError={(e) => { e.target.src = '/default-image.jpg'; }}
+                                    alt={auction.product.name || "Sản phẩm"}
+                                    onError={(e) => {
+                                        e.target.src = "/default-image.jpg";
+                                    }}
                                     className="product-image"
                                 />
                             ) : (
-                                <img src="/default-image.jpg" alt="Sản phẩm" className="product-image" />
+                                <img
+                                    src="/default-image.jpg"
+                                    alt="Sản phẩm"
+                                    className="product-image"
+                                />
                             )}
                         </AnimatePresence>
                     </div>
@@ -157,7 +190,9 @@ const AuctionDetailPage = () => {
                     {bidHistory.length > 0 ? (
                         bidHistory.map((bid, index) => (
                             <li key={index}>
-                                <strong>{bid.customerName}</strong> đã đặt <span>{formatCurrency(bid.bidAmount)}</span> lúc <em>{new Date(bid.timestamp).toLocaleTimeString('vi-VN')}</em>
+                                <strong>{bid.customerName}</strong> đã đặt{" "}
+                                <span>{formatCurrency(bid.bidAmount)}</span> lúc{" "}
+                                <em>{new Date(bid.bidTime).toLocaleTimeString("vi-VN")}</em>
                             </li>
                         ))
                     ) : (
@@ -166,7 +201,6 @@ const AuctionDetailPage = () => {
                 </ul>
             </div>
 
-            {/* CSS nội bộ hoặc tách file riêng */}
             <style jsx>{`
                 .container {
                     max-width: 900px;
@@ -195,7 +229,7 @@ const AuctionDetailPage = () => {
                     max-width: 350px;
                     height: auto;
                     border-radius: 12px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
                 }
                 .highlight {
                     background: #fffae6;
