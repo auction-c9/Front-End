@@ -104,7 +104,8 @@ const PlaceBid = ({auctionId, startingPrice, currentPrice, bidStep, token: propT
                     customerId,
                     auctionId,
                     amount: parseFloat(depositAmount),
-                    paymentMethod: method
+                    paymentMethod: method,
+                    returnUrl: window.location.href  // Gửi returnUrl từ frontend
                 },
                 {headers: {Authorization: `Bearer ${token}`}}
             );
