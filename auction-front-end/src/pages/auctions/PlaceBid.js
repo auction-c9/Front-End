@@ -2,9 +2,9 @@ import React, {useState, useEffect} from "react";
 import axios from "axios";
 import apiConfig from "../../config/apiConfig";
 
-const PlaceBid = ({auctionId, currentPrice, bidStep, token: propToken, customerId: propCustomerId}) => {
+const PlaceBid = ({auctionId, startingPrice, currentPrice, bidStep, token: propToken, customerId: propCustomerId}) => {
     const [bidAmount, setBidAmount] = useState("");
-    const [bidAmountForPayment, setBidAmountForPayment] = useState(""); // Lưu giá trị để thanh toán
+    const [depositAmount, setDepositAmount] = useState(0);
 
     const [error, setError] = useState("");
     const [showPaymentOptions, setShowPaymentOptions] = useState(false); // 🆕 Hiển thị phương thức thanh toán
@@ -36,6 +36,11 @@ const PlaceBid = ({auctionId, currentPrice, bidStep, token: propToken, customerI
         }
         console.log("[DEBUG] customerId state sau update:", customerId);
     }, [customerId, propCustomerId]);
+
+    useEffect(() => {
+        // 💰 Tính tiền đặt cọc dựa trên giá khởi điểm (VD: 10%)
+        setDepositAmount(startingPrice * 0.05);
+    }, [startingPrice]);
 
     const handleBidSubmit = async (e) => {
 
@@ -71,7 +76,7 @@ const PlaceBid = ({auctionId, currentPrice, bidStep, token: propToken, customerI
                 {headers: {Authorization: `Bearer ${token}`}}
             );
             // Lưu số tiền để thanh toán
-            setBidAmountForPayment(numericBid);
+            // setBidAmountForPayment(numericBid);
 
             setBidAmount("");
             setError("");
@@ -92,19 +97,13 @@ const PlaceBid = ({auctionId, currentPrice, bidStep, token: propToken, customerI
             return;
         }
 
-        if (!bidAmountForPayment) {
-            console.error("❌ [ERROR] bidAmount cho thanh toán không có!");
-            setError("Lỗi: Không có số tiền thanh toán.");
-            return;
-        }
-
         try {
             const response = await axios.post(
                 `${apiConfig.transactions}/create`,
                 {
                     customerId,
                     auctionId,
-                    amount: parseFloat(bidAmountForPayment),
+                    amount: parseFloat(depositAmount),
                     paymentMethod: method
                 },
                 {headers: {Authorization: `Bearer ${token}`}}
@@ -142,6 +141,7 @@ const PlaceBid = ({auctionId, currentPrice, bidStep, token: propToken, customerI
             {showPaymentOptions && (
                 <div style={{marginTop: "1rem"}}>
                     <h3>Chọn phương thức thanh toán:</h3>
+                    <p><strong>Số tiền đặt cọc:</strong> {depositAmount.toLocaleString('vi-VN')} VNĐ</p>
                     <button
                         onClick={() => handlePayment("PAYPAL")}
                         style={{

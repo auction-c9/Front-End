@@ -134,6 +134,7 @@ const AuctionDetailPage = () => {
                             bidStep={auction.bidStep}
                             token={token}
                             customerId={customerId}
+                            startingPrice={startingPriceRef.current}
                         />
 
                     </div>
