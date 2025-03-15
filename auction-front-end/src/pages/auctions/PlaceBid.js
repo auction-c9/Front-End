@@ -75,7 +75,7 @@ const PlaceBid = ({auctionId, currentPrice, bidStep, token: propToken, customerI
 
             setBidAmount("");
             setError("");
-            alert("🎉 Đặt giá thành công!");
+            // alert("🎉 Đặt giá thành công!");
             // 🆕 Hiển thị lựa chọn thanh toán sau khi đặt giá thành công
             setShowPaymentOptions(true);
         } catch (err) {
