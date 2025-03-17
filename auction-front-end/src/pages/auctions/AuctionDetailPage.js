@@ -159,6 +159,7 @@ const AuctionDetailPage = () => {
                             bidStep={bidStep}
                             token={token}
                             customerId={customerId}
+                            depositAmount={depositAmount}
                         />
                     </div>
                 </div>

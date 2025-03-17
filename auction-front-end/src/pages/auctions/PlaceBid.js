@@ -2,10 +2,8 @@ import React, {useState, useEffect} from "react";
 import axios from "axios";
 import apiConfig from "../../config/apiConfig";
 
-const PlaceBid = ({ auctionId, currentPrice, bidStep, startingPrice, token: propToken, customerId: propCustomerId }) => {
-    const [bidAmount, setBidAmount] = useState("");
-    const [depositAmount, setDepositAmount] = useState(0);
-    const [showPaymentOptions, setShowPaymentOptions] = useState(false);
+const PlaceBid = ({ auctionId, currentPrice, bidStep, depositAmount, token: propToken, customerId: propCustomerId }) => {
+    const [bidAmount, setBidAmount] = useState("");const [showPaymentOptions, setShowPaymentOptions] = useState(false);
     const [error, setError] = useState("");
     const [token, setToken] = useState(propToken || localStorage.getItem("token"));
     const [customerId, setCustomerId] = useState(propCustomerId || localStorage.getItem("customerId"));
@@ -34,11 +32,6 @@ const PlaceBid = ({ auctionId, currentPrice, bidStep, startingPrice, token: prop
         }
         console.log("[DEBUG] customerId state sau update:", customerId);
     }, [customerId, propCustomerId]);
-
-    useEffect(() => {
-        // 💰 Tính tiền đặt cọc dựa trên giá khởi điểm (VD: 10%)
-        setDepositAmount(startingPrice * 0.1);
-    }, [startingPrice]);
 
     const handleBidSubmit = async (e) => {
         e.preventDefault();
