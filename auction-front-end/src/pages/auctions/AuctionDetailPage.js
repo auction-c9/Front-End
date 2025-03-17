@@ -1,4 +1,3 @@
-// AuctionDetailPage.js
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -133,6 +132,7 @@ const AuctionDetailPage = () => {
                             bidStep={auction.bidStep}
                             token={token}
                             customerId={customerId}
+                            startingPrice={startingPriceRef.current}
                         />
                     </div>
                     <div className="info-right">
