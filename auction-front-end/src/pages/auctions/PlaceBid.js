@@ -1,26 +1,28 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 import apiConfig from "../../config/apiConfig";
 
 const PlaceBid = ({
                       auctionId,
                       currentPrice,
                       bidStep,
-                      startingPrice,
+                      startingPrice, // nếu cần dùng chỗ khác
+                      depositAmount, // ✅ Nhận từ props
                       token: propToken,
                       customerId: propCustomerId,
                       ownerId // 👈 Thêm ownerId để kiểm tra người đăng bài
                   }) => {
+    const navigate = useNavigate();
     const [bidAmount, setBidAmount] = useState("");
-    const [depositAmount, setDepositAmount] = useState(0);
     const [showPaymentOptions, setShowPaymentOptions] = useState(false);
     const [error, setError] = useState("");
     const [token, setToken] = useState(propToken || localStorage.getItem("token"));
     const [customerId, setCustomerId] = useState(propCustomerId || localStorage.getItem("customerId"));
 
     const minBid = currentPrice + bidStep;
-
-    const isOwner = customerId === ownerId; // ✅ Kiểm tra nếu là chủ bài
+    const isOwner = customerId === ownerId; // ✅ Kiểm tra chủ sản phẩm
 
     useEffect(() => {
         console.log("[DEBUG] Token từ props:", propToken);
@@ -45,10 +47,19 @@ const PlaceBid = ({
         console.log("[DEBUG] customerId state sau update:", customerId);
     }, [customerId, propCustomerId]);
 
-    useEffect(() => {
-        // 💰 Tính tiền đặt cọc dựa trên giá khởi điểm (VD: 10%)
-        setDepositAmount(startingPrice * 0.1);
-    }, [startingPrice]);
+    // Hàm kiểm tra đặt cọc
+    const checkDeposit = async () => {
+        try {
+            const response = await axios.get(`${apiConfig.bids}/deposit/check`, {
+                params: { auctionId },
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            return response.data; // true hoặc false
+        } catch (err) {
+            console.error("❌ [ERROR] Kiểm tra đặt cọc:", err);
+            return false;
+        }
+    };
 
     const handleBidSubmit = async (e) => {
         e.preventDefault();
@@ -80,6 +91,14 @@ const PlaceBid = ({
             return;
         }
 
+        // ✅ Kiểm tra xem khách hàng đã đặt cọc chưa
+        const hasDeposit = await checkDeposit();
+        if (!hasDeposit) {
+            setError("Bạn cần thanh toán đặt cọc để đấu giá!");
+            setShowPaymentOptions(true); // Hiển thị form thanh toán
+            return;
+        }
+
         console.log("🔄 [DEBUG] Gửi bid:", { auctionId, bidAmount: numericBid, customerId, token });
 
         try {
@@ -91,9 +110,12 @@ const PlaceBid = ({
 
             setBidAmount("");
             setError("");
-            // alert("🎉 Đặt giá thành công!");
-            // 🆕 Hiển thị lựa chọn thanh toán sau khi đặt giá thành công
-            setShowPaymentOptions(true);
+            toast.success("🎉 Đặt giá thành công!");
+
+            // Sau 2 giây chuyển hướng về trang auctions
+            setTimeout(() => {
+                navigate('/auctions');
+            }, 2000);
         } catch (err) {
             console.error("❌ [ERROR] Bid thất bại:", err.response?.data || err.message);
             setError(err.response?.data?.message || "Gửi giá đấu thất bại. Vui lòng thử lại.");
@@ -115,16 +137,16 @@ const PlaceBid = ({
                 {
                     customerId,
                     auctionId,
-                    amount: parseFloat(depositAmount),
+                    amount: parseFloat(depositAmount), // ✅ Dùng từ props
                     paymentMethod: method,
-                    returnUrl: window.location.href // Gửi returnUrl từ frontend
+                    returnUrl: window.location.href
                 },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
             const { redirectUrl } = response.data;
             if (redirectUrl) {
-                window.location.href = redirectUrl; // Chuyển hướng đến trang thanh toán
+                window.location.href = redirectUrl;
             } else {
                 alert("Không thể tạo giao dịch. Vui lòng thử lại!");
             }
@@ -160,15 +182,12 @@ const PlaceBid = ({
             {showPaymentOptions && (
                 <div style={{ marginTop: "1rem" }}>
                     <h3>Chọn phương thức thanh toán:</h3>
-                    <p><strong>Số tiền đặt cọc:</strong> {depositAmount.toLocaleString('vi-VN')} VNĐ</p>
+                    <p>
+                        <strong>Số tiền đặt cọc:</strong> {depositAmount.toLocaleString('vi-VN')} VNĐ
+                    </p>
                     <button
                         onClick={() => handlePayment("PAYPAL")}
-                        style={{
-                            padding: "0.5rem 1rem",
-                            marginRight: "0.5rem",
-                            backgroundColor: "#0070ba",
-                            color: "#fff"
-                        }}
+                        style={{ padding: "0.5rem 1rem", marginRight: "0.5rem", backgroundColor: "#0070ba", color: "#fff" }}
                     >
                         Thanh toán bằng PayPal
                     </button>
@@ -180,6 +199,8 @@ const PlaceBid = ({
                     </button>
                 </div>
             )}
+
+            <ToastContainer position="top-right" autoClose={2000} />
         </>
     );
 };
