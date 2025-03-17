@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {jwtDecode} from "jwt-decode";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api';
 
@@ -33,6 +34,9 @@ api.interceptors.request.use(
             const token = getToken();
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`;
+                // Thêm role vào header nếu cần
+                const decoded = jwtDecode(token);
+                config.headers['X-User-Role'] = decoded.role;
             }
         }
         return config;

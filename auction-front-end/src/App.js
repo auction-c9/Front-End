@@ -13,6 +13,9 @@ import Profile from "./pages/profile/Profile";
 import Logout from "./pages/auth/Logout";
 import Register from "./pages/login/Register";
 import ChatBox from "./components/ChatBox";
+import ForgotPasswordStep3 from "./pages/login/ForgotPasswordStep3";
+import ForgotPasswordStep2 from "./pages/login/ForgotPasswordStep2";
+import ForgotPasswordStep1 from "./pages/login/ForgotPasswordStep1";
 
 const App = () => {
     useEffect(() => {
@@ -31,6 +34,9 @@ const App = () => {
                     <Route path="/register" element={<Register />} />
                     <Route path="/logout" element={<Logout />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/forgot-password" element={<ForgotPasswordStep1 />} />
+                    <Route path="/forgot-password/step2" element={<ForgotPasswordStep2 />} />
+                    <Route path="/forgot-password/step3" element={<ForgotPasswordStep3 />} />
                 </Routes>
             </AuthProvider>
             <ChatBox/>

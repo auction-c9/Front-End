@@ -17,7 +17,7 @@ export function AuthProvider({ children }) {
         if (savedToken) {
             try {
                 const decoded = jwtDecode(savedToken);
-                setUser({ username: decoded.sub, id: decoded.id });
+                setUser({ username: decoded.sub, id: decoded.id, role: decoded.role });
                 setToken(savedToken);
             } catch (err) {
                 logout(); // Token lỗi
@@ -50,7 +50,11 @@ export function AuthProvider({ children }) {
             setUser({ username: decoded.sub, customerId });
             setToken(token);
         } catch (error) {
-            throw new Error(error.message);
+            if (error.response?.status === 409) {
+                alert("Vui lòng kiểm tra email để xác nhận liên kết trước khi đăng nhập!");
+            } else {
+                console.error("Lỗi đăng nhập:", error);
+            }
         }
     };
 
