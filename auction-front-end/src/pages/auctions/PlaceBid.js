@@ -2,13 +2,25 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import apiConfig from "../../config/apiConfig";
 
-const PlaceBid = ({ auctionId, currentPrice, bidStep, token: propToken, customerId: propCustomerId }) => {
+const PlaceBid = ({
+                      auctionId,
+                      currentPrice,
+                      bidStep,
+                      startingPrice,
+                      token: propToken,
+                      customerId: propCustomerId,
+                      ownerId // 👈 Thêm ownerId để kiểm tra người đăng bài
+                  }) => {
     const [bidAmount, setBidAmount] = useState("");
+    const [depositAmount, setDepositAmount] = useState(0);
+    const [showPaymentOptions, setShowPaymentOptions] = useState(false);
     const [error, setError] = useState("");
     const [token, setToken] = useState(propToken || localStorage.getItem("token"));
     const [customerId, setCustomerId] = useState(propCustomerId || localStorage.getItem("customerId"));
 
     const minBid = currentPrice + bidStep;
+
+    const isOwner = customerId === ownerId; // ✅ Kiểm tra nếu là chủ bài
 
     useEffect(() => {
         console.log("[DEBUG] Token từ props:", propToken);
@@ -33,8 +45,19 @@ const PlaceBid = ({ auctionId, currentPrice, bidStep, token: propToken, customer
         console.log("[DEBUG] customerId state sau update:", customerId);
     }, [customerId, propCustomerId]);
 
+    useEffect(() => {
+        // 💰 Tính tiền đặt cọc dựa trên giá khởi điểm (VD: 10%)
+        setDepositAmount(startingPrice * 0.1);
+    }, [startingPrice]);
+
     const handleBidSubmit = async (e) => {
         e.preventDefault();
+
+        if (isOwner) {
+            setError("Bạn không thể tham gia đấu giá sản phẩm của chính mình.");
+            return;
+        }
+
         const numericBid = parseFloat(bidAmount);
 
         console.log("🚀 [DEBUG] Token trước khi gửi bid:", token);
@@ -61,35 +84,103 @@ const PlaceBid = ({ auctionId, currentPrice, bidStep, token: propToken, customer
 
         try {
             await axios.post(
-                `${apiConfig.bids}`,
-                { auctionId, bidAmount: numericBid, customerId }, // Sửa key từ currentPrice -> bidAmount
+                `${apiConfig.bids}/auction/${auctionId}`,
+                { bidAmount: numericBid },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
             setBidAmount("");
             setError("");
-            alert("🎉 Đặt giá thành công!");
+            // alert("🎉 Đặt giá thành công!");
+            // 🆕 Hiển thị lựa chọn thanh toán sau khi đặt giá thành công
+            setShowPaymentOptions(true);
         } catch (err) {
             console.error("❌ [ERROR] Bid thất bại:", err.response?.data || err.message);
             setError(err.response?.data?.message || "Gửi giá đấu thất bại. Vui lòng thử lại.");
         }
     };
 
+    const handlePayment = async (method) => {
+        if (!auctionId) {
+            console.error("❌ [ERROR] auctionId bị undefined!");
+            setError("Lỗi: Không tìm thấy auctionId.");
+            return;
+        }
+
+        try {
+            console.log("🔄 [DEBUG] Gửi thanh toán:", { customerId, auctionId, depositAmount, method });
+
+            const response = await axios.post(
+                `${apiConfig.transactions}/create`,
+                {
+                    customerId,
+                    auctionId,
+                    amount: parseFloat(depositAmount),
+                    paymentMethod: method,
+                    returnUrl: window.location.href // Gửi returnUrl từ frontend
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            const { redirectUrl } = response.data;
+            if (redirectUrl) {
+                window.location.href = redirectUrl; // Chuyển hướng đến trang thanh toán
+            } else {
+                alert("Không thể tạo giao dịch. Vui lòng thử lại!");
+            }
+        } catch (err) {
+            console.error("❌ [ERROR] Thanh toán thất bại:", err.response?.data || err.message);
+            setError("Thanh toán thất bại. Vui lòng thử lại.");
+        }
+    };
+
     return (
-        <form onSubmit={handleBidSubmit} style={{ marginTop: "1rem" }}>
-            <input
-                type="number"
-                placeholder={`Nhập từ ${minBid.toLocaleString()} VNĐ`}
-                value={bidAmount}
-                onChange={(e) => setBidAmount(e.target.value)}
-                min={minBid}
-                style={{ padding: "0.5rem", marginRight: "0.5rem" }}
-            />
-            <button type="submit" style={{ padding: "0.5rem 1rem" }}>
-                Đặt giá
-            </button>
-            {error && <p style={{ color: "red", marginTop: "0.5rem" }}>{error}</p>}
-        </form>
+        <>
+            <form onSubmit={handleBidSubmit} style={{ marginTop: "1rem" }}>
+                <input
+                    type="number"
+                    placeholder={`Nhập từ ${minBid.toLocaleString()} VNĐ`}
+                    value={bidAmount}
+                    onChange={(e) => setBidAmount(e.target.value)}
+                    min={minBid}
+                    style={{ padding: "0.5rem", marginRight: "0.5rem" }}
+                    disabled={isOwner} // ❌ Không cho nhập nếu là chủ bài
+                />
+                <button type="submit" style={{ padding: "0.5rem 1rem" }} disabled={isOwner}>
+                    Đặt giá
+                </button>
+                {error && <p style={{ color: "red", marginTop: "0.5rem" }}>{error}</p>}
+                {isOwner && (
+                    <p style={{ color: "orange", marginTop: "0.5rem" }}>
+                        Bạn không thể đấu giá sản phẩm do chính mình đăng.
+                    </p>
+                )}
+            </form>
+
+            {showPaymentOptions && (
+                <div style={{ marginTop: "1rem" }}>
+                    <h3>Chọn phương thức thanh toán:</h3>
+                    <p><strong>Số tiền đặt cọc:</strong> {depositAmount.toLocaleString('vi-VN')} VNĐ</p>
+                    <button
+                        onClick={() => handlePayment("PAYPAL")}
+                        style={{
+                            padding: "0.5rem 1rem",
+                            marginRight: "0.5rem",
+                            backgroundColor: "#0070ba",
+                            color: "#fff"
+                        }}
+                    >
+                        Thanh toán bằng PayPal
+                    </button>
+                    <button
+                        onClick={() => handlePayment("VNPAY")}
+                        style={{ padding: "0.5rem 1rem", backgroundColor: "#e41e25", color: "#fff" }}
+                    >
+                        Thanh toán bằng VNPAY
+                    </button>
+                </div>
+            )}
+        </>
     );
 };
 

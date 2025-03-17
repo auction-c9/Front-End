@@ -71,6 +71,7 @@ export default {
         google: `${API_BASE_URL}/auth/google`
     },
     auctions: `${API_BASE_URL}/auctions`,
+    transactions: `${API_BASE_URL}/transactions`,
 };
 
 export {

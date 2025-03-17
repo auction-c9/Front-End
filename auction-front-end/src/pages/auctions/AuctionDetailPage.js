@@ -1,6 +1,5 @@
-// AuctionDetailPage.js
-import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import apiConfig from "../../config/apiConfig";
 import PlaceBid from "./PlaceBid";
@@ -8,82 +7,91 @@ import Header from "../../pages/Header";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { useAuth } from "../../context/AuthContext";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import "../../styles/AuctionDetailPage.css";
 
 const AuctionDetailPage = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const { token, user } = useAuth();
     const customerId = user?.id;
 
     const [auction, setAuction] = useState(null);
-    const [currentPrice, setCurrentPrice] = useState(0);
-    const [priceUpdated, setPriceUpdated] = useState(false); // Hiệu ứng khi giá thay đổi
-    const startingPriceRef = useRef(null);
-    const [depositAmount, setDepositAmount] = useState(0);
-    const [highestBidder, setHighestBidder] = useState("");
     const [bidHistory, setBidHistory] = useState([]);
+    const [highestBidder, setHighestBidder] = useState("Chưa có");
     const [timeLeft, setTimeLeft] = useState("");
+    const [priceUpdated, setPriceUpdated] = useState(false);
+    const [stompClient, setStompClient] = useState(null);
 
-    const formatCurrency = (value) => value?.toLocaleString('vi-VN') + ' VNĐ';
-
+    // ===== LẤY DỮ LIỆU ĐẤU GIÁ =====
     useEffect(() => {
-        const socket = new SockJS('http://localhost:8080/ws-auction');
+        if (!id) {
+            navigate("/not-found");
+            return;
+        }
+
+        const fetchAuctionData = async () => {
+            try {
+                const res = await axios.get(`${apiConfig.auctions}/${id}`);
+                setAuction(res.data);
+                updateTimeLeft(res.data.auctionEndTime);
+            } catch (error) {
+                console.error("Lỗi khi lấy dữ liệu đấu giá:", error);
+                navigate("/not-found");
+            }
+        };
+
+        fetchAuctionData();
+    }, [id, navigate]);
+
+    // ===== LỊCH SỬ ĐẤU GIÁ VÀ KẾT NỐI WEBSOCKET =====
+    useEffect(() => {
+        if (!token || !id) return;
+
+        const fetchBidHistory = async () => {
+            try {
+                const res = await axios.get(`${apiConfig.bids}/auction/${id}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                setBidHistory(res.data);
+                updateHighestBidder(res.data);
+            } catch (error) {
+                console.error("Lỗi lấy lịch sử đấu giá:", error);
+            }
+        };
+
+        fetchBidHistory();
+
+        const socket = new SockJS("http://localhost:8080/ws-auction");
         const client = new Client({
             webSocketFactory: () => socket,
             onConnect: () => {
-                console.log("Connected to WebSocket");
+                console.log("Đã kết nối WebSocket");
                 client.subscribe(`/topic/auction/${id}`, (message) => {
-                    const bidUpdate = JSON.parse(message.body);
-                    setCurrentPrice(bidUpdate.currentPrice);
-                    setHighestBidder(bidUpdate.highestBidder);
-                    setBidHistory(bidUpdate.bidHistory);
+                    const newBid = JSON.parse(message.body);
+                    setBidHistory((prev) => [newBid, ...prev]);
+                    setHighestBidder(newBid.user?.username || "Ẩn danh");
                     setPriceUpdated(true);
-                    setTimeout(() => setPriceUpdated(false), 1000); // Hiệu ứng highlight trong 1s
+                    setTimeout(() => setPriceUpdated(false), 1000);
                 });
             },
-            onStompError: (error) => console.error("WebSocket error: ", error),
+            onStompError: (err) => console.error("Lỗi WebSocket:", err),
         });
         client.activate();
-        return () => client.deactivate();
-    }, [id]);
+        setStompClient(client);
 
+        return () => client.deactivate(); // cleanup
+    }, [id, token]);
+
+    // ===== ĐẾM NGƯỢC THỜI GIAN =====
     useEffect(() => {
-        const auctionId = parseInt(id, 10);  // Ép kiểu id thành số nguyên
-
-        if (isNaN(auctionId)) {
-            console.error("ID không hợp lệ:", id);
-            return;
-        }
-        axios
-            .get(`${apiConfig.auctions}/${id}`)
-            .then((response) => {
-                const data = response.data;
-                console.log("Dữ liệu API trả về:", response.data);
-                console.log("Dữ liệu sản phẩm:", response.data.product);  // 🔍 Kiểm tra thông tin sản phẩm
-                console.log("Danh sách ảnh:", response.data.product?.images); // 🔍 Kiểm tra danh sách ảnh
-                setAuction(data);
-                setCurrentPrice(data.currentPrice);
-                setHighestBidder(data.highestBidder || "Chưa có");
-                setBidHistory(data.bidHistory || []);
-                if (startingPriceRef.current === null) {
-                    startingPriceRef.current = data.currentPrice;
-                    setDepositAmount(data.currentPrice * 0.05);
-                }
-                updateTimeLeft(data.auctionEndTime);
-                console.log("Danh sách ảnh:", data.product?.images);
-            })
-            .catch((error) => console.error("Lỗi khi lấy chi tiết phiên đấu giá:", error));
-    }, [id]);
-
-    useEffect(() => {
-        let interval;
-        if (auction?.auctionEndTime) {
-            interval = setInterval(() => updateTimeLeft(auction.auctionEndTime), 1000);
-        }
+        if (!auction?.auctionEndTime) return;
+        const interval = setInterval(() => updateTimeLeft(auction.auctionEndTime), 1000);
         return () => clearInterval(interval);
     }, [auction]);
 
-    function updateTimeLeft(endTime) {
+    // ===== CÁC HÀM HỖ TRỢ =====
+    const updateTimeLeft = (endTime) => {
         const now = new Date();
         const end = new Date(endTime);
         const diff = end - now;
@@ -94,119 +102,77 @@ const AuctionDetailPage = () => {
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff / (1000 * 60)) % 60);
         const seconds = Math.floor((diff / 1000) % 60);
-        setTimeLeft(`${hours > 0 ? `${hours}g ` : ""}${minutes}p ${seconds}s còn lại`);
-    }
+        setTimeLeft(`${hours > 0 ? `${hours}g ` : ""}${minutes}p ${seconds}s`);
+    };
 
-    if (!auction) return <p>Đang tải dữ liệu...</p>;
+    const updateHighestBidder = (bids) => {
+        if (bids.length > 0) {
+            const highest = bids.reduce((max, bid) => (bid.bidAmount > max.bidAmount ? bid : max), bids[0]);
+            setHighestBidder(highest.user?.username || "Ẩn danh");
+        } else {
+            setHighestBidder("Chưa có");
+        }
+    };
+
+    // ===== TÍNH GIÁ TRỊ =====
+    const startingPrice = parseFloat(auction?.currentPrice) || 0;
+    const depositAmount = startingPrice * 0.1;
+    const bidStep = parseFloat(auction?.bidStep) || 0;
+    const highestBidAmount = bidHistory[0]?.bidAmount || startingPrice;
+
+    if (!auction) return <p className="loading-text">Đang tải dữ liệu...</p>;
 
     return (
         <>
             <Header />
-            <div className="container">
-                <motion.h2
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                >
-                    {auction.product?.name || "Chưa có tên sản phẩm"}
-                </motion.h2>
-                <p>{auction.product?.description || "Chưa có mô tả"}</p>
+            <motion.h2 className="auction-title">{auction?.product?.name || "Sản phẩm chưa xác định"}</motion.h2>
+            <div className="auction-detail">
+                <div className="auction-content">
+                    <div className="auction-image">
+                        {auction.product?.image && (
+                            <img src={auction.product.image} alt={auction.product.name} className="product-image" />
+                        )}
+                    </div>
 
-                <div className="info-section">
-                    <div className="info-left">
-                        <div><strong>Giá khởi điểm:</strong> {formatCurrency(startingPriceRef.current)}</div>
-                        <div><strong>Giá đặt cọc:</strong> {formatCurrency(depositAmount)}</div>
-                        <motion.div
-                            className={`current-price ${priceUpdated ? 'highlight' : ''}`}
-                            animate={{ scale: priceUpdated ? 1.1 : 1 }}
-                            transition={{ type: "spring", stiffness: 300 }}
-                        >
-                            <strong>Giá hiện tại:</strong> {formatCurrency(currentPrice)}
-                        </motion.div>
-                        <div><strong>Người đấu giá cao nhất:</strong> <span style={{ color: 'blue' }}>{highestBidder}</span></div>
-                        <div><strong>Bước giá:</strong> {formatCurrency(auction.bidStep)}</div>
-                        <div><strong>Thời gian còn lại:</strong> <span style={{ color: 'red' }}>{timeLeft}</span></div>
+                    <div className="auction-info">
+                        <p>{auction.product?.description || "Không có mô tả"}</p>
+                        <div className="info-section">
+                            <div><strong>Giá khởi điểm:</strong> {startingPrice.toLocaleString('vi-VN')} VNĐ</div>
+                            <div><strong>Giá đặt cọc:</strong> {depositAmount.toLocaleString('vi-VN')} VNĐ</div>
+                            <div><strong>Bước giá:</strong> {bidStep.toLocaleString('vi-VN')} VNĐ</div>
+
+                            <motion.div
+                                className={`current-price ${priceUpdated ? "highlight" : ""}`}
+                                animate={{ scale: priceUpdated ? 1.1 : 1 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                Giá hiện tại: {highestBidAmount.toLocaleString('vi-VN')} VNĐ
+                            </motion.div>
+
+                            <div><strong>Người cao nhất:</strong> <span className="highest-bidder">{highestBidder}</span></div>
+                            <div><strong>Thời gian còn lại:</strong> <span className="time-left">{timeLeft}</span></div>
+                        </div>
 
                         <PlaceBid
                             auctionId={auction.auctionId}
-                            currentPrice={currentPrice}
-                            bidStep={auction.bidStep}
+                            currentPrice={highestBidAmount}
+                            bidStep={bidStep}
                             token={token}
                             customerId={customerId}
                         />
                     </div>
-                    <div className="info-right">
-                        <AnimatePresence>
-                            {auction.product?.image ? (
-                                <motion.img
-                                    src={auction.product.image}
-                                    alt={auction.product.name || 'Sản phẩm'}
-                                    onError={(e) => { e.target.src = '/default-image.jpg'; }}
-                                    className="product-image"
-                                />
-                            ) : (
-                                <img src="/default-image.jpg" alt="Sản phẩm" className="product-image" />
-                            )}
-                        </AnimatePresence>
-                    </div>
                 </div>
 
-                <h3>Lịch sử đấu giá</h3>
+                <h3 className="bid-history-title">Lịch sử đấu giá</h3>
                 <ul className="bid-history">
-                    {bidHistory.length > 0 ? (
-                        bidHistory.map((bid, index) => (
-                            <li key={index}>
-                                <strong>{bid.customerName}</strong> đã đặt <span>{formatCurrency(bid.bidAmount)}</span> lúc <em>{new Date(bid.timestamp).toLocaleTimeString('vi-VN')}</em>
-                            </li>
-                        ))
-                    ) : (
-                        <p>Chưa có lượt đấu giá nào.</p>
-                    )}
+                    {bidHistory.map((bid) => (
+                        <li key={bid.bidId}>
+                            <strong>{bid.user?.username}</strong> - <span>{bid.bidAmount.toLocaleString('vi-VN')} VNĐ</span>
+                            <em> lúc {new Date(bid.bidTime).toLocaleString('vi-VN')}</em>
+                        </li>
+                    ))}
                 </ul>
             </div>
-
-            {/* CSS nội bộ hoặc tách file riêng */}
-            <style jsx>{`
-                .container {
-                    max-width: 900px;
-                    margin: 0 auto;
-                    padding: 1rem;
-                }
-                .info-section {
-                    display: flex;
-                    gap: 1.5rem;
-                    flex-wrap: wrap;
-                }
-                .info-left {
-                    flex: 1 1 50%;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.75rem;
-                }
-                .info-right {
-                    flex: 1 1 40%;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.75rem;
-                }
-                .product-image {
-                    width: 100%;
-                    max-width: 350px;
-                    height: auto;
-                    border-radius: 12px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                }
-                .highlight {
-                    background: #fffae6;
-                    padding: 0.25rem;
-                    border-radius: 4px;
-                    transition: background 0.5s ease;
-                }
-                .bid-history li {
-                    padding: 0.25rem 0;
-                    border-bottom: 1px solid #eee;
-                }
-            `}</style>
         </>
     );
 };
