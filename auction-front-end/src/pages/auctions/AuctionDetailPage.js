@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import apiConfig from "../../config/apiConfig";
 import PlaceBid from "./PlaceBid";
@@ -11,19 +11,27 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const AuctionDetailPage = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const { token, user } = useAuth();
     const customerId = user?.id;
 
     const [auction, setAuction] = useState(null);
     const [currentPrice, setCurrentPrice] = useState(0);
-    const [priceUpdated, setPriceUpdated] = useState(false); // Hiệu ứng khi giá thay đổi
+    const [priceUpdated, setPriceUpdated] = useState(false);
     const startingPriceRef = useRef(null);
     const [depositAmount, setDepositAmount] = useState(0);
     const [highestBidder, setHighestBidder] = useState("");
     const [bidHistory, setBidHistory] = useState([]);
     const [timeLeft, setTimeLeft] = useState("");
 
-    const formatCurrency = (value) => value?.toLocaleString('vi-VN') + ' VNĐ';
+    console.log("useParams():", useParams()); // Debugging
+
+    useEffect(() => {
+        if (!id) {
+            console.error("ID không hợp lệ:", id);
+            navigate("/not-found");
+        }
+    }, [id, navigate]);
 
     useEffect(() => {
         const socket = new SockJS('http://localhost:8080/ws-auction');
@@ -37,7 +45,7 @@ const AuctionDetailPage = () => {
                     setHighestBidder(bidUpdate.highestBidder);
                     setBidHistory(bidUpdate.bidHistory);
                     setPriceUpdated(true);
-                    setTimeout(() => setPriceUpdated(false), 1000); // Hiệu ứng highlight trong 1s
+                    setTimeout(() => setPriceUpdated(false), 1000);
                 });
             },
             onStompError: (error) => console.error("WebSocket error: ", error),
@@ -47,19 +55,14 @@ const AuctionDetailPage = () => {
     }, [id]);
 
     useEffect(() => {
-        const auctionId = parseInt(id, 10);  // Ép kiểu id thành số nguyên
-
-        if (isNaN(auctionId)) {
-            console.error("ID không hợp lệ:", id);
-            return;
-        }
         axios
             .get(`${apiConfig.auctions}/${id}`)
             .then((response) => {
                 const data = response.data;
-                console.log("Dữ liệu API trả về:", response.data);
-                console.log("Dữ liệu sản phẩm:", response.data.product);  // 🔍 Kiểm tra thông tin sản phẩm
-                console.log("Danh sách ảnh:", response.data.product?.images); // 🔍 Kiểm tra danh sách ảnh
+                if (!data) {
+                    console.error("Dữ liệu phiên đấu giá không hợp lệ");
+                    return;
+                }
                 setAuction(data);
                 setCurrentPrice(data.currentPrice);
                 setHighestBidder(data.highestBidder || "Chưa có");
@@ -69,9 +72,10 @@ const AuctionDetailPage = () => {
                     setDepositAmount(data.currentPrice * 0.05);
                 }
                 updateTimeLeft(data.auctionEndTime);
-                console.log("Danh sách ảnh:", data.product?.images);
             })
-            .catch((error) => console.error("Lỗi khi lấy chi tiết phiên đấu giá:", error));
+            .catch((error) => {
+                console.error("Lỗi khi lấy chi tiết phiên đấu giá:", error);
+            });
     }, [id]);
 
     useEffect(() => {
@@ -83,6 +87,7 @@ const AuctionDetailPage = () => {
     }, [auction]);
 
     function updateTimeLeft(endTime) {
+        if (!endTime) return;
         const now = new Date();
         const end = new Date(endTime);
         const diff = end - now;
@@ -102,111 +107,31 @@ const AuctionDetailPage = () => {
         <>
             <Header />
             <div className="container">
-                <motion.h2
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                >
-                    {auction.product?.name || "Chưa có tên sản phẩm"}
-                </motion.h2>
+                <motion.h2>{auction.product?.name || "Chưa có tên sản phẩm"}</motion.h2>
                 <p>{auction.product?.description || "Chưa có mô tả"}</p>
-
                 <div className="info-section">
                     <div className="info-left">
-                        <div><strong>Giá khởi điểm:</strong> {formatCurrency(startingPriceRef.current)}</div>
-                        <div><strong>Giá đặt cọc:</strong> {formatCurrency(depositAmount)}</div>
-                        <motion.div
-                            className={`current-price ${priceUpdated ? 'highlight' : ''}`}
-                            animate={{ scale: priceUpdated ? 1.1 : 1 }}
-                            transition={{ type: "spring", stiffness: 300 }}
-                        >
-                            <strong>Giá hiện tại:</strong> {formatCurrency(currentPrice)}
+                        <div><strong>Giá khởi điểm:</strong> {startingPriceRef.current?.toLocaleString('vi-VN')} VNĐ</div>
+                        <div><strong>Giá đặt cọc:</strong> {depositAmount.toLocaleString('vi-VN')} VNĐ</div>
+                        <motion.div className={`current-price ${priceUpdated ? 'highlight' : ''}`}>
+                            <strong>Giá hiện tại:</strong> {currentPrice.toLocaleString('vi-VN')} VNĐ
                         </motion.div>
                         <div><strong>Người đấu giá cao nhất:</strong> <span style={{ color: 'blue' }}>{highestBidder}</span></div>
-                        <div><strong>Bước giá:</strong> {formatCurrency(auction.bidStep)}</div>
+                        <div><strong>Bước giá:</strong> {auction.bidStep.toLocaleString('vi-VN')} VNĐ</div>
                         <div><strong>Thời gian còn lại:</strong> <span style={{ color: 'red' }}>{timeLeft}</span></div>
-
-                        <PlaceBid
-                            auctionId={auction.auctionId}
-                            currentPrice={currentPrice}
-                            bidStep={auction.bidStep}
-                            token={token}
-                            customerId={customerId}
-                            startingPrice={startingPriceRef.current}
-                        />
+                        <PlaceBid auctionId={auction.auctionId} currentPrice={currentPrice} bidStep={auction.bidStep} token={token} customerId={customerId} />
                     </div>
                     <div className="info-right">
                         <AnimatePresence>
                             {auction.product?.image ? (
-                                <motion.img
-                                    src={auction.product.image}
-                                    alt={auction.product.name || 'Sản phẩm'}
-                                    onError={(e) => { e.target.src = '/default-image.jpg'; }}
-                                    className="product-image"
-                                />
+                                <motion.img src={auction.product.image} alt={auction.product.name || 'Sản phẩm'} className="product-image" />
                             ) : (
                                 <img src="/default-image.jpg" alt="Sản phẩm" className="product-image" />
                             )}
                         </AnimatePresence>
                     </div>
                 </div>
-
-                <h3>Lịch sử đấu giá</h3>
-                <ul className="bid-history">
-                    {bidHistory.length > 0 ? (
-                        bidHistory.map((bid, index) => (
-                            <li key={index}>
-                                <strong>{bid.customerName}</strong> đã đặt <span>{formatCurrency(bid.bidAmount)}</span> lúc <em>{new Date(bid.timestamp).toLocaleTimeString('vi-VN')}</em>
-                            </li>
-                        ))
-                    ) : (
-                        <p>Chưa có lượt đấu giá nào.</p>
-                    )}
-                </ul>
             </div>
-
-            {/* CSS nội bộ hoặc tách file riêng */}
-            <style jsx>{`
-                .container {
-                    max-width: 900px;
-                    margin: 0 auto;
-                    padding: 1rem;
-                }
-                .info-section {
-                    display: flex;
-                    gap: 1.5rem;
-                    flex-wrap: wrap;
-                }
-                .info-left {
-                    flex: 1 1 50%;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.75rem;
-                }
-                .info-right {
-                    flex: 1 1 40%;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.75rem;
-                }
-                .product-image {
-                    width: 100%;
-                    max-width: 350px;
-                    height: auto;
-                    border-radius: 12px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                }
-                .highlight {
-                    background: #fffae6;
-                    padding: 0.25rem;
-                    border-radius: 4px;
-                    transition: background 0.5s ease;
-                }
-                .bid-history li {
-                    padding: 0.25rem 0;
-                    border-bottom: 1px solid #eee;
-                }
-            `}</style>
         </>
     );
 };
