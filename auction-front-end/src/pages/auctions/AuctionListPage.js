@@ -88,7 +88,7 @@ const AuctionListPage = () => {
                                             MSRP {auction.product?.msrp ? `€${auction.product.msrp}` : 'N/A'}
                                         </Card.Text>
                                         <Card.Text style={{ fontSize: '1rem', fontWeight: 'bold', color: '#007bff' }}>
-                                            {auction.currentPrice.toLocaleString('vi-VN')} VND
+                                            {auction.currentPrice.toLocaleString('vi-VN')} VNĐ
                                         </Card.Text>
                                         <Card.Text
                                             style={{
