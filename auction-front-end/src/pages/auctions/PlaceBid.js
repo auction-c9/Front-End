@@ -2,13 +2,9 @@ import React, {useState, useEffect} from "react";
 import axios from "axios";
 import apiConfig from "../../config/apiConfig";
 
-const PlaceBid = ({auctionId, startingPrice, currentPrice, bidStep, token: propToken, customerId: propCustomerId}) => {
+const PlaceBid = ({ auctionId, currentPrice, bidStep, token: propToken, customerId: propCustomerId }) => {
     const [bidAmount, setBidAmount] = useState("");
-    const [depositAmount, setDepositAmount] = useState(0);
-
     const [error, setError] = useState("");
-    const [showPaymentOptions, setShowPaymentOptions] = useState(false); // 🆕 Hiển thị phương thức thanh toán
-
     const [token, setToken] = useState(propToken || localStorage.getItem("token"));
     const [customerId, setCustomerId] = useState(propCustomerId || localStorage.getItem("customerId"));
 
@@ -43,13 +39,12 @@ const PlaceBid = ({auctionId, startingPrice, currentPrice, bidStep, token: propT
     }, [startingPrice]);
 
     const handleBidSubmit = async (e) => {
-
         e.preventDefault();
         const numericBid = parseFloat(bidAmount);
 
         console.log("🚀 [DEBUG] Token trước khi gửi bid:", token);
         console.log("🚀 [DEBUG] customerId trước khi gửi bid:", customerId);
-        console.log("🚀 [DEBUG] Headers gửi đi:", {Authorization: `Bearer ${token}`});
+        console.log("🚀 [DEBUG] Headers gửi đi:", { Authorization: `Bearer ${token}` });
 
         if (!token) {
             setError("Bạn cần đăng nhập để đấu giá.");
@@ -71,10 +66,11 @@ const PlaceBid = ({auctionId, startingPrice, currentPrice, bidStep, token: propT
 
         try {
             await axios.post(
-                `${apiConfig.bids}`,
-                {auctionId, bidAmount: numericBid, customerId}, // Sửa key từ currentPrice -> bidAmount
-                {headers: {Authorization: `Bearer ${token}`}}
+                `${apiConfig.bids}/auction/${auctionId}`, // Kiểm tra auctionId có bị undefined không?
+                { bidAmount: numericBid },
+                { headers: { Authorization: `Bearer ${token}` } }
             );
+
             setBidAmount("");
             setError("");
             // alert("🎉 Đặt giá thành công!");

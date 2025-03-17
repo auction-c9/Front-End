@@ -63,7 +63,7 @@ export function AuthProvider({ children }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, loading, login: AuthService.login,loginWithGoogle , logout,setUser,setToken }}>
+        <AuthContext.Provider value={{ user, token, loading, login,loginWithGoogle , logout,setUser,setToken }}>
             {children}
         </AuthContext.Provider>
     );
