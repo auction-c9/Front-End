@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
-import * as AuthService from "../services/AuthService";
+import * as AuthService from '../services/AuthService';
 
 const AuthContext = createContext();
 
@@ -9,7 +9,6 @@ export function AuthProvider({ children }) {
     const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // Khi load lại trang, lấy token từ localStorage và decode
     useEffect(() => {
         const initializeAuth = () => {
         const savedToken = localStorage.getItem('token');
@@ -18,10 +17,10 @@ export function AuthProvider({ children }) {
         if (savedToken) {
             try {
                 const decoded = jwtDecode(savedToken);
-                setUser({ username: decoded.sub ,customerId: savedCustomerId});
+                setUser({ username: decoded.sub, id: decoded.id });
                 setToken(savedToken);
             } catch (err) {
-                logout();
+                logout(); // Token lỗi
             }
         }
         setLoading(false);};
@@ -34,9 +33,9 @@ export function AuthProvider({ children }) {
             const { token } = await AuthService.login(credentials);
             localStorage.setItem('token', token);
             const decoded = jwtDecode(token);
-            setUser({ username: decoded.sub });
+            setUser({ username: decoded.sub, id: decoded.id });
             setToken(token);
-        } catch (err) {
+        } catch {
             throw new Error('Đăng nhập thất bại');
         }
     };
@@ -58,10 +57,9 @@ export function AuthProvider({ children }) {
     // Hàm đăng xuất
     const logout = () => {
         localStorage.removeItem('token');
-        localStorage.removeItem('customerId'); // Nếu có lưu customerId
         setUser(null);
         setToken(null);
-        window.location.href = "/login"; // Điều hướng về login
+        window.location.href = '/login';
     };
 
     return (

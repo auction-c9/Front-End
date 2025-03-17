@@ -2,13 +2,11 @@ import React, {useState, useEffect} from "react";
 import axios from "axios";
 import apiConfig from "../../config/apiConfig";
 
-const PlaceBid = ({auctionId, startingPrice, currentPrice, bidStep, token: propToken, customerId: propCustomerId}) => {
+const PlaceBid = ({ auctionId, currentPrice, bidStep, startingPrice, token: propToken, customerId: propCustomerId }) => {
     const [bidAmount, setBidAmount] = useState("");
     const [depositAmount, setDepositAmount] = useState(0);
-
+    const [showPaymentOptions, setShowPaymentOptions] = useState(false);
     const [error, setError] = useState("");
-    const [showPaymentOptions, setShowPaymentOptions] = useState(false); // 🆕 Hiển thị phương thức thanh toán
-
     const [token, setToken] = useState(propToken || localStorage.getItem("token"));
     const [customerId, setCustomerId] = useState(propCustomerId || localStorage.getItem("customerId"));
 
@@ -39,17 +37,16 @@ const PlaceBid = ({auctionId, startingPrice, currentPrice, bidStep, token: propT
 
     useEffect(() => {
         // 💰 Tính tiền đặt cọc dựa trên giá khởi điểm (VD: 10%)
-        setDepositAmount(startingPrice * 0.05);
+        setDepositAmount(startingPrice * 0.1);
     }, [startingPrice]);
 
     const handleBidSubmit = async (e) => {
-
         e.preventDefault();
         const numericBid = parseFloat(bidAmount);
 
         console.log("🚀 [DEBUG] Token trước khi gửi bid:", token);
         console.log("🚀 [DEBUG] customerId trước khi gửi bid:", customerId);
-        console.log("🚀 [DEBUG] Headers gửi đi:", {Authorization: `Bearer ${token}`});
+        console.log("🚀 [DEBUG] Headers gửi đi:", { Authorization: `Bearer ${token}` });
 
         if (!token) {
             setError("Bạn cần đăng nhập để đấu giá.");
@@ -75,6 +72,7 @@ const PlaceBid = ({auctionId, startingPrice, currentPrice, bidStep, token: propT
                 { bidAmount: numericBid },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
+
             setBidAmount("");
             setError("");
             // alert("🎉 Đặt giá thành công!");
