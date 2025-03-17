@@ -65,7 +65,9 @@ const ChatBox = () => {
             {isOpen && (
                 <div className="chat-box">
                     <div className="chat-header">
-                        <span>Hỗ trợ khách hàng</span>
+                        <div className="chat-header custom-shadow">
+                            Hỗ trợ tư vấn
+                        </div>
                         <button className="chat-close-btn" onClick={() => setIsOpen(false)}>⨉</button>
                     </div>
                     <div className="chat-messages">
