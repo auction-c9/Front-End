@@ -51,7 +51,11 @@ export function AuthProvider({ children }) {
             setUser({ username: decoded.sub, customerId });
             setToken(token);
         } catch (error) {
-            throw new Error(error.message);
+            if (error.response?.status === 409) {
+                alert("Vui lòng kiểm tra email để xác nhận liên kết trước khi đăng nhập!");
+            } else {
+                console.error("Lỗi đăng nhập:", error);
+            }
         }
     };
 
@@ -65,7 +69,7 @@ export function AuthProvider({ children }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, loading, login: AuthService.login,loginWithGoogle , logout,setUser,setToken }}>
+        <AuthContext.Provider value={{ user, token, loading, login,loginWithGoogle , logout,setUser,setToken }}>
             {children}
         </AuthContext.Provider>
     );

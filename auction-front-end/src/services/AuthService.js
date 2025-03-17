@@ -2,11 +2,6 @@
 import { api,setToken, clearTokens } from '../config/apiConfig';
 import ENDPOINTS from '../config/apiConfig';
 
-/**
- * Đăng nhập vào hệ thống
- * @param {Object} credentials - Thông tin đăng nhập (username, password, …)
- * @returns {Promise<Object>} Dữ liệu phản hồi từ server (token, setToken, customerId, …)
- */
 const login = async (credentials) => {
     try {
         console.log("Dữ liệu gửi lên server (credentials):", JSON.stringify(credentials, null, 2));
@@ -62,8 +57,14 @@ const loginWithGoogle = async (googleToken) => {
 
         return response.data;
     } catch (error) {
-        console.error("❌ Lỗi đăng nhập Google:", error.response?.data || error.message);
-        throw new Error(error.response?.data?.message || 'Đăng nhập bằng Google thất bại');
+        if (error.response?.status === 409) {
+            // Hiển thị thông báo yêu cầu xác nhận email
+            alert("Vui lòng kiểm tra email để xác nhận liên kết tài khoản!");
+        }else
+            {
+                console.error("❌ Lỗi đăng nhập Google:", error.response?.data || error.message);
+                throw new Error(error.response?.data?.message || 'Đăng nhập bằng Google thất bại');
+            }
     }
 };
 
