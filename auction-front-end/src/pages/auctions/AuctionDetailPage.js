@@ -21,7 +21,6 @@ const AuctionDetailPage = () => {
     const [highestBidder, setHighestBidder] = useState("Chưa có");
     const [timeLeft, setTimeLeft] = useState("");
     const [priceUpdated, setPriceUpdated] = useState(false);
-    const [stompClient, setStompClient] = useState(null);
 
     // ===== LẤY DỮ LIỆU ĐẤU GIÁ =====
     useEffect(() => {
@@ -78,7 +77,6 @@ const AuctionDetailPage = () => {
             onStompError: (err) => console.error("Lỗi WebSocket:", err),
         });
         client.activate();
-        setStompClient(client);
 
         return () => client.deactivate(); // cleanup
     }, [id, token]);
@@ -157,9 +155,11 @@ const AuctionDetailPage = () => {
                             auctionId={auction.auctionId}
                             currentPrice={highestBidAmount}
                             bidStep={bidStep}
+                            startingPrice={startingPrice} // Có thể truyền nếu cần
+                            depositAmount={depositAmount} // ✅ Thêm prop này
                             token={token}
                             customerId={customerId}
-                            depositAmount={depositAmount}
+                            ownerId={auction.product?.user?.id} // ✅ Để kiểm tra chủ sản phẩm
                         />
                     </div>
                 </div>
