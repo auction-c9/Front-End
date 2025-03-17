@@ -1,6 +1,4 @@
-
-// AuctionDetailPage.js
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import apiConfig from "../../config/apiConfig";
@@ -136,7 +134,6 @@ const AuctionDetailPage = () => {
                             customerId={customerId}
                             startingPrice={startingPriceRef.current}
                         />
-
                     </div>
                     <div className="info-right">
                         <AnimatePresence>

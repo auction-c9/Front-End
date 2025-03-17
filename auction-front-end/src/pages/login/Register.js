@@ -16,7 +16,8 @@ const Register = () => {
         password: '',
         confirmPassword: '',
         captcha: '',
-        captchaQuestion: ''
+        captchaQuestion: '',
+        avatarFile: null
     });
 
     const [captcha, setCaptcha] = useState({ question: '', answer: '' });
@@ -50,6 +51,13 @@ const Register = () => {
         });
     };
 
+    const handleFileChange = (e) => {
+        setFormData({
+            ...formData,
+            avatarFile: e.target.files[0]
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -58,9 +66,21 @@ const Register = () => {
             return;
         }
 
+        const formDataToSend = new FormData();
+        Object.keys(formData).forEach(key => {
+            if (key === 'avatarFile' && formData[key]) {
+                formDataToSend.append(key, formData[key]);
+            } else if (formData[key] !== null && formData[key] !== undefined) {
+                formDataToSend.append(key, formData[key]);
+            }
+        });
+
         try {
-            // Sửa thành api.post thay vì axios.post
-            const response = await api.post('/auth/register', formData);
+            const response = await api.post('/auth/register',  formDataToSend, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
             // Hiển thị thông báo thành công bằng Toast
             toast.success('Đăng ký thành công! Đang chuyển hướng...', {
                 autoClose: 2000,
@@ -88,7 +108,20 @@ const Register = () => {
 
                             {error && <Alert variant="danger">{error}</Alert>}
 
-                            <Form onSubmit={handleSubmit}>
+                            <Form onSubmit={handleSubmit} encType="multipart/form-data">
+                                <Row className="mb-3">
+                                    <Col md={12}>
+                                        <Form.Group controlId="avatarFile">
+                                            <Form.Label>Ảnh đại diện</Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleFileChange}
+                                                required
+                                            />
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
                                 {/* Hàng 1 - Họ tên và SĐT */}
                                 <Row className="mb-3">
                                     <Col md={6}>
