@@ -12,6 +12,7 @@ import { AuthProvider } from './context/AuthContext';
 import Profile from "./pages/profile/Profile";
 import Logout from "./pages/auth/Logout";
 import Register from "./pages/login/Register";
+import ChatBox from "./components/ChatBox";
 
 const App = () => {
     useEffect(() => {
@@ -32,6 +33,7 @@ const App = () => {
                     <Route path="/profile" element={<Profile />} />
                 </Routes>
             </AuthProvider>
+            <ChatBox/>
         </Router>
     );
 };

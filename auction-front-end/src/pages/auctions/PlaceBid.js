@@ -71,9 +71,9 @@ const PlaceBid = ({auctionId, startingPrice, currentPrice, bidStep, token: propT
 
         try {
             await axios.post(
-                `${apiConfig.bids}`,
-                {auctionId, bidAmount: numericBid, customerId}, // Sửa key từ currentPrice -> bidAmount
-                {headers: {Authorization: `Bearer ${token}`}}
+                `${apiConfig.bids}/auction/${auctionId}`, // Kiểm tra auctionId có bị undefined không?
+                { bidAmount: numericBid },
+                { headers: { Authorization: `Bearer ${token}` } }
             );
             setBidAmount("");
             setError("");

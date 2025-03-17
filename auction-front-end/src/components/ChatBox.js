@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
+import '../styles/ChatBox.css'
 
 const ChatBox = () => {
     const [stompClient, setStompClient] = useState(null);
@@ -21,7 +22,7 @@ const ChatBox = () => {
 
         client.onConnect = () => {
             console.log("Connected to WebSocket!");
-            client.subscribe("/topic/chat", (msg) => {
+            client.subscribe("/topic/messages", (msg) => {
                 const newMessage = JSON.parse(msg.body);
                 setMessages((prev) => [...prev, newMessage]);
             });
@@ -45,7 +46,7 @@ const ChatBox = () => {
     const sendMessage = () => {
         if (stompClient && stompClient.connected) {
             const chatMessage = { sender: "User", content: message };
-            stompClient.publish({ destination: "/app/chat", body: JSON.stringify(chatMessage) });
+            stompClient.publish({ destination: "/app/sendMessage", body: JSON.stringify(chatMessage) });
             setMessage("");
         } else {
             console.error("STOMP Client is not connected!");
@@ -54,40 +55,40 @@ const ChatBox = () => {
 
     return (
         <div>
-            {/* Nút mở chat */}
             <button
-                className="fixed bottom-4 right-4 bg-blue-500 text-white p-2 rounded-full shadow-lg"
+                className="chat-toggle-btn"
                 onClick={() => setIsOpen(!isOpen)}
             >
-                💬 Chat tư vấn
+                💬
             </button>
 
-            {/* Khung chat */}
             {isOpen && (
-                <div className="fixed bottom-16 right-4 w-80 bg-white border rounded shadow-lg">
-                    <div className="p-2 bg-blue-500 text-white text-center font-bold">
-                        Hỗ trợ khách hàng
+                <div className="chat-box">
+                    <div className="chat-header">
+                        <span>Hỗ trợ khách hàng</span>
+                        <button className="chat-close-btn" onClick={() => setIsOpen(false)}>⨉</button>
                     </div>
-                    <div className="p-2 h-64 overflow-auto border">
+                    <div className="chat-messages">
                         {messages.map((msg, index) => (
                             <p key={index}>
                                 <strong>{msg.sender}:</strong> {msg.content}
                             </p>
                         ))}
                     </div>
-                    <div className="p-2 border-t flex">
+                    <div className="chat-input-container">
                         <input
                             type="text"
-                            className="border flex-1 p-1"
+                            className="chat-input"
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
                         />
-                        <button className="bg-blue-500 text-white px-3 py-1" onClick={sendMessage}>
+                        <button className="chat-send-btn" onClick={sendMessage}>
                             Gửi
                         </button>
                     </div>
                 </div>
             )}
+
         </div>
     );
 };
