@@ -1,8 +1,16 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import apiConfig from "../../config/apiConfig";
 
-const PlaceBid = ({ auctionId, currentPrice, bidStep, startingPrice, token: propToken, customerId: propCustomerId }) => {
+const PlaceBid = ({
+                      auctionId,
+                      currentPrice,
+                      bidStep,
+                      startingPrice,
+                      token: propToken,
+                      customerId: propCustomerId,
+                      ownerId // 👈 Thêm ownerId để kiểm tra người đăng bài
+                  }) => {
     const [bidAmount, setBidAmount] = useState("");
     const [depositAmount, setDepositAmount] = useState(0);
     const [showPaymentOptions, setShowPaymentOptions] = useState(false);
@@ -11,6 +19,8 @@ const PlaceBid = ({ auctionId, currentPrice, bidStep, startingPrice, token: prop
     const [customerId, setCustomerId] = useState(propCustomerId || localStorage.getItem("customerId"));
 
     const minBid = currentPrice + bidStep;
+
+    const isOwner = customerId === ownerId; // ✅ Kiểm tra nếu là chủ bài
 
     useEffect(() => {
         console.log("[DEBUG] Token từ props:", propToken);
@@ -42,6 +52,12 @@ const PlaceBid = ({ auctionId, currentPrice, bidStep, startingPrice, token: prop
 
     const handleBidSubmit = async (e) => {
         e.preventDefault();
+
+        if (isOwner) {
+            setError("Bạn không thể tham gia đấu giá sản phẩm của chính mình.");
+            return;
+        }
+
         const numericBid = parseFloat(bidAmount);
 
         console.log("🚀 [DEBUG] Token trước khi gửi bid:", token);
@@ -64,11 +80,11 @@ const PlaceBid = ({ auctionId, currentPrice, bidStep, startingPrice, token: prop
             return;
         }
 
-        console.log("🔄 [DEBUG] Gửi bid:", {auctionId, bidAmount: numericBid, customerId, token});
+        console.log("🔄 [DEBUG] Gửi bid:", { auctionId, bidAmount: numericBid, customerId, token });
 
         try {
             await axios.post(
-                `${apiConfig.bids}/auction/${auctionId}`, // Kiểm tra auctionId có bị undefined không?
+                `${apiConfig.bids}/auction/${auctionId}`,
                 { bidAmount: numericBid },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -85,7 +101,6 @@ const PlaceBid = ({ auctionId, currentPrice, bidStep, startingPrice, token: prop
     };
 
     const handlePayment = async (method) => {
-
         if (!auctionId) {
             console.error("❌ [ERROR] auctionId bị undefined!");
             setError("Lỗi: Không tìm thấy auctionId.");
@@ -93,7 +108,7 @@ const PlaceBid = ({ auctionId, currentPrice, bidStep, startingPrice, token: prop
         }
 
         try {
-            console.log("🔄 [DEBUG] Gửi thanh toán:", {customerId, auctionId, depositAmount, method});
+            console.log("🔄 [DEBUG] Gửi thanh toán:", { customerId, auctionId, depositAmount, method });
 
             const response = await axios.post(
                 `${apiConfig.transactions}/create`,
@@ -102,12 +117,12 @@ const PlaceBid = ({ auctionId, currentPrice, bidStep, startingPrice, token: prop
                     auctionId,
                     amount: parseFloat(depositAmount),
                     paymentMethod: method,
-                    returnUrl: window.location.href  // Gửi returnUrl từ frontend
+                    returnUrl: window.location.href // Gửi returnUrl từ frontend
                 },
-                {headers: {Authorization: `Bearer ${token}`}}
+                { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            const {redirectUrl} = response.data;
+            const { redirectUrl } = response.data;
             if (redirectUrl) {
                 window.location.href = redirectUrl; // Chuyển hướng đến trang thanh toán
             } else {
@@ -121,23 +136,29 @@ const PlaceBid = ({ auctionId, currentPrice, bidStep, startingPrice, token: prop
 
     return (
         <>
-            <form onSubmit={handleBidSubmit} style={{marginTop: "1rem"}}>
+            <form onSubmit={handleBidSubmit} style={{ marginTop: "1rem" }}>
                 <input
                     type="number"
                     placeholder={`Nhập từ ${minBid.toLocaleString()} VNĐ`}
                     value={bidAmount}
                     onChange={(e) => setBidAmount(e.target.value)}
                     min={minBid}
-                    style={{padding: "0.5rem", marginRight: "0.5rem"}}
+                    style={{ padding: "0.5rem", marginRight: "0.5rem" }}
+                    disabled={isOwner} // ❌ Không cho nhập nếu là chủ bài
                 />
-                <button type="submit" style={{padding: "0.5rem 1rem"}}>
+                <button type="submit" style={{ padding: "0.5rem 1rem" }} disabled={isOwner}>
                     Đặt giá
                 </button>
-                {error && <p style={{color: "red", marginTop: "0.5rem"}}>{error}</p>}
+                {error && <p style={{ color: "red", marginTop: "0.5rem" }}>{error}</p>}
+                {isOwner && (
+                    <p style={{ color: "orange", marginTop: "0.5rem" }}>
+                        Bạn không thể đấu giá sản phẩm do chính mình đăng.
+                    </p>
+                )}
             </form>
 
             {showPaymentOptions && (
-                <div style={{marginTop: "1rem"}}>
+                <div style={{ marginTop: "1rem" }}>
                     <h3>Chọn phương thức thanh toán:</h3>
                     <p><strong>Số tiền đặt cọc:</strong> {depositAmount.toLocaleString('vi-VN')} VNĐ</p>
                     <button
@@ -153,15 +174,13 @@ const PlaceBid = ({ auctionId, currentPrice, bidStep, startingPrice, token: prop
                     </button>
                     <button
                         onClick={() => handlePayment("VNPAY")}
-                        style={{padding: "0.5rem 1rem", backgroundColor: "#e41e25", color: "#fff"}}
+                        style={{ padding: "0.5rem 1rem", backgroundColor: "#e41e25", color: "#fff" }}
                     >
                         Thanh toán bằng VNPAY
                     </button>
                 </div>
             )}
         </>
-
-
     );
 };
 
