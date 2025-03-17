@@ -17,7 +17,7 @@ export function AuthProvider({ children }) {
         if (savedToken) {
             try {
                 const decoded = jwtDecode(savedToken);
-                setUser({ username: decoded.sub, id: decoded.id });
+                setUser({ username: decoded.sub, id: decoded.id, role: decoded.role });
                 setToken(savedToken);
             } catch (err) {
                 logout(); // Token lỗi
