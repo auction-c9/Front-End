@@ -75,9 +75,6 @@ const PlaceBid = ({auctionId, startingPrice, currentPrice, bidStep, token: propT
                 {auctionId, bidAmount: numericBid, customerId}, // Sửa key từ currentPrice -> bidAmount
                 {headers: {Authorization: `Bearer ${token}`}}
             );
-            // Lưu số tiền để thanh toán
-            // setBidAmountForPayment(numericBid);
-
             setBidAmount("");
             setError("");
             // alert("🎉 Đặt giá thành công!");
@@ -98,6 +95,8 @@ const PlaceBid = ({auctionId, startingPrice, currentPrice, bidStep, token: propT
         }
 
         try {
+            console.log("🔄 [DEBUG] Gửi thanh toán:", {customerId, auctionId, depositAmount, method});
+
             const response = await axios.post(
                 `${apiConfig.transactions}/create`,
                 {
