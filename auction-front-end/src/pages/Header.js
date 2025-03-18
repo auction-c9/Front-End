@@ -75,6 +75,7 @@ const Header = () => {
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
                                 <Dropdown.Item as={Link} to="/profile">Thông tin tài khoản</Dropdown.Item>
+                                <Dropdown.Item as={Link} to="/auction-register">Lịch sử đăng ký đấu giá</Dropdown.Item>
                                 <Dropdown.Item as={Link} to="/product/add">Thêm sản phẩm đấu giá</Dropdown.Item>
                                 <Dropdown.Item onClick={logout}>Đăng xuất</Dropdown.Item>
                             </Dropdown.Menu>
