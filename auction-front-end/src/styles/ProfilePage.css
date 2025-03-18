@@ -1,0 +1,39 @@
+/* ProfilePage.css */
+.profile-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Để container chiếm toàn bộ chiều cao màn hình */
+    background-color: #f8f9fa; /* Màu nền nhẹ (tùy chọn) */
+}
+
+.profile-card {
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.profile-avatar {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%; /* Biến ảnh thành hình tròn */
+    border: 2px solid #ddd; /* Đường viền nhẹ cho ảnh */
+}
+password-toggle-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 5;
+    width: 20px;
+    height: 20px;
+}
+
+.password-toggle-icon svg {
+    width: 16px;
+    height: 16px;
+    color: #6c757d;
+}
