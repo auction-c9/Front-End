@@ -1,0 +1,82 @@
+/* ======= Footer Styles ======= */
+.footer {
+    background: #f9f9f9; /* Màu nền giống Bottom Header */
+    color: #333;
+    padding: 40px 0;
+    font-size: 16px;
+    border-top: 2px solid #00BE2F; /* Viền xanh đồng bộ */
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: auto;
+    padding: 0 20px;
+}
+
+.footer-column {
+    flex: 1;
+    min-width: 250px;
+    margin-bottom: 20px;
+}
+
+.footer-logo {
+    font-size: 22px;
+    font-weight: bold;
+    color: #00BE2F; /* Xanh lá giống Header */
+    text-transform: uppercase;
+}
+
+.footer-column h4 {
+    font-size: 18px;
+    font-weight: bold; /* Làm đậm tiêu đề */
+    color: #00BE2F;
+}
+
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-column ul li {
+    margin-bottom: 8px;
+}
+
+.footer-column ul li a {
+    color: #555;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-column ul li a:hover {
+    color: #00BE2F; /* Hover xanh lá giống Header */
+}
+
+/* Mạng xã hội */
+.social-icons {
+    margin-top: 10px;
+}
+
+.social-icons a {
+    display: inline-block;
+    margin-right: 10px;
+    color: #333;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.social-icons a:hover {
+    color: #00BE2F; /* Hover xanh lá */
+    transform: scale(1.2);
+}
+
+/* Dòng bản quyền */
+.footer-bottom {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+    font-size: 12px;
+    color: #666;
+}

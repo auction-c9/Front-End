@@ -38,7 +38,7 @@ const App = () => {
                     <Route path="/forgot-password/step2" element={<ForgotPasswordStep2/>}/>
                     <Route path="/forgot-password/step3" element={<ForgotPasswordStep3/>}/>
                 </Routes>
-                {/*<ChatBox/>*/}
+                <ChatBox/>
             </AuthProvider>
         </Router>
     );

@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from './Header';
 import AuctionListPage from './auctions/AuctionListPage';
+import Footer from "./Footer";
 
 const Home = () => {
     return (
@@ -11,6 +12,7 @@ const Home = () => {
                     <AuctionListPage />
                 </main>
             </div>
+            <Footer />
         </div>
     );
 };
