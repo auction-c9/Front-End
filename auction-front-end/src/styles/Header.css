@@ -15,7 +15,7 @@
 .logo-text {
     font-size: 24px;
     font-weight: bold;
-    color: #2e7d32; /* Màu chủ đạo xanh lá */
+    color: #00BE2F; /* Màu chủ đạo xanh lá */
     text-decoration: none;
 }
 
@@ -41,7 +41,7 @@
 }
 
 .search-button {
-    background: #2e7d32;
+    background: #00BE2F;
     border: none;
     padding: 10px 15px;
     cursor: pointer;
@@ -94,5 +94,11 @@
 }
 
 .nav-link:hover {
-    color: #2e7d32;
+    color: #00BE2F;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 15px; /* Tạo khoảng cách giữa hai nút */
+    align-items: center;
 }

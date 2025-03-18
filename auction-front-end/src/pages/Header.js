@@ -79,14 +79,17 @@ const Header = () => {
                     ) : (
                         <>
                             <>
-                                <div className="header-buttons">
-                                    <button className="btn btn-outline-primary" onClick={() => navigate('/login')}>
-                                        Đăng nhập
-                                    </button>
-                                    <button className="btn btn-primary" onClick={() => navigate('/register')}>
-                                        Đăng ký
-                                    </button>
-                                </div>
+                                {!user && (
+                                    <div className="auth-buttons">
+                                        <button className="btn btn-outline-primary" onClick={() => navigate('/login')}>
+                                            Đăng nhập
+                                        </button>
+                                        <button className="btn btn-primary" onClick={() => navigate('/register')}>
+                                            Đăng ký
+                                        </button>
+                                    </div>
+                                )}
+
                             </>
 
                         </>
@@ -97,12 +100,10 @@ const Header = () => {
             {/* Bottom Header (Danh mục) */}
             <div className="bottom-header">
                 <nav className="category-nav">
-                    <Link to="/auctions" className="nav-link">Tất cả sản phẩm</Link>
-                    <Link to="/category/appliances" className="nav-link">Thiết bị gia dụng</Link>
-                    <Link to="/category/mobile" className="nav-link">Điện thoại</Link>
                     <Link to="/categories" className="nav-link">Danh mục</Link>
-                    <Link to="/sellers" className="nav-link">Người bán</Link>
                     <Link to="/auctions/live" className="nav-link">Đang diễn ra</Link>
+                    <Link to="/auctions/upcoming" className="nav-link">Sắp diễn ra</Link>
+                    <Link to="/auctions/ended" className="nav-link">Đã diễn ra</Link>
                 </nav>
             </div>
         </header>

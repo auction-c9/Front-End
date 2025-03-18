@@ -1,7 +1,8 @@
 /* Giao diện tổng thể */
 body {
     font-family: 'Poppins', sans-serif;
-    background: #f4f6f9;
+    background: #121212; /* Màu nền đen */
+    color: white;
     margin: 0;
     padding: 0;
 }
@@ -11,7 +12,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #2e7d32; /* Màu xanh lá chủ đạo */
+    background: #00BE2F; /* Màu xanh lá chủ đạo */
     padding: 15px 20px;
     color: white;
 }
@@ -28,7 +29,7 @@ body {
 
 /* Sidebar */
 .sidebar {
-    background: #2e7d32;
+    background: #00BE2F;
     color: white;
     padding: 20px;
     border-radius: 10px;
@@ -47,7 +48,7 @@ body {
 }
 
 .sidebar nav a:hover {
-    background: #205723; /* Xanh lá đậm hơn */
+    background: #008C23; /* Xanh lá đậm hơn */
 }
 
 /* Nội dung chính */
@@ -59,15 +60,15 @@ body {
 
 .auction-main {
     flex: 1;
-    background: white;
+    background: #1e1e1e; /* Màu nền đen xám */
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
     padding: 20px;
 }
 
 /* Nút đấu giá */
 .btn-auction {
-    background: #ff9800;
+    background: #00BE2F;
     color: white;
     padding: 10px 20px;
     border-radius: 8px;
@@ -78,16 +79,15 @@ body {
 }
 
 .btn-auction:hover {
-    background: #e68900;
+    background: #008C23;
 }
 
-/* Khi trỏ chuột vào trang */
+/* Hiệu ứng hover tổng thể */
 body:hover {
-    background-color: rgba(46, 125, 50, 0.05); /* Màu xanh lá nhạt */
+    background-color: rgba(0, 190, 47, 0.05); /* Xanh lá nhạt */
     transition: background-color 0.3s ease;
 }
 
-/* Chỉ đổi màu các tiêu đề, link, icon, không ảnh hưởng nút */
 body:hover h1,
 body:hover h2,
 body:hover h3,
@@ -95,7 +95,7 @@ body:hover h4,
 body:hover p,
 body:hover span,
 body:hover a:not(.btn) {
-    color: #2e7d32 !important; /* Chuyển sang xanh lá */
+    color: #00BE2F !important;
 }
 
 /* Không đổi màu trong header */
@@ -103,20 +103,20 @@ header:hover {
     background-color: inherit !important;
 }
 
-/* Chỉ đổi màu viền nút (không làm mất chữ) */
+/* Chỉ đổi màu viền nút */
 body:hover .btn-outline-primary {
-    border-color: #2e7d32;
-    color: #2e7d32;
+    border-color: #00BE2F;
+    color: #00BE2F;
 }
 
 body:hover .btn-primary {
-    background-color: #2e7d32;
+    background-color: #00BE2F;
     color: white;
 }
 
-/* Thông báo lỗi (không dùng đỏ, dùng cam/vàng thay thế) */
+/* Thông báo lỗi */
 .error-message {
-    background: #ffcc00; /* Màu vàng */
+    background: #FFA500; /* Màu cam */
     color: black;
     padding: 10px;
     border-radius: 5px;
