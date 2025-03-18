@@ -4,7 +4,7 @@ import {Formik, Form, Field, ErrorMessage} from 'formik';
 import * as Yup from 'yup';
 import {useAuth} from '../context/AuthContext';
 import {Dropdown} from 'react-bootstrap';
-import {Search, ShoppingCart, User, Menu} from 'react-feather';
+import {Search, ShoppingCart, User, Menu, Bell} from 'react-feather';
 import {User as UserIcon} from "react-feather";
 import '../styles/Header.css';
 
@@ -56,6 +56,9 @@ const Header = () => {
 
                 {/* User & Navigation */}
                 <div className="nav-icons">
+                    <Link to="/notifications" className="icon-link">
+                        <Bell size={22} />
+                    </Link>
                     <Link to="/cart" className="icon-link">
                         <ShoppingCart size={22}/>
                     </Link>
