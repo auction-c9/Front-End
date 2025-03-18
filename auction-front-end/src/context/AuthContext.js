@@ -22,6 +22,7 @@ export function AuthProvider({ children }) {
                     const decoded = jwtDecode(savedToken);
                     console.log("Decoded Token:", decoded); // 🐛 Debug xem token có trường id không
                     setUser({ username: decoded.sub, id: decoded.customerId, role: decoded.role });
+                    console.log("🔹 User sau khi set:", user);
                     setToken(savedToken);
                 } catch (err) {
                     logout(); // Token lỗi
