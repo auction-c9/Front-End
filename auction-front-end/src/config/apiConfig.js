@@ -28,21 +28,7 @@ const setToken = (token) => localStorage.setItem("token", token);
 const clearTokens = () => localStorage.removeItem('token');
 
 // Gắn token vào request tự động
-api.interceptors.request.use(
-    (config) => {
-        if (!isUnauthorizedRoute(config.url)) {
-            const token = getToken();
-            if (token) {
-                config.headers.Authorization = `Bearer ${token}`;
-                // Thêm role vào header nếu cần
-                const decoded = jwtDecode(token);
-                config.headers['X-User-Role'] = decoded.role;
-            }
-        }
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
+ 
 
 // Xử lý lỗi (Không còn refreshToken nên chỉ redirect nếu 401)
 api.interceptors.response.use(
