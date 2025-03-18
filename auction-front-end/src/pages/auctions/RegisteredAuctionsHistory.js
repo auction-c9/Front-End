@@ -62,12 +62,12 @@ const RegisteredAuctionsHistory = () => {
                     <td>{auction.productName}</td>
                     <td>{auction.productDescription}</td>
                     <td>{auction.createdAt}</td>
-                    <td>{auction.status}</td>
+                    <td>{mapStatus(auction.status)}</td>
                     <td>
                         <Button
                             variant="danger"
                             onClick={() => handleCancel(auction.auctionId)}
-                            disabled={auction.status !== 'pending'}
+                            disabled={auction.status.toLowerCase() !== 'pending'}
                         >
                             Hủy
                         </Button>
