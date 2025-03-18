@@ -1,27 +1,18 @@
-// src/components/Home.js
 import React from 'react';
 import Header from './Header';
 import AuctionListPage from './auctions/AuctionListPage';
+import Footer from "./Footer";
 
 const Home = () => {
     return (
-        <div>
+        <div className="home-page">
             <Header />
-            <div
-                className="content-wrapper"
-                style={{ display: 'flex', gap: '20px', padding: '20px' }}
-            >
-                <main
-                    style={{
-                        flex: 1,
-                        border: '1px solid #ddd',
-                        padding: '10px',
-                        background: '#fff',
-                    }}
-                >
+            <div className="home-content">
+                <main className="home-main">
                     <AuctionListPage />
                 </main>
             </div>
+            <Footer />
         </div>
     );
 };

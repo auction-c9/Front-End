@@ -1,175 +1,125 @@
-/* Reset cơ bản */
-* {
+/* Giao diện tổng thể */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #121212; /* Màu nền đen */
+    color: white;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
-body {
-    font-family: sans-serif;
-    background-color: #f1f1f1;
-    margin: 0;
-}
-
-/* Phần Header */
-header {
-    background-color: #fff;
-    border-bottom: 1px solid #ddd;
-}
-
-/* Header trên cùng */
-.top-header {
+/* Header */
+.auction-header {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 10px 20px;
+    align-items: center;
+    background: #00BE2F; /* Màu xanh lá chủ đạo */
+    padding: 15px 20px;
+    color: white;
 }
 
-/* Logo */
-.logo a {
-    text-decoration: none;
-    color: #333;
-    font-size: 24px;
+.logo {
+    font-size: 1.5rem;
     font-weight: bold;
 }
 
-/* Thanh tìm kiếm */
-.search-container {
-    flex: 1;
+.header-icons {
     display: flex;
-    align-items: center;
-    margin: 0 20px;
-}
-.search-container input[type="text"] {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-right: none;
-    border-radius: 4px 0 0 4px;
-    outline: none;
-}
-.search-container button {
-    padding: 8px 16px;
-    border: none;
-    background-color: #333;
-    color: #fff;
-    border-radius: 0 4px 4px 0;
-    cursor: pointer;
-}
-
-/* Các liên kết điều hướng (For Buyers, For Sellers, Support) */
-.nav-links a {
-    margin: 0 10px;
-    text-decoration: none;
-    color: #333;
-    font-weight: 500;
-}
-
-/* Khu vực Sign In / Register Now */
-.auth-links {
-    display: flex;
-    align-items: center;
-}
-.auth-links button {
-    margin: 0 5px;
-    padding: 8px 16px;
-    border: 1px solid #333;
-    background-color: #fff;
-    color: #333;
-    cursor: pointer;
-    border-radius: 4px;
-    font-weight: 500;
-}
-.auth-links button:hover {
-    background-color: #eee;
-}
-.register-now {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-}
-.register-now:hover {
-    background-color: #0056b3;
-}
-
-/* Header bên dưới (danh sách category, v.v.) */
-.bottom-header {
-    background-color: #f5f5f5;
-    border-top: 1px solid #ddd;
-}
-.category-nav {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 8px 20px;
-}
-.category-nav a {
-    margin: 5px 10px;
-    text-decoration: none;
-    color: #333;
-    font-size: 14px;
-    white-space: nowrap;
-}
-.category-nav a:hover {
-    text-decoration: underline;
+    gap: 15px;
 }
 
 /* Sidebar */
 .sidebar {
-    width: 220px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    padding: 10px;
-    font-family: sans-serif;
+    background: #00BE2F;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 250px;
 }
 
-/* Mỗi phần (section) trong sidebar */
-.sidebar details {
-    margin-bottom: 1rem;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 8px;
-}
-
-/* Tiêu đề (summary) của từng phần */
-.sidebar summary {
-    cursor: pointer;
-    font-weight: bold;
-    outline: none; /* Loại bỏ viền nét đứt khi click (tuỳ trình duyệt) */
-    list-style: none; /* Ẩn dấu mũi tên mặc định trên một số trình duyệt cũ */
-}
-
-/* Nội dung phần filter */
-.filter-content {
-    margin-left: 1rem; /* tạo khoảng cách cho nội dung khi mở */
-    margin-top: 8px;
-}
-
-/* Label cho từng tùy chọn checkbox */
-.filter-content label {
-    display: block;
-    margin: 4px 0;
-}
-
-/* Link "Xem thêm" hoặc "Áp dụng" */
-.see-all {
-    display: inline-block;
-    margin-top: 5px;
-    color: #007bff;
-    text-decoration: none;
-    font-size: 0.9rem;
-}
-.see-all:hover {
-    text-decoration: underline;
-}
-
-/* Nhóm input giá */
-.price-range {
+.sidebar nav a {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 10px;
+    padding: 10px;
+    color: white;
+    text-decoration: none;
+    transition: background 0.3s ease;
+    border-radius: 8px;
 }
-.price-range input[type="text"] {
-    width: 60px;
-    padding: 4px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+
+.sidebar nav a:hover {
+    background: #008C23; /* Xanh lá đậm hơn */
+}
+
+/* Nội dung chính */
+.auction-content {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+}
+
+.auction-main {
+    flex: 1;
+    background: #1e1e1e; /* Màu nền đen xám */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+    padding: 20px;
+}
+
+/* Nút đấu giá */
+.btn-auction {
+    background: #00BE2F;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-auction:hover {
+    background: #008C23;
+}
+
+/* Hiệu ứng hover tổng thể */
+body:hover {
+    background-color: rgba(0, 190, 47, 0.05); /* Xanh lá nhạt */
+    transition: background-color 0.3s ease;
+}
+
+body:hover h1,
+body:hover h2,
+body:hover h3,
+body:hover h4,
+body:hover p,
+body:hover span,
+body:hover a:not(.btn) {
+    color: #00BE2F !important;
+}
+
+/* Không đổi màu trong header */
+header:hover {
+    background-color: inherit !important;
+}
+
+/* Chỉ đổi màu viền nút */
+body:hover .btn-outline-primary {
+    border-color: #00BE2F;
+    color: #00BE2F;
+}
+
+body:hover .btn-primary {
+    background-color: #00BE2F;
+    color: white;
+}
+
+/* Thông báo lỗi */
+.error-message {
+    background: #FFA500; /* Màu cam */
+    color: black;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    margin-top: 10px;
 }

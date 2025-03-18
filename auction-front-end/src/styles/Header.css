@@ -1,29 +1,104 @@
+/* ======= Header Styles ======= */
+.header {
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Top Header */
 .top-header {
-    background-color: #fff;
-    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
 }
 
 .logo-text {
-    font-size: 1.8rem;
+    font-size: 24px;
     font-weight: bold;
-    color: #007bff;
+    color: #00BE2F; /* Màu chủ đạo xanh lá */
     text-decoration: none;
+}
+
+.search-container {
+    flex: 1;
+    max-width: 500px;
+}
+
+.search-form {
+    display: flex;
+    background: #f1f1f1;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    outline: none;
+    background: transparent;
+}
+
+.search-button {
+    background: #00BE2F;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    color: white;
+}
+
+.error-text {
+    color: #ffcc00; /* Màu vàng để dễ phân biệt với màu chủ đạo */
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* Navigation Icons */
+.nav-icons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.icon-link {
+    color: #333;
+    text-decoration: none;
+}
+
+.user-dropdown {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* Bottom Header */
+.bottom-header {
+    background: #f9f9f9;
+    padding: 10px 20px;
+    text-align: center;
+}
+
+.category-nav {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
 }
 
 .nav-link {
-    color: #333;
-    padding: 0.5rem 1rem;
     text-decoration: none;
+    color: #555;
+    font-weight: 500;
+    transition: color 0.3s;
 }
 
 .nav-link:hover {
-    color: #007bff;
+    color: #00BE2F;
 }
 
-.category-nav .nav-link {
-    font-size: 0.9rem;
-}
-
-.auth-links button {
-    margin-left: 0.5rem;
+.auth-buttons {
+    display: flex;
+    gap: 15px; /* Tạo khoảng cách giữa hai nút */
+    align-items: center;
 }

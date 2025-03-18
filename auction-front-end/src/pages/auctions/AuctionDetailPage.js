@@ -16,11 +16,36 @@ const AuctionDetailPage = () => {
     const { token, user } = useAuth();
     const customerId = user?.id;
 
+    // Khai báo state
     const [auction, setAuction] = useState(null);
     const [bidHistory, setBidHistory] = useState([]);
     const [highestBidder, setHighestBidder] = useState("Chưa có");
     const [timeLeft, setTimeLeft] = useState("");
     const [priceUpdated, setPriceUpdated] = useState(false);
+
+    // Sử dụng useEffect để log dữ liệu sau khi state được khởi tạo
+    useEffect(() => {
+        console.log("customerId:", customerId);
+        console.log("user:", user);
+        if (auction) {
+            console.log("auction.product?.account?.id:", auction.product?.account?.accountId);
+        } else {
+            console.log("Auction data is not yet loaded");
+        }
+    }, [auction, customerId, user]);
+
+    useEffect(() => {
+        console.log("Auction Object:", auction);
+    }, [auction]);
+
+    useEffect(() => {
+        console.log("Auction Object:", auction);
+        console.log("Product:", auction?.product);
+        console.log("Account:", auction?.product?.account);
+        console.log("Account ID:", auction?.product?.account?.accountId);
+    }, [auction]);
+
+
 
     // ===== LẤY DỮ LIỆU ĐẤU GIÁ =====
     useEffect(() => {
@@ -32,6 +57,7 @@ const AuctionDetailPage = () => {
         const fetchAuctionData = async () => {
             try {
                 const res = await axios.get(`${apiConfig.auctions}/${id}`);
+                console.log("Auction Data:", res.data);
                 setAuction(res.data);
                 updateTimeLeft(res.data.auctionEndTime);
             } catch (error) {
@@ -66,7 +92,7 @@ const AuctionDetailPage = () => {
             webSocketFactory: () => socket,
             onConnect: () => {
                 console.log("Đã kết nối WebSocket");
-                client.subscribe(`/topic/auction/${id}`, (message) => {
+                client.subscribe(`/topic/auctions/${id}`, (message) => {
                     const newBid = JSON.parse(message.body);
                     setBidHistory((prev) => [newBid, ...prev]);
                     setHighestBidder(newBid.user?.username || "Ẩn danh");
@@ -78,7 +104,7 @@ const AuctionDetailPage = () => {
         });
         client.activate();
 
-        return () => client.deactivate(); // cleanup
+        return () => client.deactivate();
     }, [id, token]);
 
     // ===== ĐẾM NGƯỢC THỜI GIAN =====
@@ -135,32 +161,77 @@ const AuctionDetailPage = () => {
                     <div className="auction-info">
                         <p>{auction.product?.description || "Không có mô tả"}</p>
                         <div className="info-section">
-                            <div><strong>Giá khởi điểm:</strong> {startingPrice.toLocaleString('vi-VN')} VNĐ</div>
-                            <div><strong>Giá đặt cọc:</strong> {depositAmount.toLocaleString('vi-VN')} VNĐ</div>
-                            <div><strong>Bước giá:</strong> {bidStep.toLocaleString('vi-VN')} VNĐ</div>
+                            <div>
+                                <strong>Giá khởi điểm:</strong> {startingPrice.toLocaleString("vi-VN")} VNĐ
+                            </div>
+                            <div>
+                                <strong>Giá đặt cọc:</strong> {depositAmount.toLocaleString("vi-VN")} VNĐ
+                            </div>
+                            <div>
+                                <strong>Bước giá:</strong> {bidStep.toLocaleString("vi-VN")} VNĐ
+                            </div>
 
                             <motion.div
                                 className={`current-price ${priceUpdated ? "highlight" : ""}`}
-                                animate={{ scale: priceUpdated ? 1.1 : 1 }}
-                                transition={{ duration: 0.3 }}
+                                animate={{scale: priceUpdated ? 1.1 : 1}}
+                                transition={{duration: 0.3}}
                             >
-                                Giá hiện tại: {highestBidAmount.toLocaleString('vi-VN')} VNĐ
+                                Giá hiện tại: {highestBidAmount.toLocaleString("vi-VN")} VNĐ
                             </motion.div>
 
-                            <div><strong>Người cao nhất:</strong> <span className="highest-bidder">{highestBidder}</span></div>
-                            <div><strong>Thời gian còn lại:</strong> <span className="time-left">{timeLeft}</span></div>
+                            <div>
+                                <strong>Người Đấu giá cao nhất:</strong>{" "}
+                                {highestBidder !== "Chưa có" && bidHistory[0]?.user ? (
+                                    <a href={`/profile/${bidHistory[0].user.accountId}`} className="highest-bidder">
+                                        {highestBidder}
+                                    </a>
+                                ) : (
+                                    <span className="highest-bidder">{highestBidder}</span>
+                                )}
+                            </div>
+                            <div>
+                                <strong>Thời gian còn lại:</strong> <span className="time-left">{timeLeft}</span>
+                            </div>
+                            <div>
+                                <strong>Người đăng bán:</strong>{" "}
+                                {auction.product?.account ? (
+                                    <a href={`/profile/${auction.product.account.accountId}`}>
+                                        {auction.product.account.username}
+                                    </a>
+                                ) : (
+                                    <span>Chưa có thông tin</span>
+                                )}
+                            </div>
                         </div>
 
-                        <PlaceBid
-                            auctionId={auction.auctionId}
-                            currentPrice={highestBidAmount}
-                            bidStep={bidStep}
-                            startingPrice={startingPrice} // Có thể truyền nếu cần
-                            depositAmount={depositAmount} // ✅ Thêm prop này
-                            token={token}
-                            customerId={customerId}
-                            ownerId={auction.product?.user?.id} // ✅ Để kiểm tra chủ sản phẩm
-                        />
+                        {customerId !== undefined && customerId !== null ? (
+                            customerId === auction.product?.account?.accountId ? (
+                                <p style={{color: "red", fontWeight: "bold", marginTop: "1rem"}}>
+                                    ⚠️ Bạn là chủ bài đăng, không thể tham gia đấu giá.
+                                </p>
+                            ) : (
+                                <PlaceBid
+                                    auctionId={auction.auctionId}
+                                    currentPrice={highestBidAmount}
+                                    bidStep={bidStep}
+                                    startingPrice={startingPrice}
+                                    depositAmount={depositAmount}
+                                    token={token}
+                                    customerId={customerId}
+                                    ownerId={auction.product?.account?.accountId}  // Sử dụng account.id nếu có
+                                />
+                            )
+                        ) : token ? (
+                            <p style={{ color: "blue", fontWeight: "bold", marginTop: "1rem" }}>
+                                🔹 Đang tải thông tin người dùng...
+                            </p>
+                        ) : (
+                            <p style={{ color: "blue", fontWeight: "bold", marginTop: "1rem" }}>
+                                🔹 Vui lòng đăng nhập để tham gia đấu giá.
+                            </p>
+                        )}
+
+
                     </div>
                 </div>
 
@@ -168,8 +239,9 @@ const AuctionDetailPage = () => {
                 <ul className="bid-history">
                     {bidHistory.map((bid) => (
                         <li key={bid.bidId}>
-                            <strong>{bid.user?.username}</strong> - <span>{bid.bidAmount.toLocaleString('vi-VN')} VNĐ</span>
-                            <em> lúc {new Date(bid.bidTime).toLocaleString('vi-VN')}</em>
+                            <strong>{bid.user?.username || "Ẩn danh"}</strong> -{" "}
+                            <span>{bid.bidAmount.toLocaleString("vi-VN")} VNĐ</span>
+                            <em> lúc {new Date(bid.bidTime).toLocaleString("vi-VN")}</em>
                         </li>
                     ))}
                 </ul>

@@ -1,0 +1,97 @@
+
+.chat-toggle-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #2e7d32;
+    color: white;
+    padding: 12px;
+    border-radius: 50%;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    font-size: 18px;
+    border: none;
+    transition: background 0.3s;
+}
+
+.chat-toggle-btn:hover {
+    background-color: #1b5e20;
+}
+
+.chat-box {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 320px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+/* Giữ màu chữ cố định cho .chat-header */
+.chat-header {
+    background: #2e7d32;
+    color: white !important;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-header.custom-shadow {
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+}
+
+
+/* Giữ màu cho tiêu đề trong chatbox khi hover body */
+body:hover .chat-header {
+    color: white !important;
+}
+
+
+.chat-close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.chat-messages {
+    padding: 10px;
+    height: 250px;
+    overflow-y: auto;
+    border-bottom: 1px solid #ddd;
+}
+
+.chat-input-container {
+    display: flex;
+    padding: 10px;
+    background: #f9f9f9;
+}
+
+.chat-input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.chat-send-btn {
+    background: #2e7d32;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    margin-left: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.chat-send-btn:hover {
+    background: #1b5e20;
+}

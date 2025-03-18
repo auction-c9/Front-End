@@ -1,10 +1,12 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import {Link, useNavigate} from 'react-router-dom';
+import {Formik, Form, Field, ErrorMessage} from 'formik';
 import * as Yup from 'yup';
-import { useAuth } from "../context/AuthContext";
-import { Dropdown } from 'react-bootstrap';
-import '../styles/Header.css'; // Nếu bạn muốn tách style riêng
+import {useAuth} from '../context/AuthContext';
+import {Dropdown} from 'react-bootstrap';
+import {Search, ShoppingCart, User, Menu, Bell} from 'react-feather';
+import {User as UserIcon} from "react-feather";
+import '../styles/Header.css';
 
 const searchSchema = Yup.object().shape({
     query: Yup.string().required('Vui lòng nhập từ khóa tìm kiếm'),
@@ -12,18 +14,17 @@ const searchSchema = Yup.object().shape({
 
 const Header = () => {
     const navigate = useNavigate();
-    const { user, logout } = useAuth();
+    const {user, logout} = useAuth();
 
-    const handleSearch = (values, { resetForm }) => {
-        console.log('Searching for:', values.query);
+    const handleSearch = (values, {resetForm}) => {
         navigate(`/search?query=${values.query}`);
         resetForm();
     };
 
     return (
-        <header>
+        <header className="header">
             {/* Top Header */}
-            <div className="top-header d-flex justify-content-between align-items-center p-3 shadow-sm">
+            <div className="top-header">
                 {/* Logo */}
                 <div className="logo">
                     <Link to="/" className="logo-text">C9-Stock</Link>
@@ -32,74 +33,80 @@ const Header = () => {
                 {/* Search Bar */}
                 <div className="search-container">
                     <Formik
-                        initialValues={{ query: '' }}
+                        initialValues={{query: ''}}
                         validationSchema={searchSchema}
                         onSubmit={handleSearch}
                     >
                         {() => (
-                            <Form className="d-flex">
+                            <Form className="search-form">
                                 <Field
                                     type="text"
                                     name="query"
-                                    placeholder="Tìm kiếm sản phẩm, danh mục, người bán..."
-                                    className="form-control me-2"
+                                    placeholder="Tìm kiếm sản phẩm..."
+                                    className="search-input"
                                 />
-                                <button type="submit" className="btn btn-primary">Tìm kiếm</button>
-                                <ErrorMessage name="query" component="div" className="text-danger mt-1" />
+                                <button type="submit" className="search-button">
+                                    <Search size={20}/>
+                                </button>
+                                <ErrorMessage name="query" component="div" className="error-text"/>
                             </Form>
                         )}
                     </Formik>
                 </div>
 
-                {/* Navigation & Auth */}
-                <div className="d-flex align-items-center gap-3">
-                    <Link to="/buyers" className="nav-link">Dành cho người mua</Link>
-                    <Link to="/sellers" className="nav-link">Dành cho người bán</Link>
-                    <Link to="/support" className="nav-link">Hỗ trợ</Link>
+                {/* User & Navigation */}
+                <div className="nav-icons">
+                    <Link to="/notifications" className="icon-link">
+                        <Bell size={22} />
+                    </Link>
+                    <Link to="/cart" className="icon-link">
+                        <ShoppingCart size={22}/>
+                    </Link>
 
                     {user ? (
-                        // Khi đã đăng nhập
                         <Dropdown>
-                            <Dropdown.Toggle variant="light" id="dropdown-basic">
-                                Xin chào, {user.username && user.username.includes('@') ? user.username.split('@')[0] : user.username}
+                            <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center">
+                                <UserIcon size={20} className="me-2"/>
+                                <span>
+        {user?.username
+            ? `Xin chào, ${user.username.includes('@') ? user.username.split('@')[0] : user.username}`
+            : "Tài khoản"}
+    </span>
                             </Dropdown.Toggle>
-
                             <Dropdown.Menu>
                                 <Dropdown.Item as={Link} to="/profile">Thông tin tài khoản</Dropdown.Item>
-                                <Dropdown.Item as={Link} to="/product/add">Thêm sản phẩm đấu giá</Dropdown.Item> {/* Nút thêm sản phẩm */}
+                                <Dropdown.Item as={Link} to="/product/add">Thêm sản phẩm đấu giá</Dropdown.Item>
                                 <Dropdown.Item onClick={logout}>Đăng xuất</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
                     ) : (
-                        // Khi chưa đăng nhập
                         <>
-                            <button className="btn btn-outline-primary" onClick={() => navigate('/login')}>
-                                Đăng nhập
-                            </button>
-                            <button className="btn btn-primary" onClick={() => navigate('/register')}>
-                                Đăng ký
-                            </button>
+                            <>
+                                {!user && (
+                                    <div className="auth-buttons">
+                                        <button className="btn btn-outline-primary" onClick={() => navigate('/login')}>
+                                            Đăng nhập
+                                        </button>
+                                        <button className="btn btn-primary" onClick={() => navigate('/register')}>
+                                            Đăng ký
+                                        </button>
+                                    </div>
+                                )}
+
+                            </>
+
                         </>
                     )}
                 </div>
             </div>
 
             {/* Bottom Header (Danh mục) */}
-            <div className="bottom-header bg-light p-2 shadow-sm">
-                <nav className="category-nav d-flex flex-wrap justify-content-center gap-3">
-                    <Link to="/auctions" className="nav-link">Tất cả sản phẩm</Link>
-                    <Link to="/category/appliances" className="nav-link">Thiết bị gia dụng</Link>
-                    <Link to="/category/mobile" className="nav-link">Điện thoại di động</Link>
-                    <Link to="/categories" className="nav-link">Tất cả danh mục</Link>
-                    <Link to="/brand/samsung" className="nav-link">Samsung</Link>
-                    <Link to="/sellers" className="nav-link">Tất cả người bán</Link>
+            <div className="bottom-header">
+                <nav className="category-nav">
+                    <Link to="/categories" className="nav-link">Danh mục</Link>
                     <Link to="/auctions/live" className="nav-link">Đang diễn ra</Link>
-                    <Link to="/auctions/new" className="nav-link">Hàng mới</Link>
-                    <Link to="/status" className="nav-link">Tình trạng</Link>
-                    <Link to="/region/northeast" className="nav-link">Miền Đông Bắc</Link>
-                    <Link to="/region/central-west" className="nav-link">Miền Trung Tây</Link>
-                    <Link to="/region/south" className="nav-link">Miền Nam</Link>
-                    <Link to="/regions" className="nav-link">Khu vực khác</Link>
+                    <Link to="/auctions/upcoming" className="nav-link">Sắp diễn ra</Link>
+                    <Link to="/auctions/ended" className="nav-link">Đã diễn ra</Link>
                 </nav>
             </div>
         </header>

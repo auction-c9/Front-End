@@ -10,20 +10,26 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const initializeAuth = () => {
-        const savedToken = localStorage.getItem('token');
-        const savedCustomerId = localStorage.getItem('customerId');
+        console.log("AuthContext - User data:", user);
+    }, [user]);
 
-        if (savedToken) {
-            try {
-                const decoded = jwtDecode(savedToken);
-                setUser({ username: decoded.sub, id: decoded.id });
-                setToken(savedToken);
-            } catch (err) {
-                logout(); // Token lỗi
+    useEffect(() => {
+        const initializeAuth = () => {
+            const savedToken = localStorage.getItem("token");
+
+            if (savedToken) {
+                try {
+                    const decoded = jwtDecode(savedToken);
+                    console.log("Decoded Token:", decoded); // 🐛 Debug xem token có trường id không
+                    setUser({ username: decoded.sub, id: decoded.customerId, role: decoded.role });
+                    setToken(savedToken);
+                } catch (err) {
+                    logout(); // Token lỗi
+                }
             }
-        }
-        setLoading(false);};
+            setLoading(false);
+        };
+
         initializeAuth();
     }, []);
 
@@ -31,12 +37,13 @@ export function AuthProvider({ children }) {
     const login = async (credentials) => {
         try {
             const { token } = await AuthService.login(credentials);
-            localStorage.setItem('token', token);
+            localStorage.setItem("token", token);
             const decoded = jwtDecode(token);
-            setUser({ username: decoded.sub, id: decoded.id });
+            console.log("Decoded Token on Login:", decoded); // 🐛 Debug sau khi login
+            setUser({ username: decoded.sub, id: decoded.customerId });
             setToken(token);
         } catch {
-            throw new Error('Đăng nhập thất bại');
+            throw new Error("Đăng nhập thất bại");
         }
     };
 

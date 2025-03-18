@@ -8,7 +8,6 @@ const PlaceBid = ({
                       auctionId,
                       currentPrice,
                       bidStep,
-                      startingPrice, // nếu cần dùng chỗ khác
                       depositAmount, // ✅ Nhận từ props
                       token: propToken,
                       customerId: propCustomerId,
@@ -64,16 +63,13 @@ const PlaceBid = ({
     const handleBidSubmit = async (e) => {
         e.preventDefault();
 
+        // ✅ Kiểm tra trước: Nếu là chủ sản phẩm, không cho đấu giá
         if (isOwner) {
             setError("Bạn không thể tham gia đấu giá sản phẩm của chính mình.");
             return;
         }
 
         const numericBid = parseFloat(bidAmount);
-
-        console.log("🚀 [DEBUG] Token trước khi gửi bid:", token);
-        console.log("🚀 [DEBUG] customerId trước khi gửi bid:", customerId);
-        console.log("🚀 [DEBUG] Headers gửi đi:", { Authorization: `Bearer ${token}` });
 
         if (!token) {
             setError("Bạn cần đăng nhập để đấu giá.");
@@ -91,15 +87,13 @@ const PlaceBid = ({
             return;
         }
 
-        // ✅ Kiểm tra xem khách hàng đã đặt cọc chưa
+        // ✅ Kiểm tra đặt cọc *sau* khi đã xác nhận không phải chủ sản phẩm
         const hasDeposit = await checkDeposit();
         if (!hasDeposit) {
             setError("Bạn cần thanh toán đặt cọc để đấu giá!");
-            setShowPaymentOptions(true); // Hiển thị form thanh toán
+            setShowPaymentOptions(true);
             return;
         }
-
-        console.log("🔄 [DEBUG] Gửi bid:", { auctionId, bidAmount: numericBid, customerId, token });
 
         try {
             await axios.post(
@@ -112,7 +106,6 @@ const PlaceBid = ({
             setError("");
             toast.success("🎉 Đặt giá thành công!");
 
-            // Sau 2 giây chuyển hướng về trang auctions
             setTimeout(() => {
                 navigate('/auctions');
             }, 2000);
