@@ -76,6 +76,9 @@ const Header = () => {
                             <Dropdown.Menu>
                                 <Dropdown.Item as={Link} to="/profile">Thông tin tài khoản</Dropdown.Item>
                                 <Dropdown.Item as={Link} to="/product/add">Thêm sản phẩm đấu giá</Dropdown.Item>
+                                {user?.role === "ROLE_ADMIN" && (
+                                    <Dropdown.Item as={Link} to="/admin">Trang quản trị</Dropdown.Item>
+                                )}
                                 <Dropdown.Item onClick={logout}>Đăng xuất</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>

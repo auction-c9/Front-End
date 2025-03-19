@@ -76,6 +76,7 @@ export default {
     },
     auctions: `${API_BASE_URL}/auctions`,
     transactions: `${API_BASE_URL}/transactions`,
+    customers: `${API_BASE_URL}/admin/customers`,
 };
 
 export {
