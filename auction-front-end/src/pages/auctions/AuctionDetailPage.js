@@ -133,25 +133,43 @@ const AuctionDetailPage = () => {
 
     // ===== ĐẾM NGƯỢC THỜI GIAN =====
     useEffect(() => {
-        if (!auction?.auctionEndTime) return;
-        const interval = setInterval(() => updateTimeLeft(auction.auctionEndTime), 1000);
+        if (!auction) return;
+
+        updateTimeLeft();
+        const interval = setInterval(updateTimeLeft, 1000);
+
         return () => clearInterval(interval);
     }, [auction]);
 
+
     // ===== CÁC HÀM HỖ TRỢ =====
-    const updateTimeLeft = (endTime) => {
+    const updateTimeLeft = () => {
+        if (!auction) return;
+
         const now = new Date();
-        const end = new Date(endTime);
-        const diff = end - now;
-        if (diff <= 0) {
+        let end;
+
+        if (auction.status === "pending") {
+            end = new Date(auction.auctionStartTime);
+        } else if (auction.status === "active") {
+            end = new Date(auction.auctionEndTime);
+        } else {
             setTimeLeft("Đã kết thúc");
             return;
         }
+
+        const diff = end - now;
+        if (diff <= 0) {
+            setTimeLeft(auction.status === "pending" ? "Đang bắt đầu..." : "Đã kết thúc");
+            return;
+        }
+
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff / (1000 * 60)) % 60);
         const seconds = Math.floor((diff / 1000) % 60);
         setTimeLeft(`${hours > 0 ? `${hours}g ` : ""}${minutes}p ${seconds}s`);
     };
+
 
     const updateHighestBidder = (bids) => {
         if (bids.length > 0) {
@@ -228,7 +246,11 @@ const AuctionDetailPage = () => {
                             </div>
                         </div>
 
-                        {auction.status === "ended" ? (
+                        {auction.status === "pending" ? (
+                            <p style={{ color: "orange", fontWeight: "bold", marginTop: "1rem" }}>
+                                ⚠️ Phiên đấu giá chưa bắt đầu.
+                            </p>
+                        ) : auction.status === "ended" ? (
                             <p style={{ color: "red", fontWeight: "bold", marginTop: "1rem" }}>
                                 ⚠️ Phiên đấu giá đã kết thúc.
                                 {winnerBid ? (
@@ -241,7 +263,6 @@ const AuctionDetailPage = () => {
                                 ) : (
                                     "Không có người thắng."
                                 )}
-
                             </p>
                         ) : customerId !== undefined && customerId !== null ? (
                             customerId === auction.product?.account?.accountId ? (
@@ -269,6 +290,7 @@ const AuctionDetailPage = () => {
                                 🔹 Vui lòng đăng nhập để tham gia đấu giá.
                             </p>
                         )}
+
                     </div>
                 </div>
 

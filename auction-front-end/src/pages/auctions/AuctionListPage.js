@@ -1,4 +1,3 @@
-// src/components/auctions/AuctionListPage.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import apiConfig from '../../config/apiConfig';
@@ -9,21 +8,35 @@ import { Container, Row, Col, Card } from 'react-bootstrap';
 
 const AuctionListPage = () => {
     const [auctions, setAuctions] = useState([]);
-    const [timeLeftMap, setTimeLeftMap] = useState({}); // Lưu thông tin {time, highlight} theo auctionId
+    const [timeLeftMap, setTimeLeftMap] = useState({});
 
-    // Hàm tính thời gian còn lại với hiệu ứng highlight khi dưới 15 phút
-    const calculateTimeLeft = (endTime) => {
+    // Hàm tính thời gian còn lại
+    const calculateTimeLeft = (auction) => {
+        if (!auction) return { time: 'Đang tải...', highlight: false };
+
         const now = new Date();
-        const end = new Date(endTime);
+        let end;
+        let label = '';
+
+        if (auction.status === "pending") {
+            end = new Date(auction.auctionStartTime);
+            label = "Bắt đầu sau: ";
+        } else if (auction.status === "active") {
+            end = new Date(auction.auctionEndTime);
+            label = "Kết thúc sau: ";
+        } else {
+            return { time: "Đã kết thúc", highlight: false };
+        }
+
         const diff = end - now;
-        if (diff <= 0) return { time: 'Đã kết thúc', highlight: false };
+        if (diff <= 0) return { time: auction.status === "pending" ? "Đang bắt đầu..." : "Đã kết thúc", highlight: false };
 
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff / (1000 * 60)) % 60);
         const seconds = Math.floor((diff / 1000) % 60);
-        // Highlight nếu còn dưới 15 phút
         const highlight = diff < 15 * 60 * 1000;
-        return { time: `${hours > 0 ? `${hours}g ` : ''}${minutes}p ${seconds}s`, highlight };
+
+        return { time: `${label}${hours > 0 ? `${hours}g ` : ''}${minutes}p ${seconds}s`, highlight };
     };
 
     // Gọi API lấy danh sách phiên đấu giá
@@ -32,10 +45,10 @@ const AuctionListPage = () => {
             .then(response => {
                 setAuctions(response.data);
 
-                // Khởi tạo timeLeftMap ban đầu với object {time, highlight}
+                // Tạo danh sách thời gian ban đầu
                 const initialTimeLeft = {};
                 response.data.forEach(auction => {
-                    initialTimeLeft[auction.auctionId] = calculateTimeLeft(auction.auctionEndTime);
+                    initialTimeLeft[auction.auctionId] = calculateTimeLeft(auction);
                 });
                 setTimeLeftMap(initialTimeLeft);
             })
@@ -48,13 +61,13 @@ const AuctionListPage = () => {
             setTimeLeftMap(prevMap => {
                 const updatedMap = { ...prevMap };
                 auctions.forEach(auction => {
-                    updatedMap[auction.auctionId] = calculateTimeLeft(auction.auctionEndTime);
+                    updatedMap[auction.auctionId] = calculateTimeLeft(auction);
                 });
                 return updatedMap;
             });
         }, 1000);
 
-        return () => clearInterval(interval); // Dọn dẹp interval khi component unmount
+        return () => clearInterval(interval);
     }, [auctions]);
 
     return (
@@ -78,15 +91,6 @@ const AuctionListPage = () => {
                                         <Card.Title className="mb-2" style={{ fontSize: '1rem', fontWeight: 'bold' }}>
                                             {auction.product?.name}
                                         </Card.Title>
-                                        <Card.Text className="text-muted" style={{ fontSize: '0.85rem' }}>
-                                            {auction.product?.location || 'Chưa rõ địa điểm'}
-                                        </Card.Text>
-                                        <Card.Text className="text-success" style={{ fontSize: '0.85rem' }}>
-                                            {auction.product?.condition || 'New'}
-                                        </Card.Text>
-                                        <Card.Text className="text-muted" style={{ textDecoration: 'line-through', fontSize: '0.85rem' }}>
-                                            MSRP {auction.product?.msrp ? `€${auction.product.msrp}` : 'N/A'}
-                                        </Card.Text>
                                         <Card.Text style={{ fontSize: '1rem', fontWeight: 'bold', color: '#007bff' }}>
                                             {auction.currentPrice.toLocaleString('vi-VN')} VNĐ
                                         </Card.Text>
@@ -98,9 +102,6 @@ const AuctionListPage = () => {
                                             }}
                                         >
                                             {timeLeftMap[auction.auctionId]?.time || 'Đang tải...'}
-                                        </Card.Text>
-                                        <Card.Text style={{ fontSize: '0.85rem', color: '#333' }}>
-                                            Trạng thái: {auction.status}
                                         </Card.Text>
                                     </Card.Body>
                                 </Card>
