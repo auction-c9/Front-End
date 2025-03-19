@@ -13,6 +13,11 @@ export default function Login() {
     const location = useLocation();
 
     useEffect(() => {
+        document.body.classList.add("hide-layout");
+        return () => document.body.classList.remove("hide-layout");
+    }, []);
+
+    useEffect(() => {
         if (location.state?.successMessage) {
             setError(location.state.successMessage);
             navigate(location.pathname, { replace: true });

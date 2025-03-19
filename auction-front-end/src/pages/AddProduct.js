@@ -126,7 +126,7 @@ const AddProduct = () => {
                             <Form.Label>Mô tả:</Form.Label>
                             <Field as="textarea" name="description" className="form-control" placeholder="Nhập mô tả sản phẩm" maxLength={300} />
                             <ErrorMessage name="description" component="div" className="text-danger" />
-                            <div className="text-muted">{values.description.length}/300 ký tự</div>
+                            {/*<div className="text-muted">{values.description.length}/300 ký tự</div>*/}
                         </Form.Group>
 
                         <Form.Group className="mb-3" controlId="formCategory">

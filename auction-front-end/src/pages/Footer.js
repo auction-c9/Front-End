@@ -5,7 +5,7 @@ import '../styles/Footer.css';
 
 const Footer = () => {
     return (
-        <footer className="footer">
+        <footer className="footer main-content">
             <div className="footer-container">
                 <div className="footer-column">
                     <h4>Thông tin</h4>
@@ -19,9 +19,8 @@ const Footer = () => {
                 <div className="footer-column">
                     <h4>Pháp lý</h4>
                     <ul>
-                        <li><Link to="/about">Chính sách bảo mật</Link></li>
+                        <li><Link to="/privacy-policy">Chính sách bảo mật</Link></li>
                         <li><Link to="/contact">Giấy phép</Link></li>
-                        <li><Link to="/terms">Tuyên bố từ chối trách nhiệm</Link></li>
                     </ul>
                 </div>
 
@@ -37,9 +36,9 @@ const Footer = () => {
                 <div className="footer-column">
                     <h4>Kết nối với chúng tôi</h4>
                     <div className="social-icons">
-                        <a href="#"><Facebook size={20}/></a>
-                        <a href="#"><Twitter size={20}/></a>
-                        <a href="#"><Instagram size={20}/></a>
+                        <a href="#"><Facebook size={20} /></a>
+                        <a href="#"><Twitter size={20} /></a>
+                        <a href="#"><Instagram size={20} /></a>
                     </div>
                 </div>
             </div>
