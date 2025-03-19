@@ -1,8 +1,12 @@
 .footer {
-    background: black;
-    color: white;
+    background: #ece8e8;
+    color: black;
     padding: 40px 0;
     font-size: 16px;
+    position: relative;
+    bottom: 0;
+    left: 0;
+    width: 100%;
 }
 
 .footer-container {
@@ -18,17 +22,10 @@
     min-width: 200px;
 }
 
-.footer-logo {
-    font-size: 22px;
-    font-weight: bold;
-    color: #EEA019; /* Cam nổi bật */
-    text-transform: uppercase;
-}
-
 .footer-column h4 {
     font-size: 18px;
     font-weight: bold;
-    color: #EEA019; /* Tiêu đề cam */
+    color: #EEA019;
     margin-bottom: 10px;
 }
 
@@ -42,16 +39,15 @@
 }
 
 .footer-column ul li a {
-    color: #FFD580; /* Vàng nhạt */
+    color: #965E00;
     text-decoration: none;
     transition: color 0.3s ease;
 }
 
 .footer-column ul li a:hover {
-    color: white; /* Màu trắng khi hover */
+    color: #EEA019;
 }
 
-/* Mạng xã hội */
 .social-icons {
     margin-top: 10px;
 }
@@ -59,21 +55,20 @@
 .social-icons a {
     display: inline-block;
     margin-right: 10px;
-    color: white;
+    color: #965E00;
     transition: transform 0.3s ease, color 0.3s ease;
 }
 
 .social-icons a:hover {
-    color: #EEA019; /* Cam khi hover */
+    color: #EEA019;
     transform: scale(1.2);
 }
 
-/* Dòng bản quyền */
 .footer-bottom {
     text-align: center;
     margin-top: 20px;
     padding-top: 15px;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: 1px solid #EEA019;
     font-size: 12px;
-    color: #FFD580; /* Vàng nhạt */
+    color: #965E00;
 }

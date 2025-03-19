@@ -213,3 +213,9 @@
     }
 }
 
+.hide-layout header,
+.hide-layout footer {
+    display: none;
+}
+
+

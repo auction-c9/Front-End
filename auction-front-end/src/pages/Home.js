@@ -10,6 +10,7 @@ const Home = () => {
                 </main>
             </div>
         </div>
+
     );
 };
 

@@ -22,7 +22,6 @@
 }
 
 /* Sidebar */
-/* Bo tròn sidebar */
 .admin-sidebar {
     width: 250px;
     background: white;
@@ -30,19 +29,18 @@
     padding: 20px;
     border-right: 1px solid #ddd;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-    min-height: 100%; /* Không ép chiều cao cố định */
-    border-top-right-radius: 10px; /* Bo góc trên phải */
-    border-bottom-right-radius: 10px; /* Bo góc dưới phải */
-    overflow: hidden; /* Đảm bảo nội dung không tràn */
+    min-height: 100%;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    overflow: hidden;
 }
-
 
 .admin-sidebar h2 {
     font-size: 20px;
     font-weight: bold;
     text-align: center;
     margin-bottom: 20px;
-    color: #2ecc71; /* Xanh lá */
+    color: #EEA019; /* Cam chủ đạo */
 }
 
 .admin-sidebar nav {
@@ -68,7 +66,7 @@
 }
 
 .admin-sidebar nav a:hover {
-    background: #2ecc71; /* Xanh lá */
+    background: #EEA019; /* Cam chủ đạo */
     color: white;
 }
 
@@ -87,7 +85,7 @@
 .admin-content h2 {
     font-size: 24px;
     margin-bottom: 15px;
-    color: #2ecc71; /* Xanh lá */
+    color: #EEA019; /* Cam chủ đạo */
 }
 
 /* Bảng dữ liệu */
@@ -99,7 +97,7 @@
 }
 
 .admin-content th {
-    background: #2ecc71; /* Xanh lá */
+    background: #EEA019; /* Cam chủ đạo */
     color: white;
     padding: 12px;
     text-align: left;
@@ -122,20 +120,125 @@
     gap: 10px;
 }
 
+/* Nút bấm */
 .admin-content button {
-    background: #2ecc71; /* Xanh lá */
+    background: #EEA019; /* Cam chủ đạo */
     color: white;
     border: none;
     padding: 8px 12px;
     cursor: pointer;
     border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .admin-content button:hover {
-    background: #27ae60; /* Xanh lá đậm */
+    background: #d88a00; /* Cam đậm hơn */
 }
 
 .admin-content button:disabled {
     background: #ccc;
     cursor: not-allowed;
+}
+
+/* Định dạng overlay cho modal */
+.overlay-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+/* Định dạng modal */
+.custom-modal {
+    background: white;
+    padding: 20px;
+    width: 400px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+/* Nút trong modal */
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* Tăng khoảng cách giữa hai nút */
+    margin-top: 20px;
+}
+
+.modal-actions button {
+    flex: 1; /* Cả hai nút có độ rộng bằng nhau */
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+/* Nút xác nhận (OK, Xóa, ...) */
+.modal-actions .confirm-btn {
+    background: #EEA019; /* Màu cam chủ đạo */
+    color: white;
+    border: none;
+}
+
+.modal-actions .confirm-btn:hover {
+    background: #d88a00; /* Màu cam đậm hơn */
+}
+
+/* Nút hủy (Cancel) */
+.modal-actions .cancel-btn {
+    background: #ccc;
+    color: #333;
+    border: none;
+}
+
+.modal-actions .cancel-btn:hover {
+    background: #aaa;
+}
+
+/* Thêm một lớp mới cho nhóm nút để căn chỉnh ngang */
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Định dạng nút */
+.customer-table td button {
+    padding: 5px 10px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Định dạng cho nút khóa/mở khóa */
+.lock-btn {
+    background-color: red;
+    color: white;
+    margin-right: 10px; /* Khoảng cách giữa nút khóa và nút xem chi tiết */
+}
+
+.unlock-btn {
+    background-color: green;
+    color: white;
+}
+
+/* Định dạng nút xem chi tiết */
+.detail-btn {
+    background-color: #007bff;
+    color: white;
+    margin-left: 10px; /* Khoảng cách giữa nút khóa và nút xem chi tiết */
 }

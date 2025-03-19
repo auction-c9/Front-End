@@ -26,6 +26,8 @@ const createProduct = async (formData) => {
     return response.data;
 };
 
+
+
 const productService = {
     getProductById,
     createProduct,

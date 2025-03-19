@@ -1,10 +1,9 @@
-/* ======= Header Styles ======= */
 .header {
-    background: #EEA019; /* Màu cam chủ đạo */
+    background: white;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
 }
 
-/* Top Header */
 .top-header {
     display: flex;
     justify-content: space-between;
@@ -15,11 +14,10 @@
 .logo-text {
     font-size: 24px;
     font-weight: bold;
-    color: #965E00; /* Chữ màu trắng để nổi bật */
+    color: #965E00;
     text-decoration: none;
 }
 
-/* === Search Bar === */
 .search-container {
     flex: 1;
     max-width: 500px;
@@ -30,6 +28,7 @@
     background: white;
     border-radius: 8px;
     overflow: hidden;
+    border: 2px solid #EEA019;
 }
 
 .search-input {
@@ -51,16 +50,15 @@
 }
 
 .search-button:hover {
-    background: #CC8400; /* Đậm hơn khi hover */
+    background: #CC8400;
 }
 
 .error-text {
-    color: #FF0000; /* Màu đỏ nổi bật hơn */
+    color: #FF0000;
     font-size: 12px;
     margin-top: 5px;
 }
 
-/* === Navigation Icons === */
 .nav-icons {
     display: flex;
     gap: 15px;
@@ -68,7 +66,7 @@
 }
 
 .icon-link {
-    color: white; /* Màu trắng để phù hợp với nền cam */
+    color: #965E00;
     text-decoration: none;
     transition: color 0.3s;
 }
@@ -77,14 +75,12 @@
     color: #CC8400;
 }
 
-/* === User Dropdown === */
 .user-dropdown {
     background: none;
     border: none;
     cursor: pointer;
 }
 
-/* === Bottom Header === */
 .bottom-header {
     background: #965E00;
     padding: 10px 20px;
@@ -94,11 +90,13 @@
 .category-nav {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 20px;
     flex-wrap: wrap;
+    font-size: 18px;
 }
 
 .nav-link {
+    padding: 10px 20px;
     text-decoration: none;
     color: white;
     font-weight: 500;
@@ -106,17 +104,15 @@
 }
 
 .nav-link:hover {
-    color: #FFD580; /* Vàng nhạt khi hover */
+    color: #FFD580;
 }
 
-/* === Authentication Buttons (Login / Register) === */
 .auth-buttons {
     display: flex;
     gap: 15px;
     align-items: center;
 }
 
-/* Nút Đăng nhập */
 .auth-buttons .btn-outline-primary {
     background-color: white !important;
     color: #965E00 !important;
@@ -132,7 +128,6 @@
     color: white !important;
 }
 
-/* Nút Đăng ký */
 .auth-buttons .btn-primary {
     background-color: #965E00 !important;
     color: white !important;
@@ -144,5 +139,5 @@
 }
 
 .auth-buttons .btn-primary:hover {
-    background-color: #CC8400 !important; /* Đậm hơn khi hover */
+    background-color: #CC8400 !important;
 }

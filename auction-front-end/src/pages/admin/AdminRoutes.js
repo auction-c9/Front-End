@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminDashboard from './AdminDashboard';
 import AdminCustomerList from './AdminCustomerList';
 import { useAuth } from '../../context/AuthContext';
+import AdminProductList from "./AdminProductList";
 
 const AdminRoutes = () => {
     const { user } = useAuth();
@@ -30,6 +31,7 @@ const AdminRoutes = () => {
         <Routes>
             <Route path="/" element={<AdminDashboard />} />
             <Route path="/customers" element={<AdminCustomerList />} />
+            <Route path="/products" element={<AdminProductList/>} />
         </Routes>
     );
 };

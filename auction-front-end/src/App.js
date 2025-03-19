@@ -22,6 +22,12 @@ import RegisteredAuctionsHistory from "./pages/auctions/RegisteredAuctionsHistor
 import AdminRoutes from "./pages/admin/AdminRoutes";
 import Header from "./pages/Header";
 import Footer from "./pages/Footer";
+import PrivacyPolicy from "./pages/auth/PrivacyPolicy";
+import About from "./pages/auth/About";
+import TermOfService from "./pages/auth/TermOfService";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 const App = () => {
     useEffect(() => {
@@ -31,24 +37,33 @@ const App = () => {
     return (
         <Router>
             <AuthProvider>
-                <Header/>
-                <Routes>
-                    <Route path="/" element={<Home/>}/>
-                    <Route path="/auctions" element={<AuctionList/>}/>
-                    <Route path="/product/add" element={<AddProduct/>}/>
-                    <Route path="/auction/:id" element={<AuctionDetailPage/>}/>
-                    <Route path="/login" element={<Login/>}/>
-                    <Route path="/register" element={<Register/>}/>
-                    <Route path="/logout" element={<Logout/>}/>
-                    <Route path="/profile" element={<ProfilePage/>}/>
-                    <Route path="/forgot-password" element={<ForgotPasswordStep1/>}/>
-                    <Route path="/forgot-password/step2" element={<ForgotPasswordStep2/>}/>
-                    <Route path="/forgot-password/step3" element={<ForgotPasswordStep3/>}/>
-                    <Route path="/auctions/live" element={<LiveAuctions />} />
-                    <Route path="/auctions/upcoming" element={<UpcomingAuctions />} />
-                    <Route path="/auctions/ended" element={<EndedAuctions />} />
-                </Routes>
-                <Footer/>
+                <ToastContainer position="top-right" autoClose={3000} />
+                <div className="app-container">
+                    <Header/>
+                    <div className="content-container">
+                        <Routes>
+                            <Route path="/" element={<Home/>}/>
+                            <Route path="/auctions" element={<AuctionList/>}/>
+                            <Route path="/product/add" element={<AddProduct/>}/>
+                            <Route path="/auction/:id" element={<AuctionDetailPage/>}/>
+                            <Route path="/login" element={<Login/>}/>
+                            <Route path="/register" element={<Register/>}/>
+                            <Route path="/logout" element={<Logout/>}/>
+                            <Route path="/profile" element={<ProfilePage/>}/>
+                            <Route path="/forgot-password" element={<ForgotPasswordStep1/>}/>
+                            <Route path="/forgot-password/step2" element={<ForgotPasswordStep2/>}/>
+                            <Route path="/forgot-password/step3" element={<ForgotPasswordStep3/>}/>
+                            <Route path="/auctions/live" element={<LiveAuctions/>}/>
+                            <Route path="/auctions/upcoming" element={<UpcomingAuctions/>}/>
+                            <Route path="/auctions/ended" element={<EndedAuctions/>}/>
+                            <Route path="/admin/*" element={<AdminRoutes/>}/>
+                            <Route path="/privacy-policy" element={<PrivacyPolicy/>}/>
+                            <Route path="/about" element={<About/>}/>
+                            <Route path="/terms" element={<TermOfService/>}/>
+                        </Routes>
+                    </div>
+                    <Footer/>
+                </div>
             </AuthProvider>
         </Router>
     );
