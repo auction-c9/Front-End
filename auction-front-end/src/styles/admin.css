@@ -30,7 +30,7 @@
     padding: 20px;
     border-right: 1px solid #ddd;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-    min-height: auto; /* Không ép chiều cao cố định */
+    min-height: 100%; /* Không ép chiều cao cố định */
     border-top-right-radius: 10px; /* Bo góc trên phải */
     border-bottom-right-radius: 10px; /* Bo góc dưới phải */
     overflow: hidden; /* Đảm bảo nội dung không tràn */
@@ -80,6 +80,7 @@
     border-radius: 10px;
     margin: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-height: 100%;
 }
 
 /* Tiêu đề trang */

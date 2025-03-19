@@ -1,7 +1,6 @@
-/* Giao diện tổng thể */
 body {
     font-family: 'Poppins', sans-serif;
-    background: #121212; /* Màu nền đen */
+    background: #121212;
     color: white;
     margin: 0;
     padding: 0;
@@ -12,7 +11,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #00BE2F; /* Màu xanh lá chủ đạo */
+    background: #EEA019FF;
     padding: 15px 20px;
     color: white;
 }
@@ -29,7 +28,7 @@ body {
 
 /* Sidebar */
 .sidebar {
-    background: #00BE2F;
+    background: #EEA019FF;
     color: white;
     padding: 20px;
     border-radius: 10px;
@@ -48,7 +47,7 @@ body {
 }
 
 .sidebar nav a:hover {
-    background: #008C23; /* Xanh lá đậm hơn */
+    background: #008C23;
 }
 
 /* Nội dung chính */
@@ -68,7 +67,7 @@ body {
 
 /* Nút đấu giá */
 .btn-auction {
-    background: #00BE2F;
+    background: #EEA019FF;
     color: white;
     padding: 10px 20px;
     border-radius: 8px;
@@ -79,44 +78,23 @@ body {
 }
 
 .btn-auction:hover {
-    background: #008C23;
-}
-
-/* Hiệu ứng hover tổng thể */
-body:hover {
-    background-color: rgba(0, 190, 47, 0.05); /* Xanh lá nhạt */
-    transition: background-color 0.3s ease;
-}
-
-body:hover h1,
-body:hover h2,
-body:hover h3,
-body:hover h4,
-body:hover p,
-body:hover span,
-body:hover a:not(.btn) {
-    color: #00BE2F !important;
-}
-
-/* Không đổi màu trong header */
-header:hover {
-    background-color: inherit !important;
+    background: #EEA019FF;
 }
 
 /* Chỉ đổi màu viền nút */
 body:hover .btn-outline-primary {
-    border-color: #00BE2F;
-    color: #00BE2F;
+    border-color: #EEA019FF;
+    color: #EEA019FF;
 }
 
 body:hover .btn-primary {
-    background-color: #00BE2F;
+    background-color: #EEA019FF;
     color: white;
 }
 
 /* Thông báo lỗi */
 .error-message {
-    background: #FFA500; /* Màu cam */
+    background: #FFA500;
     color: black;
     padding: 10px;
     border-radius: 5px;

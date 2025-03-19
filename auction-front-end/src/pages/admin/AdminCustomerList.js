@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import customerService from "../../services/customerService";
 import "../../styles/admin.css"
-import Header from "../Header";
 import AdminSidebar from "./AdminSidebar";
 
 const AdminCustomerList = () => {
@@ -29,7 +28,6 @@ const AdminCustomerList = () => {
 
     return (
         <div className="admin-layout">
-            <Header/>
             <div className="admin-container">
                 <AdminSidebar/>
                 <div className="admin-content">
@@ -44,15 +42,17 @@ const AdminCustomerList = () => {
                                 <tr>
                                     <th>ID</th>
                                     <th>Tên</th>
+                                    <th>Địa chỉ</th>
                                     <th>Email</th>
                                     <th>Số điện thoại</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {customers.map((customer) => (
-                                    <tr key={customer.id}>
-                                        <td>{customer.id}</td>
+                                    <tr key={customer.customerId}>
+                                        <td>{customer.customerId}</td>
                                         <td>{customer.name}</td>
+                                        <td>{customer.address}</td>
                                         <td>{customer.email}</td>
                                         <td>{customer.phone}</td>
                                     </tr>

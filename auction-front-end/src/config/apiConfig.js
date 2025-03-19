@@ -28,7 +28,16 @@ const setToken = (token) => localStorage.setItem("token", token);
 const clearTokens = () => localStorage.removeItem('token');
 
 // Gắn token vào request tự động
- 
+api.interceptors.request.use(
+    (config) => {
+        const token = getToken();
+        if (token && !isUnauthorizedRoute(config.url)) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
 
 // Xử lý lỗi (Không còn refreshToken nên chỉ redirect nếu 401)
 api.interceptors.response.use(

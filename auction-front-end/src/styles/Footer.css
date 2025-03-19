@@ -1,38 +1,35 @@
-/* ======= Footer Styles ======= */
 .footer {
-    background: #f9f9f9; /* Màu nền giống Bottom Header */
-    color: #333;
+    background: black;
+    color: white;
     padding: 40px 0;
     font-size: 16px;
-    border-top: 2px solid #00BE2F; /* Viền xanh đồng bộ */
 }
 
 .footer-container {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
     max-width: 1200px;
     margin: auto;
     padding: 0 20px;
 }
 
 .footer-column {
-    flex: 1;
-    min-width: 250px;
-    margin-bottom: 20px;
+    min-width: 200px;
 }
 
 .footer-logo {
     font-size: 22px;
     font-weight: bold;
-    color: #00BE2F; /* Xanh lá giống Header */
+    color: #EEA019; /* Cam nổi bật */
     text-transform: uppercase;
 }
 
 .footer-column h4 {
     font-size: 18px;
-    font-weight: bold; /* Làm đậm tiêu đề */
-    color: #00BE2F;
+    font-weight: bold;
+    color: #EEA019; /* Tiêu đề cam */
+    margin-bottom: 10px;
 }
 
 .footer-column ul {
@@ -45,13 +42,13 @@
 }
 
 .footer-column ul li a {
-    color: #555;
+    color: #FFD580; /* Vàng nhạt */
     text-decoration: none;
     transition: color 0.3s ease;
 }
 
 .footer-column ul li a:hover {
-    color: #00BE2F; /* Hover xanh lá giống Header */
+    color: white; /* Màu trắng khi hover */
 }
 
 /* Mạng xã hội */
@@ -62,12 +59,12 @@
 .social-icons a {
     display: inline-block;
     margin-right: 10px;
-    color: #333;
+    color: white;
     transition: transform 0.3s ease, color 0.3s ease;
 }
 
 .social-icons a:hover {
-    color: #00BE2F; /* Hover xanh lá */
+    color: #EEA019; /* Cam khi hover */
     transform: scale(1.2);
 }
 
@@ -76,7 +73,7 @@
     text-align: center;
     margin-top: 20px;
     padding-top: 15px;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
     font-size: 12px;
-    color: #666;
+    color: #FFD580; /* Vàng nhạt */
 }
