@@ -17,41 +17,11 @@ import Register from "./pages/login/Register";
 import ForgotPasswordStep3 from "./pages/login/ForgotPasswordStep3";
 import ForgotPasswordStep2 from "./pages/login/ForgotPasswordStep2";
 import ForgotPasswordStep1 from "./pages/login/ForgotPasswordStep1";
-import ChatBox from "./pages/chat/ChatBox";
 import ProfilePage from "./pages/profile/ProfilePage";
 import RegisteredAuctionsHistory from "./pages/auctions/RegisteredAuctionsHistory";
-import AdminCustomerList from "./pages/admin/AdminCustomerList";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-
-const AdminRoutes = () => {
-    const { user } = useAuth();
-    const [isAuthChecked, setIsAuthChecked] = useState(false);
-
-    useEffect(() => {
-        if (user) {
-            setIsAuthChecked(true);
-        }
-    }, [user]);
-
-    if (!isAuthChecked) {
-        return null;
-    }
-
-    if (!user) {
-        return <Navigate to="/login" />;
-    }
-
-    if (user.role !== "ROLE_ADMIN") {
-        return <Navigate to="/" />;
-    }
-
-    return (
-        <Routes>
-            <Route path="/" element={<AdminDashboard />} />
-            <Route path="/customers" element={<AdminCustomerList />} />
-        </Routes>
-    );
-};
+import AdminRoutes from "./pages/admin/AdminRoutes";
+import Header from "./pages/Header";
+import Footer from "./pages/Footer";
 
 const App = () => {
     useEffect(() => {
@@ -61,6 +31,7 @@ const App = () => {
     return (
         <Router>
             <AuthProvider>
+                <Header/>
                 <Routes>
                     <Route path="/" element={<Home/>}/>
                     <Route path="/auctions" element={<AuctionList/>}/>
@@ -77,7 +48,7 @@ const App = () => {
                     <Route path="/auctions/upcoming" element={<UpcomingAuctions />} />
                     <Route path="/auctions/ended" element={<EndedAuctions />} />
                 </Routes>
-                <ChatBox/>
+                <Footer/>
             </AuthProvider>
         </Router>
     );

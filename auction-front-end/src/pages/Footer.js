@@ -17,6 +17,15 @@ const Footer = () => {
                 </div>
 
                 <div className="footer-column">
+                    <h4>Pháp lý</h4>
+                    <ul>
+                        <li><Link to="/about">Chính sách bảo mật</Link></li>
+                        <li><Link to="/contact">Giấy phép</Link></li>
+                        <li><Link to="/terms">Tuyên bố từ chối trách nhiệm</Link></li>
+                    </ul>
+                </div>
+
+                <div className="footer-column">
                     <h4>Hỗ trợ</h4>
                     <ul>
                         <li><Link to="/faq">Câu hỏi thường gặp</Link></li>
@@ -24,13 +33,13 @@ const Footer = () => {
                         <li><Link to="/shipping">Vận chuyển & Thanh toán</Link></li>
                     </ul>
                 </div>
-                
+
                 <div className="footer-column">
                     <h4>Kết nối với chúng tôi</h4>
                     <div className="social-icons">
-                        <a href="#"><Facebook size={20} /></a>
-                        <a href="#"><Twitter size={20} /></a>
-                        <a href="#"><Instagram size={20} /></a>
+                        <a href="#"><Facebook size={20}/></a>
+                        <a href="#"><Twitter size={20}/></a>
+                        <a href="#"><Instagram size={20}/></a>
                     </div>
                 </div>
             </div>

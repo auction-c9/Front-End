@@ -1,7 +1,7 @@
 /* ======= Header Styles ======= */
 .header {
-    background: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: #EEA019; /* Màu cam chủ đạo */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Top Header */
@@ -15,10 +15,11 @@
 .logo-text {
     font-size: 24px;
     font-weight: bold;
-    color: #00BE2F; /* Màu chủ đạo xanh lá */
+    color: #965E00; /* Chữ màu trắng để nổi bật */
     text-decoration: none;
 }
 
+/* === Search Bar === */
 .search-container {
     flex: 1;
     max-width: 500px;
@@ -26,7 +27,7 @@
 
 .search-form {
     display: flex;
-    background: #f1f1f1;
+    background: white;
     border-radius: 8px;
     overflow: hidden;
 }
@@ -41,20 +42,25 @@
 }
 
 .search-button {
-    background: #00BE2F;
+    background: #965E00;
     border: none;
     padding: 10px 15px;
     cursor: pointer;
     color: white;
+    transition: background 0.3s;
+}
+
+.search-button:hover {
+    background: #CC8400; /* Đậm hơn khi hover */
 }
 
 .error-text {
-    color: #ffcc00; /* Màu vàng để dễ phân biệt với màu chủ đạo */
+    color: #FF0000; /* Màu đỏ nổi bật hơn */
     font-size: 12px;
     margin-top: 5px;
 }
 
-/* Navigation Icons */
+/* === Navigation Icons === */
 .nav-icons {
     display: flex;
     gap: 15px;
@@ -62,19 +68,25 @@
 }
 
 .icon-link {
-    color: #333;
+    color: white; /* Màu trắng để phù hợp với nền cam */
     text-decoration: none;
+    transition: color 0.3s;
 }
 
+.icon-link:hover {
+    color: #CC8400;
+}
+
+/* === User Dropdown === */
 .user-dropdown {
     background: none;
     border: none;
     cursor: pointer;
 }
 
-/* Bottom Header */
+/* === Bottom Header === */
 .bottom-header {
-    background: #f9f9f9;
+    background: #965E00;
     padding: 10px 20px;
     text-align: center;
 }
@@ -88,17 +100,49 @@
 
 .nav-link {
     text-decoration: none;
-    color: #555;
+    color: white;
     font-weight: 500;
     transition: color 0.3s;
 }
 
 .nav-link:hover {
-    color: #00BE2F;
+    color: #FFD580; /* Vàng nhạt khi hover */
 }
 
+/* === Authentication Buttons (Login / Register) === */
 .auth-buttons {
     display: flex;
-    gap: 15px; /* Tạo khoảng cách giữa hai nút */
+    gap: 15px;
     align-items: center;
+}
+
+/* Nút Đăng nhập */
+.auth-buttons .btn-outline-primary {
+    background-color: white !important;
+    color: #965E00 !important;
+    border: 2px solid #965E00 !important;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.auth-buttons .btn-outline-primary:hover {
+    background-color: #CC8400 !important;
+    color: white !important;
+}
+
+/* Nút Đăng ký */
+.auth-buttons .btn-primary {
+    background-color: #965E00 !important;
+    color: white !important;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 10px 15px;
+    border: none;
+    transition: all 0.3s;
+}
+
+.auth-buttons .btn-primary:hover {
+    background-color: #CC8400 !important; /* Đậm hơn khi hover */
 }

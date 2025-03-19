@@ -21,8 +21,13 @@ export function AuthProvider({ children }) {
                 try {
                     const decoded = jwtDecode(savedToken);
                     console.log("Decoded Token:", decoded); // 🐛 Debug xem token có trường id không
-                    setUser({ username: decoded.sub, id: decoded.customerId, role: decoded.role });
-                    console.log("🔹 User sau khi set:", user);
+                    // setUser({ username: decoded.sub, id: decoded.customerId, role: decoded.role });
+                    // Cập nhật state user với thông tin từ token
+                    setUser({
+                        username: decoded.sub,
+                        id: decoded.customerId,
+                        role: decoded.role || "ROLE_USER", // Mặc định là ROLE_USER nếu không có role
+                    });
                     setToken(savedToken);
                 } catch (err) {
                     logout(); // Token lỗi
@@ -41,7 +46,15 @@ export function AuthProvider({ children }) {
             localStorage.setItem("token", token);
             const decoded = jwtDecode(token);
             console.log("Decoded Token on Login:", decoded); // 🐛 Debug sau khi login
-            setUser({ username: decoded.sub, id: decoded.customerId });
+            // setUser({ username: decoded.sub, id: decoded.customerId });
+            // Cập nhật state user
+            const newUser = {
+                username: decoded.sub,
+                id: decoded.customerId,
+                role: decoded.role || "ROLE_USER", // Đảm bảo role được cập nhật
+            };
+            setUser(newUser); // Cập nhật state user
+            console.log("User after login:", newUser); // 🐛 Debug user sau khi cập nhật
             setToken(token);
         } catch {
             throw new Error("Đăng nhập thất bại");

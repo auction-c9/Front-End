@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import apiConfig from "../../config/apiConfig";
 import PlaceBid from "./PlaceBid";
-import Header from "../../pages/Header";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { useAuth } from "../../context/AuthContext";
@@ -190,7 +189,6 @@ const AuctionDetailPage = () => {
 
     return (
         <>
-            <Header />
             <motion.h2 className="auction-title">{auction?.product?.name || "Sản phẩm chưa xác định"}</motion.h2>
             <div className="auction-detail">
                 <div className="auction-content">
