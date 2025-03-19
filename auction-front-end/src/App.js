@@ -6,10 +6,12 @@ import AuctionList from "./pages/AuctionList";
 import AddProduct from './pages/AddProduct';
 import AuctionDetailPage from './pages/auctions/AuctionDetailPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import LiveAuctions from "./pages/LiveAuctions";
+import UpcomingAuctions from "./pages/UpcomingAuctions";
+import EndedAuctions from "./pages/EndedAuctions";
 
 import Login from "./pages/login/Login";
-import {AuthProvider, useAuth} from './context/AuthContext';
-import Profile from "./pages/profile/Profile";
+import {AuthProvider} from './context/AuthContext';
 import Logout from "./pages/auth/Logout";
 import Register from "./pages/login/Register";
 import ForgotPasswordStep3 from "./pages/login/ForgotPasswordStep3";
@@ -42,8 +44,9 @@ const App = () => {
                     <Route path="/forgot-password" element={<ForgotPasswordStep1/>}/>
                     <Route path="/forgot-password/step2" element={<ForgotPasswordStep2/>}/>
                     <Route path="/forgot-password/step3" element={<ForgotPasswordStep3/>}/>
-                    <Route path="/auction-register" element={<RegisteredAuctionsHistory/>}/>
-                    <Route path="/admin/*" element={<AdminRoutes />} />
+                    <Route path="/auctions/live" element={<LiveAuctions />} />
+                    <Route path="/auctions/upcoming" element={<UpcomingAuctions />} />
+                    <Route path="/auctions/ended" element={<EndedAuctions />} />
                 </Routes>
                 <Footer/>
             </AuthProvider>

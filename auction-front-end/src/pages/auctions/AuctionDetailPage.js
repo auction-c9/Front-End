@@ -21,6 +21,7 @@ const AuctionDetailPage = () => {
     const [highestBidder, setHighestBidder] = useState("Chưa có");
     const [timeLeft, setTimeLeft] = useState("");
     const [priceUpdated, setPriceUpdated] = useState(false);
+    const winnerBid = bidHistory.reduce((max, bid) => bid.isWinner ? bid : max, null);
 
     // Sử dụng useEffect để log dữ liệu sau khi state được khởi tạo
     useEffect(() => {
@@ -33,9 +34,7 @@ const AuctionDetailPage = () => {
         }
     }, [auction, customerId, user]);
 
-    useEffect(() => {
-        console.log("Auction Object:", auction);
-    }, [auction]);
+
 
     useEffect(() => {
         console.log("Auction Object:", auction);
@@ -44,6 +43,14 @@ const AuctionDetailPage = () => {
         console.log("Account ID:", auction?.product?.account?.accountId);
     }, [auction]);
 
+    useEffect(() => {
+        console.log("Bid History:", bidHistory);
+        console.log("Winner Bid:", winnerBid);
+    }, [bidHistory, winnerBid]);
+    useEffect(() => {
+        console.log("Bid History:", bidHistory);
+        bidHistory.forEach(bid => console.log(`Bid ID: ${bid.bidId}, isWinner: ${bid.isWinner}`));
+    }, [bidHistory]);
 
 
     // ===== LẤY DỮ LIỆU ĐẤU GIÁ =====
@@ -67,6 +74,23 @@ const AuctionDetailPage = () => {
 
         fetchAuctionData();
     }, [id, navigate]);
+    useEffect(() => {
+        if (auction?.status === "ended") {
+            const fetchUpdatedBids = async () => {
+                try {
+                    const res = await axios.get(`${apiConfig.bids}/auction/${id}`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    console.log("Updated Bid History:", res.data);
+                    setBidHistory(res.data);
+                } catch (error) {
+                    console.error("Lỗi khi cập nhật lịch sử đấu giá:", error);
+                }
+            };
+            fetchUpdatedBids();
+        }
+    }, [auction?.status, id, token]);
+
 
     // ===== LỊCH SỬ ĐẤU GIÁ VÀ KẾT NỐI WEBSOCKET =====
     useEffect(() => {
@@ -108,25 +132,43 @@ const AuctionDetailPage = () => {
 
     // ===== ĐẾM NGƯỢC THỜI GIAN =====
     useEffect(() => {
-        if (!auction?.auctionEndTime) return;
-        const interval = setInterval(() => updateTimeLeft(auction.auctionEndTime), 1000);
+        if (!auction) return;
+
+        updateTimeLeft();
+        const interval = setInterval(updateTimeLeft, 1000);
+
         return () => clearInterval(interval);
     }, [auction]);
 
+
     // ===== CÁC HÀM HỖ TRỢ =====
-    const updateTimeLeft = (endTime) => {
+    const updateTimeLeft = () => {
+        if (!auction) return;
+
         const now = new Date();
-        const end = new Date(endTime);
-        const diff = end - now;
-        if (diff <= 0) {
+        let end;
+
+        if (auction.status === "pending") {
+            end = new Date(auction.auctionStartTime);
+        } else if (auction.status === "active") {
+            end = new Date(auction.auctionEndTime);
+        } else {
             setTimeLeft("Đã kết thúc");
             return;
         }
+
+        const diff = end - now;
+        if (diff <= 0) {
+            setTimeLeft(auction.status === "pending" ? "Đang bắt đầu..." : "Đã kết thúc");
+            return;
+        }
+
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff / (1000 * 60)) % 60);
         const seconds = Math.floor((diff / 1000) % 60);
         setTimeLeft(`${hours > 0 ? `${hours}g ` : ""}${minutes}p ${seconds}s`);
     };
+
 
     const updateHighestBidder = (bids) => {
         if (bids.length > 0) {
@@ -202,9 +244,27 @@ const AuctionDetailPage = () => {
                             </div>
                         </div>
 
-                        {customerId !== undefined && customerId !== null ? (
+                        {auction.status === "pending" ? (
+                            <p style={{ color: "orange", fontWeight: "bold", marginTop: "1rem" }}>
+                                ⚠️ Phiên đấu giá chưa bắt đầu.
+                            </p>
+                        ) : auction.status === "ended" ? (
+                            <p style={{ color: "red", fontWeight: "bold", marginTop: "1rem" }}>
+                                ⚠️ Phiên đấu giá đã kết thúc.
+                                {winnerBid ? (
+                                    <>
+                                        Người thắng:{" "}
+                                        <a href={`/profile/${winnerBid.user?.accountId}`} className="highest-bidder">
+                                            {winnerBid.user?.username || "Ẩn danh"}
+                                        </a>
+                                    </>
+                                ) : (
+                                    "Không có người thắng."
+                                )}
+                            </p>
+                        ) : customerId !== undefined && customerId !== null ? (
                             customerId === auction.product?.account?.accountId ? (
-                                <p style={{color: "red", fontWeight: "bold", marginTop: "1rem"}}>
+                                <p style={{ color: "red", fontWeight: "bold", marginTop: "1rem" }}>
                                     ⚠️ Bạn là chủ bài đăng, không thể tham gia đấu giá.
                                 </p>
                             ) : (
@@ -216,7 +276,7 @@ const AuctionDetailPage = () => {
                                     depositAmount={depositAmount}
                                     token={token}
                                     customerId={customerId}
-                                    ownerId={auction.product?.account?.accountId}  // Sử dụng account.id nếu có
+                                    ownerId={auction.product?.account?.accountId}
                                 />
                             )
                         ) : token ? (
@@ -228,7 +288,6 @@ const AuctionDetailPage = () => {
                                 🔹 Vui lòng đăng nhập để tham gia đấu giá.
                             </p>
                         )}
-
 
                     </div>
                 </div>
