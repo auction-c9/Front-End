@@ -1,0 +1,140 @@
+/* Định dạng chung */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Layout tổng thể */
+.admin-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Chỉ áp dụng layout cho phần nội dung admin */
+.admin-container {
+    display: flex;
+    flex: 1;
+    background: #f4f4f4;
+    align-items: stretch;
+}
+
+/* Sidebar */
+/* Bo tròn sidebar */
+.admin-sidebar {
+    width: 250px;
+    background: white;
+    color: #333;
+    padding: 20px;
+    border-right: 1px solid #ddd;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    min-height: auto; /* Không ép chiều cao cố định */
+    border-top-right-radius: 10px; /* Bo góc trên phải */
+    border-bottom-right-radius: 10px; /* Bo góc dưới phải */
+    overflow: hidden; /* Đảm bảo nội dung không tràn */
+}
+
+
+.admin-sidebar h2 {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2ecc71; /* Xanh lá */
+}
+
+.admin-sidebar nav {
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-sidebar nav a {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    text-decoration: none;
+    font-size: 16px;
+    color: #333;
+    transition: all 0.3s;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.admin-sidebar nav a svg {
+    margin-right: 10px;
+    font-size: 20px;
+}
+
+.admin-sidebar nav a:hover {
+    background: #2ecc71; /* Xanh lá */
+    color: white;
+}
+
+/* Nội dung chính */
+.admin-content {
+    flex: 1;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    margin: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Tiêu đề trang */
+.admin-content h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: #2ecc71; /* Xanh lá */
+}
+
+/* Bảng dữ liệu */
+.admin-content table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    margin-top: 10px;
+}
+
+.admin-content th {
+    background: #2ecc71; /* Xanh lá */
+    color: white;
+    padding: 12px;
+    text-align: left;
+}
+
+.admin-content td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.admin-content tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+/* Phân trang */
+.admin-content .pagination {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-content button {
+    background: #2ecc71; /* Xanh lá */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.admin-content button:hover {
+    background: #27ae60; /* Xanh lá đậm */
+}
+
+.admin-content button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
