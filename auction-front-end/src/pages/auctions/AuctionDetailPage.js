@@ -9,6 +9,9 @@ import { useAuth } from "../../context/AuthContext";
 import { motion } from "framer-motion";
 import "../../styles/AuctionDetailPage.css";
 
+// Import component Bảng xếp hạng
+import AuctionRanking from "./AuctionRanking";
+
 const AuctionDetailPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -21,37 +24,12 @@ const AuctionDetailPage = () => {
     const [highestBidder, setHighestBidder] = useState("Chưa có");
     const [timeLeft, setTimeLeft] = useState("");
     const [priceUpdated, setPriceUpdated] = useState(false);
-    const winnerBid = bidHistory.reduce((max, bid) => bid.isWinner ? bid : max, null);
 
-    // Sử dụng useEffect để log dữ liệu sau khi state được khởi tạo
-    useEffect(() => {
-        console.log("customerId:", customerId);
-        console.log("user:", user);
-        if (auction) {
-            console.log("auction.product?.account?.id:", auction.product?.account?.accountId);
-        } else {
-            console.log("Auction data is not yet loaded");
-        }
-    }, [auction, customerId, user]);
-
-
-
-    useEffect(() => {
-        console.log("Auction Object:", auction);
-        console.log("Product:", auction?.product);
-        console.log("Account:", auction?.product?.account);
-        console.log("Account ID:", auction?.product?.account?.accountId);
-    }, [auction]);
-
-    useEffect(() => {
-        console.log("Bid History:", bidHistory);
-        console.log("Winner Bid:", winnerBid);
-    }, [bidHistory, winnerBid]);
-    useEffect(() => {
-        console.log("Bid History:", bidHistory);
-        bidHistory.forEach(bid => console.log(`Bid ID: ${bid.bidId}, isWinner: ${bid.isWinner}`));
-    }, [bidHistory]);
-
+    // Tìm winner (nếu có)
+    const winnerBid = bidHistory.reduce(
+        (max, bid) => (bid.isWinner ? bid : max),
+        null
+    );
 
     // ===== LẤY DỮ LIỆU ĐẤU GIÁ =====
     useEffect(() => {
@@ -63,7 +41,6 @@ const AuctionDetailPage = () => {
         const fetchAuctionData = async () => {
             try {
                 const res = await axios.get(`${apiConfig.auctions}/${id}`);
-                console.log("Auction Data:", res.data);
                 setAuction(res.data);
                 updateTimeLeft(res.data.auctionEndTime);
             } catch (error) {
@@ -74,6 +51,8 @@ const AuctionDetailPage = () => {
 
         fetchAuctionData();
     }, [id, navigate]);
+
+    // Nếu đấu giá đã kết thúc, tải lại bidHistory để có trạng thái mới nhất (winner)
     useEffect(() => {
         if (auction?.status === "ended") {
             const fetchUpdatedBids = async () => {
@@ -81,7 +60,6 @@ const AuctionDetailPage = () => {
                     const res = await axios.get(`${apiConfig.bids}/auction/${id}`, {
                         headers: { Authorization: `Bearer ${token}` },
                     });
-                    console.log("Updated Bid History:", res.data);
                     setBidHistory(res.data);
                 } catch (error) {
                     console.error("Lỗi khi cập nhật lịch sử đấu giá:", error);
@@ -91,16 +69,16 @@ const AuctionDetailPage = () => {
         }
     }, [auction?.status, id, token]);
 
-
     // ===== LỊCH SỬ ĐẤU GIÁ VÀ KẾT NỐI WEBSOCKET =====
     useEffect(() => {
-        if (!token || !id) return;
+        if (!id) return;
 
         const fetchBidHistory = async () => {
             try {
-                const res = await axios.get(`${apiConfig.bids}/auction/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+                const config = token
+                    ? { headers: { Authorization: `Bearer ${token}` } }
+                    : {};
+                const res = await axios.get(`${apiConfig.bids}/auction/${id}`, config);
                 setBidHistory(res.data);
                 updateHighestBidder(res.data);
             } catch (error) {
@@ -110,6 +88,7 @@ const AuctionDetailPage = () => {
 
         fetchBidHistory();
 
+        // Thiết lập WebSocket
         const socket = new SockJS("http://localhost:8080/ws-auction");
         const client = new Client({
             webSocketFactory: () => socket,
@@ -130,21 +109,18 @@ const AuctionDetailPage = () => {
         return () => client.deactivate();
     }, [id, token]);
 
-    // ===== ĐẾM NGƯỢC THỜI GIAN =====
+    // ===== ĐẾM NGƯỜC THỜI GIAN =====
     useEffect(() => {
         if (!auction) return;
-
         updateTimeLeft();
         const interval = setInterval(updateTimeLeft, 1000);
-
         return () => clearInterval(interval);
+        // eslint-disable-next-line
     }, [auction]);
-
 
     // ===== CÁC HÀM HỖ TRỢ =====
     const updateTimeLeft = () => {
         if (!auction) return;
-
         const now = new Date();
         let end;
 
@@ -159,7 +135,9 @@ const AuctionDetailPage = () => {
 
         const diff = end - now;
         if (diff <= 0) {
-            setTimeLeft(auction.status === "pending" ? "Đang bắt đầu..." : "Đã kết thúc");
+            setTimeLeft(
+                auction.status === "pending" ? "Đang bắt đầu..." : "Đã kết thúc"
+            );
             return;
         }
 
@@ -169,10 +147,12 @@ const AuctionDetailPage = () => {
         setTimeLeft(`${hours > 0 ? `${hours}g ` : ""}${minutes}p ${seconds}s`);
     };
 
-
     const updateHighestBidder = (bids) => {
         if (bids.length > 0) {
-            const highest = bids.reduce((max, bid) => (bid.bidAmount > max.bidAmount ? bid : max), bids[0]);
+            const highest = bids.reduce(
+                (max, bid) => (bid.bidAmount > max.bidAmount ? bid : max),
+                bids[0]
+            );
             setHighestBidder(highest.user?.username || "Ẩn danh");
         } else {
             setHighestBidder("Chưa có");
@@ -185,27 +165,46 @@ const AuctionDetailPage = () => {
     const bidStep = parseFloat(auction?.bidStep) || 0;
     const highestBidAmount = bidHistory[0]?.bidAmount || startingPrice;
 
+    // Sắp xếp bidHistory theo giá đấu (giảm dần) -> topBids
+    const sortedBids = [...bidHistory].sort((a, b) => b.bidAmount - a.bidAmount);
+    const topBids = sortedBids.slice(0, 5);
+
+    // Nếu chưa tải xong dữ liệu
     if (!auction) return <p className="loading-text">Đang tải dữ liệu...</p>;
 
     return (
         <>
-            <motion.h2 className="auction-title">{auction?.product?.name || "Sản phẩm chưa xác định"}</motion.h2>
+
+
             <div className="auction-detail">
-                <div className="auction-content">
-                    <div className="auction-image">
+                {/* Layout 3 cột */}
+                <div className="auction-content" style={{display: "flex"}}>
+                    {/* Cột 1: Hình ảnh sản phẩm */}
+                    <div className="auction-image" style={{flex: 1}}>
                         {auction.product?.image && (
-                            <img src={auction.product.image} alt={auction.product.name} className="product-image" />
+                            <img
+                                src={auction.product.image}
+                                alt={auction.product.name}
+                                className="product-image"
+                            />
                         )}
                     </div>
 
-                    <div className="auction-info">
+                    {/* Cột 2: Thông tin sản phẩm và đấu giá */}
+
+                    <div className="auction-info" style={{flex: 2, marginLeft: "1rem"}}>
+                        <h2 className="auction-title">
+                            {auction?.product?.name || "Sản phẩm chưa xác định"}
+                        </h2>
                         <p>{auction.product?.description || "Không có mô tả"}</p>
                         <div className="info-section">
                             <div>
-                                <strong>Giá khởi điểm:</strong> {startingPrice.toLocaleString("vi-VN")} VNĐ
+                                <strong>Giá khởi điểm:</strong>{" "}
+                                {startingPrice.toLocaleString("vi-VN")} VNĐ
                             </div>
                             <div>
-                                <strong>Giá đặt cọc:</strong> {depositAmount.toLocaleString("vi-VN")} VNĐ
+                                <strong>Giá đặt cọc:</strong>{" "}
+                                {depositAmount.toLocaleString("vi-VN")} VNĐ
                             </div>
                             <div>
                                 <strong>Bước giá:</strong> {bidStep.toLocaleString("vi-VN")} VNĐ
@@ -222,7 +221,10 @@ const AuctionDetailPage = () => {
                             <div>
                                 <strong>Người Đấu giá cao nhất:</strong>{" "}
                                 {highestBidder !== "Chưa có" && bidHistory[0]?.user ? (
-                                    <a href={`/profile/${bidHistory[0].user.accountId}`} className="highest-bidder">
+                                    <a
+                                        href={`/profile/${bidHistory[0].user.accountId}`}
+                                        className="highest-bidder"
+                                    >
                                         {highestBidder}
                                     </a>
                                 ) : (
@@ -230,7 +232,8 @@ const AuctionDetailPage = () => {
                                 )}
                             </div>
                             <div>
-                                <strong>Thời gian còn lại:</strong> <span className="time-left">{timeLeft}</span>
+                                <strong>Thời gian còn lại:</strong>{" "}
+                                <span className="time-left">{timeLeft}</span>
                             </div>
                             <div>
                                 <strong>Người đăng bán:</strong>{" "}
@@ -244,17 +247,22 @@ const AuctionDetailPage = () => {
                             </div>
                         </div>
 
+                        {/* Trạng thái đấu giá */}
                         {auction.status === "pending" ? (
-                            <p style={{ color: "orange", fontWeight: "bold", marginTop: "1rem" }}>
+                            <p style={{color: "orange", fontWeight: "bold", marginTop: "1rem"}}>
                                 ⚠️ Phiên đấu giá chưa bắt đầu.
                             </p>
                         ) : auction.status === "ended" ? (
-                            <p style={{ color: "red", fontWeight: "bold", marginTop: "1rem" }}>
+                            <p style={{color: "red", fontWeight: "bold", marginTop: "1rem"}}>
                                 ⚠️ Phiên đấu giá đã kết thúc.
                                 {winnerBid ? (
                                     <>
+                                        {" "}
                                         Người thắng:{" "}
-                                        <a href={`/profile/${winnerBid.user?.accountId}`} className="highest-bidder">
+                                        <a
+                                            href={`/profile/${winnerBid.user?.accountId}`}
+                                            className="highest-bidder"
+                                        >
                                             {winnerBid.user?.username || "Ẩn danh"}
                                         </a>
                                     </>
@@ -264,7 +272,7 @@ const AuctionDetailPage = () => {
                             </p>
                         ) : customerId !== undefined && customerId !== null ? (
                             customerId === auction.product?.account?.accountId ? (
-                                <p style={{ color: "red", fontWeight: "bold", marginTop: "1rem" }}>
+                                <p style={{color: "red", fontWeight: "bold", marginTop: "1rem"}}>
                                     ⚠️ Bạn là chủ bài đăng, không thể tham gia đấu giá.
                                 </p>
                             ) : (
@@ -280,18 +288,22 @@ const AuctionDetailPage = () => {
                                 />
                             )
                         ) : token ? (
-                            <p style={{ color: "blue", fontWeight: "bold", marginTop: "1rem" }}>
+                            <p style={{color: "blue", fontWeight: "bold", marginTop: "1rem"}}>
                                 🔹 Đang tải thông tin người dùng...
                             </p>
                         ) : (
-                            <p style={{ color: "blue", fontWeight: "bold", marginTop: "1rem" }}>
+                            <p style={{color: "blue", fontWeight: "bold", marginTop: "1rem"}}>
                                 🔹 Vui lòng đăng nhập để tham gia đấu giá.
                             </p>
                         )}
-
                     </div>
+
+
+                    {/* Cột 3: Gọi component Bảng xếp hạng */}
+                    <AuctionRanking topBids={topBids}/>
                 </div>
 
+                {/* Lịch sử đấu giá (nếu muốn để dưới) */}
                 <h3 className="bid-history-title">Lịch sử đấu giá</h3>
                 <ul className="bid-history">
                     {bidHistory.map((bid) => (

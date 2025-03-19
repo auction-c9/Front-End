@@ -1,0 +1,146 @@
+/************************************************************
+ * Phần tạo hình “khiên” với viền vàng, nền đỏ.
+ * Sử dụng 2 lớp div:
+ *  - .shield-border (bên ngoài, màu vàng)
+ *  - .shield-inner (bên trong, màu đỏ)
+ * Cả 2 đều dùng clip-path polygon để mô phỏng hình khiên.
+ ************************************************************/
+
+/* Container bọc tất cả */
+.shield-container {
+    position: relative;
+    width: 350px;       /* Bạn có thể tuỳ chỉnh */
+    min-height: 450px;  /* Đảm bảo đủ chiều cao để nhìn rõ hình khiên */
+    margin: 0 auto;     /* Căn giữa nếu muốn */
+}
+
+/* Lớp ngoài: Viền vàng */
+.shield-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #f0c674; /* Màu vàng kim */
+    z-index: 1;
+
+    /*
+     * Clip-path mô phỏng hình khiên (bạn có thể tuỳ chỉnh toạ độ).
+     * polygon(x% y%, ...) với thứ tự các điểm chạy xung quanh hình.
+     */
+    clip-path: polygon(
+            20% 0%,   /* điểm 1 */
+            80% 0%,   /* điểm 2 */
+            100% 20%, /* điểm 3 */
+            100% 85%, /* điểm 4 */
+            50% 100%, /* điểm 5 */
+            0% 85%,   /* điểm 6 */
+            0% 20%    /* điểm 7 */
+    );
+}
+
+/* Lớp trong: Nền đỏ (gradient) */
+.shield-inner {
+    position: absolute;
+    top: 4%;      /* đẩy xuống một chút để lộ viền vàng */
+    left: 4%;     /* đẩy sang phải để lộ viền vàng */
+    width: 92%;   /* thu nhỏ để viền vàng hiện xung quanh */
+    height: 92%;
+    z-index: 2;
+    background: linear-gradient(to bottom, #b20a0a, #e62e2e);
+    clip-path: polygon(
+            20% 0%,
+            80% 0%,
+            100% 20%,
+            100% 85%,
+            50% 100%,
+            0% 85%,
+            0% 20%
+    );
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    border-radius: 2px;
+}
+
+/************************************************************
+ * Phần nội dung bên trong (leaderboard)
+ ************************************************************/
+.leaderboard-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    color: #fff;
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+/* Tiêu đề Leaderboard */
+.leaderboard-content h2 {
+    margin: 0 0 10px;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Icon kim cương – thay đường dẫn background-image theo ý bạn */
+.diamond-icon {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 20px;
+    background: url("https://i.ibb.co/xDmjVt9/diamond.png") no-repeat center center;
+    background-size: contain;
+}
+
+/* Trường hợp chưa có ai đấu giá */
+.no-bids {
+    margin-top: 20px;
+    font-style: italic;
+}
+
+/* Danh sách xếp hạng */
+.leaderboard-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Từng item trong bảng xếp hạng */
+.leaderboard-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 0.75rem;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.95rem;
+}
+
+/* Icon huy chương hoặc # thứ tự */
+.rank-icon {
+    width: 32px;
+    margin-right: 0.5rem;
+    font-size: 1.25rem;
+    text-align: center;
+}
+
+/* Màu sắc đặc trưng cho top 3 */
+.gold {
+    color: #ffbf00;
+}
+.silver {
+    color: #c0c0c0;
+}
+.bronze {
+    color: #cd7f32;
+}
+
+/* Tên người chơi và số tiền */
+.player-name {
+    font-weight: 600;
+    margin-right: auto;
+}
+
+.bid-amount {
+    font-weight: 600;
+    color: #fff;
+}

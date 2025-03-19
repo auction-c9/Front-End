@@ -9,7 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import LiveAuctions from "./pages/LiveAuctions";
 import UpcomingAuctions from "./pages/UpcomingAuctions";
 import EndedAuctions from "./pages/EndedAuctions";
-
+import Header from "./pages/Header";
 import Login from "./pages/login/Login";
 import {AuthProvider} from './context/AuthContext';
 import Logout from "./pages/auth/Logout";
@@ -18,12 +18,13 @@ import ForgotPasswordStep3 from "./pages/login/ForgotPasswordStep3";
 import ForgotPasswordStep2 from "./pages/login/ForgotPasswordStep2";
 import ForgotPasswordStep1 from "./pages/login/ForgotPasswordStep1";
 import ProfilePage from "./pages/profile/ProfilePage";
-import { useAuth } from './context/AuthContext';
+import {useAuth} from './context/AuthContext';
 import AdminCustomerList from "./pages/admin/AdminCustomerList";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import Footer from "./pages/Footer";
 
 const AdminRoutes = () => {
-    const { user } = useAuth();
+    const {user} = useAuth();
     const [isAuthChecked, setIsAuthChecked] = useState(false);
 
     useEffect(() => {
@@ -37,24 +38,21 @@ const AdminRoutes = () => {
     }
 
     if (!user) {
-        return <Navigate to="/login" />;
+        return <Navigate to="/login"/>;
     }
 
     if (user.role !== "ROLE_ADMIN") {
-        return <Navigate to="/" />;
+        return <Navigate to="/"/>;
     }
 
     return (
         <Routes>
-            <Route path="/" element={<AdminDashboard />} />
-            <Route path="/customers" element={<AdminCustomerList />} />
+            <Route path="/" element={<AdminDashboard/>}/>
+            <Route path="/customers" element={<AdminCustomerList/>}/>
         </Routes>
     );
 };
-import RegisteredAuctionsHistory from "./pages/auctions/RegisteredAuctionsHistory";
-import AdminRoutes from "./pages/admin/AdminRoutes";
-import Header from "./pages/Header";
-import Footer from "./pages/Footer";
+
 
 const App = () => {
     useEffect(() => {
@@ -77,12 +75,14 @@ const App = () => {
                     <Route path="/forgot-password" element={<ForgotPasswordStep1/>}/>
                     <Route path="/forgot-password/step2" element={<ForgotPasswordStep2/>}/>
                     <Route path="/forgot-password/step3" element={<ForgotPasswordStep3/>}/>
-                    <Route path="/auctions/live" element={<LiveAuctions />} />
-                    <Route path="/auctions/upcoming" element={<UpcomingAuctions />} />
-                    <Route path="/auctions/ended" element={<EndedAuctions />} />
+                    <Route path="/auctions/live" element={<LiveAuctions/>}/>
+                    <Route path="/auctions/upcoming" element={<UpcomingAuctions/>}/>
+                    <Route path="/auctions/ended" element={<EndedAuctions/>}/>
+                    <Route path="/admin/*" element={<AdminRoutes/>}/>
                 </Routes>
-                <ChatBox/>
+
             </AuthProvider>
+            <Footer />
         </Router>
     );
 };
