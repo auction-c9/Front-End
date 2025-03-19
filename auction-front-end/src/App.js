@@ -9,7 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import LiveAuctions from "./pages/LiveAuctions";
 import UpcomingAuctions from "./pages/UpcomingAuctions";
 import EndedAuctions from "./pages/EndedAuctions";
-
+import Header from "./pages/Header";
 import Login from "./pages/login/Login";
 import {AuthProvider} from './context/AuthContext';
 import Logout from "./pages/auth/Logout";
@@ -20,7 +20,6 @@ import ForgotPasswordStep1 from "./pages/login/ForgotPasswordStep1";
 import ProfilePage from "./pages/profile/ProfilePage";
 import RegisteredAuctionsHistory from "./pages/auctions/RegisteredAuctionsHistory";
 import AdminRoutes from "./pages/admin/AdminRoutes";
-import Header from "./pages/Header";
 import Footer from "./pages/Footer";
 import PrivacyPolicy from "./pages/auth/PrivacyPolicy";
 import About from "./pages/auth/About";

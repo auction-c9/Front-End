@@ -16,6 +16,7 @@ import productService from '../services/productService';
 import categoryService from '../services/categoryService';
 import 'react-toastify/dist/ReactToastify.css';
 
+
 const ProductSchema = Yup.object().shape({
     name: Yup.string().required('Tên sản phẩm là bắt buộc'),
     categoryId: Yup.number()
@@ -55,6 +56,11 @@ const AddProduct = () => {
         };
         fetchCategories();
     }, []);
+    const validationSchema = Yup.object().shape({
+        description: Yup.string()
+            .max(300, 'Mô tả không được vượt quá 300 ký tự')
+            .required('Mô tả là bắt buộc'),
+    });
 
     const handleImageFileChange = (event, setFieldValue) => {
         const file = event.currentTarget.files[0];
@@ -116,10 +122,11 @@ const AddProduct = () => {
                 {({ isSubmitting, setFieldValue, handleSubmit }) => (
                     // Sử dụng Form của react-bootstrap, gắn onSubmit = Formik's handleSubmit
                     <Form noValidate onSubmit={handleSubmit}>
-                        <Form.Group className="mb-3" controlId="formProductName">
-                            <Form.Label>Tên sản phẩm:</Form.Label>
-                            <Field name="name" as={Form.Control} type="text" placeholder="Nhập tên sản phẩm" />
-                            <ErrorMessage name="name" component="div" className="text-danger" />
+                        <Form.Group className="mb-3" controlId="formDescription">
+                            <Form.Label>Mô tả:</Form.Label>
+                            <Field as="textarea" name="description" className="form-control" placeholder="Nhập mô tả sản phẩm" maxLength={300} />
+                            <ErrorMessage name="description" component="div" className="text-danger" />
+                            <div className="text-muted">{values.description.length}/300 ký tự</div>
                         </Form.Group>
 
                         <Form.Group className="mb-3" controlId="formCategory">
@@ -146,16 +153,16 @@ const AddProduct = () => {
                             <ErrorMessage name="categoryId" component="div" className="text-danger" />
                         </Form.Group>
 
-                        <Form.Group className="mb-3" controlId="formDescription">
-                            <Form.Label>Mô tả:</Form.Label>
-                            <Field
-                                as="textarea"
-                                name="description"
-                                className="form-control"
-                                placeholder="Nhập mô tả sản phẩm"
-                            />
-                            <ErrorMessage name="description" component="div" className="text-danger" />
-                        </Form.Group>
+                        {({ isSubmitting, setFieldValue, handleSubmit, values }) => (
+                            <Form noValidate onSubmit={handleSubmit}>
+                                <Form.Group className="mb-3" controlId="formDescription">
+                                    <Form.Label>Mô tả:</Form.Label>
+                                    <Field as="textarea" name="description" className="form-control" placeholder="Nhập mô tả sản phẩm" maxLength={300} />
+                                    <ErrorMessage name="description" component="div" className="text-danger" />
+                                    <div className="text-muted">{values.description.length}/300 ký tự</div>
+                                </Form.Group>
+                            </Form>
+                        )}
 
                         <Row>
                             <Col md={6}>

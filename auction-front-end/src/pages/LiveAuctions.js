@@ -3,6 +3,7 @@ import axios from 'axios';
 import apiConfig from '../config/apiConfig';
 import { Link } from 'react-router-dom';
 
+
 // React Bootstrap
 import { Container, Row, Col, Card } from 'react-bootstrap';
 
@@ -83,6 +84,7 @@ const LiveAuctions= () => {
 
     return (
         <>
+
             <Container>
                 <h2 className="my-4">Danh sách phiên đấu giá</h2>
                 {auctions.length === 0 ? (
