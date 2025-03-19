@@ -18,6 +18,39 @@ import ForgotPasswordStep3 from "./pages/login/ForgotPasswordStep3";
 import ForgotPasswordStep2 from "./pages/login/ForgotPasswordStep2";
 import ForgotPasswordStep1 from "./pages/login/ForgotPasswordStep1";
 import ProfilePage from "./pages/profile/ProfilePage";
+import { useAuth } from './context/AuthContext';
+import AdminCustomerList from "./pages/admin/AdminCustomerList";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+
+const AdminRoutes = () => {
+    const { user } = useAuth();
+    const [isAuthChecked, setIsAuthChecked] = useState(false);
+
+    useEffect(() => {
+        if (user) {
+            setIsAuthChecked(true);
+        }
+    }, [user]);
+
+    if (!isAuthChecked) {
+        return null;
+    }
+
+    if (!user) {
+        return <Navigate to="/login" />;
+    }
+
+    if (user.role !== "ROLE_ADMIN") {
+        return <Navigate to="/" />;
+    }
+
+    return (
+        <Routes>
+            <Route path="/" element={<AdminDashboard />} />
+            <Route path="/customers" element={<AdminCustomerList />} />
+        </Routes>
+    );
+};
 import RegisteredAuctionsHistory from "./pages/auctions/RegisteredAuctionsHistory";
 import AdminRoutes from "./pages/admin/AdminRoutes";
 import Header from "./pages/Header";
@@ -48,7 +81,7 @@ const App = () => {
                     <Route path="/auctions/upcoming" element={<UpcomingAuctions />} />
                     <Route path="/auctions/ended" element={<EndedAuctions />} />
                 </Routes>
-                <Footer/>
+                <ChatBox/>
             </AuthProvider>
         </Router>
     );
