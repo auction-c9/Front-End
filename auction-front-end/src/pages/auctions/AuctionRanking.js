@@ -14,7 +14,7 @@ const AuctionRanking = ({ topBids }) => {
             <div className="shield-inner">
                 <div className="leaderboard-content">
                     {/* Tiêu đề */}
-                    <h2>LEADERBOARD</h2>
+                    <h2>BẢNG XẾP HẠNG</h2>
                     {/* Icon kim cương - tuỳ chỉnh URL hoặc dùng SVG */}
                     <div className="diamond-icon"></div>
 

@@ -126,8 +126,13 @@ const AddProduct = () => {
                             <Form.Label>Mô tả:</Form.Label>
                             <Field as="textarea" name="description" className="form-control" placeholder="Nhập mô tả sản phẩm" maxLength={300} />
                             <ErrorMessage name="description" component="div" className="text-danger" />
-                            {/*<div className="text-muted">{values.description.length}/300 ký tự</div>*/}
+                            <Formik.Consumer>
+                                {({ values }) => (
+                                    <div className="text-muted">{values.description.length}/300 ký tự</div>
+                                )}
+                            </Formik.Consumer>
                         </Form.Group>
+
 
                         <Form.Group className="mb-3" controlId="formCategory">
                             <Form.Label>Danh mục:</Form.Label>
