@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import './styles/main.css';
-import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom';
+import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import Home from './pages/Home';
 import AuctionList from "./pages/AuctionList";
 import AddProduct from './pages/AddProduct';
@@ -35,8 +35,8 @@ const App = () => {
 
     return (
         <Router>
+            <ToastContainer position="top-right" autoClose={3000} />
             <AuthProvider>
-                <ToastContainer position="top-right" autoClose={3000} />
                 <div className="app-container">
                     <Header/>
                     <div className="content-container">
