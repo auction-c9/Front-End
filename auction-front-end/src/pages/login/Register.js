@@ -39,7 +39,7 @@ const Register = () => {
             .required('CMND/CCCD là bắt buộc'),
         address: Yup.string()
             .required('Địa chỉ là bắt buộc')
-            .min(10, 'Tối thiểu 1 ký tự'),
+            .min(10, 'Tối thiểu 10 ký tự'),
         password: Yup.string()
             .min(6, 'Tối thiểu 6 ký tự')
             .required('Mật khẩu là bắt buộc'),

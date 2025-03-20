@@ -13,6 +13,8 @@ import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "../../styles/user.css";
 import UserSidebar from "./UserSidebar";
+import { Modal } from 'react-bootstrap';
+import ChangePasswordForm from "./ChangePasswordForm";
 
 const ProfileSchema = Yup.object().shape({
     name: Yup.string().required('Họ tên không được để trống'),
@@ -20,21 +22,15 @@ const ProfileSchema = Yup.object().shape({
     phone: Yup.string()
         .matches(/^\d{10,15}$/, 'Số điện thoại không hợp lệ')
         .nullable(),
-    dob: Yup.date().nullable().max(new Date(), 'Ngày sinh không hợp lệ'),
+    dob: Yup.date()
+        .nullable()
+        .max(new Date(new Date().setFullYear(new Date().getFullYear() - 18)), 'Bạn phải từ 18 tuổi trở lên'),
+    bankAccount: Yup.string()
+        .matches(/^\d{10,20}$/, 'Số tài khoản phải có từ 10 đến 20 chữ số')
+        .nullable(),
+    bankName: Yup.string().nullable(),
     identityCard: Yup.string().nullable(),
     address: Yup.string().nullable(),
-    currentPassword: Yup.string()
-        .when('newPassword', (newPassword, schema) => { // Sử dụng hàm callback
-            return newPassword ? schema.required('Vui lòng nhập mật khẩu hiện tại') : schema;
-        }),
-    newPassword: Yup.string()
-        .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
-        .nullable(),
-    confirmPassword: Yup.string()
-        .oneOf([Yup.ref('newPassword'), null], 'Mật khẩu không khớp')
-        .when('newPassword', (newPassword, schema) => { // Sử dụng hàm callback
-            return newPassword ? schema.required('Vui lòng xác nhận mật khẩu') : schema;
-        }),
 });
 
 const ProfilePage = () => {
@@ -43,23 +39,7 @@ const ProfilePage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [avatarPreview, setAvatarPreview] = useState(null);
-    const [showPasswordFields, setShowPasswordFields] = useState(false);
-    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-    const [showNewPassword, setShowNewPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-    const togglePasswordField = (setter) => () => {
-        setter(prev => !prev);
-    };
-
-    const handleCancelPasswordChange = (resetForm, values) => {
-        setShowPasswordFields(false);
-        resetForm({
-            values: {
-                ...values, currentPassword: '', newPassword: '', confirmPassword: ''
-            }
-        });
-    };
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -79,13 +59,33 @@ const ProfilePage = () => {
     const handleSubmit = async (values, {setSubmitting}) => {
         try {
             const formData = new FormData();
+            const dobISO = values.dob ? new Date(values.dob).toISOString().split('T')[0] : null;
+            const fields = {
+                name: values.name,
+                email: values.email,
+                phone: values.phone,
+                dob: dobISO,
+                bankAccount: values.bankAccount,
+                bankName: values.bankName,
+                identityCard: values.identityCard,
+                address: values.address
+            };
 
-            // Thêm các trường dữ liệu
-            Object.entries(values).forEach(([key, value]) => {
+            Object.entries(fields).forEach(([key, value]) => {
                 if (key !== 'avatarFile' && value !== null && value !== undefined) {
                     formData.append(key, value);
                 }
             });
+            // fields.forEach(key => {
+            //     if (values[key] !== null && values[key] !== undefined) {
+            //         // Xử lý đặc biệt cho trường dob
+            //         if (key === 'dob' && values[key] instanceof Date) {
+            //             formData.append(key, values[key].toISOString());
+            //         } else {
+            //             formData.append(key, values[key]);
+            //         }
+            //     }
+            // });
 
             // Thêm file ảnh nếu có
             if (values.avatarFile) {
@@ -99,12 +99,9 @@ const ProfilePage = () => {
             });
 
             setProfileData(response.data);
-            if (values.newPassword) {
-                toast.success('🎉 Cập nhật mật khẩu thành công!');
-            } else {
-                toast.success('✅ Cập nhật thông tin thành công!');
-            }
+            toast.success('✅ Cập nhật thông tin thành công!');
         } catch (err) {
+            console.error('Error updating profile:', err);
             toast.error(err.response?.data?.error || '❌ Cập nhật thất bại');
             setError(err.response?.data?.error || 'Cập nhật thất bại');
         } finally {
@@ -117,6 +114,16 @@ const ProfilePage = () => {
         if (file) {
             setFieldValue('avatarFile', file);
             setAvatarPreview(URL.createObjectURL(file));
+        }
+    };
+
+    const handlePasswordSubmit = async (values) => {
+        try {
+            await api.put('/auth/change-password', values);
+            toast.success('🎉 Đổi mật khẩu thành công!');
+            setShowPasswordModal(false);
+        } catch (error) {
+            toast.error(error.response?.data?.message || '❌ Đổi mật khẩu thất bại');
         }
     };
 
@@ -148,17 +155,16 @@ const ProfilePage = () => {
                                     email: profileData?.email || '',
                                     phone: profileData?.phone || '',
                                     dob: profileData?.dob ? new Date(profileData.dob) : null,
+                                    bankAccount: profileData?.bankAccount || '',
+                                    bankName: profileData?.bankName || '',
                                     identityCard: profileData?.identityCard || '',
                                     address: profileData?.address || '',
-                                    currentPassword: '',
-                                    newPassword: '',
-                                    confirmPassword: '',
                                     avatarFile: null,
                                 }}
                                 validationSchema={ProfileSchema}
                                 onSubmit={handleSubmit}
                             >
-                                {({isSubmitting, setFieldValue, values, resetForm}) => (
+                                {({isSubmitting, setFieldValue, values}) => (
                                     <Form>
                                         {/* Avatar Section */}
                                         <div className="mb-4 text-center">
@@ -206,14 +212,36 @@ const ProfilePage = () => {
                                                 <label htmlFor="dob">Ngày sinh</label>
                                                 <Field name="dob">
                                                     {({field, form}) => (<DatePicker
-                                                            selected={field.value}
-                                                            onChange={(date) => form.setFieldValue('dob', date)}
-                                                            dateFormat="dd/MM/yyyy"
-                                                            className="form-control"
-                                                            showYearDropdown
-                                                        />)}
+                                                        selected={field.value}
+                                                        onChange={(date) => form.setFieldValue('dob', date)}
+                                                        dateFormat="dd/MM/yyyy"
+                                                        className="form-control w-100"
+                                                        showYearDropdown
+                                                        wrapperClassName="w-100"
+                                                    />)}
                                                 </Field>
                                                 <ErrorMessage name="dob" component="div" className="text-danger"/>
+                                            </div>
+
+                                            <div className="col-md-6">
+                                                <label htmlFor="bankAccount">Số tài khoản</label>
+                                                <Field
+                                                    name="bankAccount"
+                                                    className="form-control"
+                                                    placeholder="Nhập số tài khoản"
+                                                />
+                                                <ErrorMessage name="bankAccount" component="div"
+                                                              className="text-danger"/>
+                                            </div>
+
+                                            <div className="col-md-6">
+                                                <label htmlFor="bankName">Tên ngân hàng</label>
+                                                <Field
+                                                    name="bankName"
+                                                    className="form-control"
+                                                    placeholder="Nhập tên ngân hàng"
+                                                />
+                                                <ErrorMessage name="bankName" component="div" className="text-danger"/>
                                             </div>
 
                                             <div className="col-12">
@@ -228,83 +256,6 @@ const ProfilePage = () => {
                                                 <Field name="address" as="textarea" className="form-control" rows={3}/>
                                                 <ErrorMessage name="address" component="div" className="text-danger"/>
                                             </div>
-
-                                            {/* Password Change Section */}
-                                            {showPasswordFields && (<div className="row mt-4">
-                                                    <div className="col-12 d-flex justify-content-between">
-                                                        <div className="row g-3">
-                                                            {/* Current Password */}
-                                                            <div className="col-md-4 password-input-group">
-                                                                <label>Mật khẩu hiện tại</label>
-                                                                <div className="d-flex align-items-center">
-                                                                    <Field
-                                                                        name="currentPassword"
-                                                                        type={showCurrentPassword ? "text" : "password"}
-                                                                        className="form-control"
-                                                                    />
-                                                                    <span
-                                                                        className="password-toggle-icon ms-2"
-                                                                        onClick={togglePasswordField(setShowCurrentPassword)}
-                                                                    >
-                                                                    {showCurrentPassword ? '🙈' : '👁️'}
-                                                                    </span>
-                                                                </div>
-                                                                <ErrorMessage name="currentPassword" component="div"
-                                                                              className="text-danger"/>
-                                                            </div>
-
-                                                            {/* New Password */}
-                                                            <div className="col-md-4 password-input-group">
-                                                                <label>Mật khẩu mới</label>
-                                                                <div className="d-flex align-items-center">
-                                                                    <Field
-                                                                        name="newPassword"
-                                                                        type={showNewPassword ? "text" : "password"}
-                                                                        className="form-control"
-                                                                    />
-                                                                    <span
-                                                                        className="password-toggle-icon ms-2"
-                                                                        onClick={togglePasswordField(setShowNewPassword)}
-                                                                    >
-                                                                      {showNewPassword ? '🙈' : '👁️'}
-                                                                    </span>
-                                                                </div>
-                                                                <ErrorMessage name="newPassword" component="div"
-                                                                              className="text-danger"/>
-                                                            </div>
-
-                                                            {/* Confirm Password */}
-                                                            <div className="col-md-4 password-input-group">
-                                                                <label>Xác nhận mật khẩu</label>
-                                                                <div className="d-flex align-items-center">
-                                                                    <Field
-                                                                        name="confirmPassword"
-                                                                        type={showConfirmPassword ? "text" : "password"}
-                                                                        className="form-control"
-                                                                    />
-                                                                    <span
-                                                                        className="password-toggle-icon ms-2"
-                                                                        onClick={togglePasswordField(setShowConfirmPassword)}
-                                                                    >
-                              {showConfirmPassword ? '🙈' : '👁️'}
-                            </span>
-                                                                </div>
-                                                                <ErrorMessage name="confirmPassword" component="div"
-                                                                              className="text-danger"/>
-                                                            </div>
-
-                                                            {/* Cancel Button */}
-                                                            <div className="col-12 mt-3">
-                                                                <Button
-                                                                    variant="outline-danger"
-                                                                    onClick={() => handleCancelPasswordChange(resetForm, values)}
-                                                                >
-                                                                    Hủy đổi mật khẩu
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>)}
                                         </div>
 
                                         <div className="action-buttons mt-4">
@@ -318,44 +269,34 @@ const ProfilePage = () => {
                                                     {isSubmitting ? 'Đang lưu...' : 'Lưu thay đổi'}
                                                 </Button>
 
-                                                {!showPasswordFields && (
-                                                    <Button
-                                                        variant="outline-secondary"
-                                                        onClick={() => setShowPasswordFields(true)}
-                                                        className="change-password-button"
-                                                    >
-                                                        Đổi mật khẩu
-                                                    </Button>
-                                                )}
+                                                <Button
+                                                    variant="outline-secondary"
+                                                    onClick={() => setShowPasswordModal(true)}
+                                                >
+                                                    Đổi mật khẩu
+                                                </Button>
                                             </div>
                                         </div>
-
-                                        {/* Password Change Section */}
-                                        {showPasswordFields && (
-                                            <div className="row mt-4">
-                                                <div className="col-12">
-                                                    <h5>Đổi mật khẩu</h5>
-                                                    <div className="row g-3">
-                                                        {/* ... Giữ nguyên các field password ... */}
-                                                        <div className="col-12 mt-3">
-                                                            <Button
-                                                                variant="outline-danger"
-                                                                onClick={() => handleCancelPasswordChange(resetForm, values)}
-                                                            >
-                                                                Hủy đổi mật khẩu
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
                                     </Form>)}
                             </Formik>
                         </Card.Body>
                     </Card>
+
+                    <Modal show={showPasswordModal} onHide={() => setShowPasswordModal(false)}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Đổi mật khẩu</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <ChangePasswordForm
+                                onSubmit={handlePasswordSubmit}
+                                onCancel={() => setShowPasswordModal(false)}
+                            />
+                        </Modal.Body>
+                    </Modal>
                 </div>
             </div>
-        </div>);
+        </div>
+    );
 };
 
 export default ProfilePage;
