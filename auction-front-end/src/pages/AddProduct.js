@@ -119,18 +119,15 @@ const AddProduct = () => {
                     }
                 }}
             >
-                {({ isSubmitting, setFieldValue, handleSubmit }) => (
+                {({ isSubmitting, setFieldValue, handleSubmit, values }) => (
                     // Sử dụng Form của react-bootstrap, gắn onSubmit = Formik's handleSubmit
                     <Form noValidate onSubmit={handleSubmit}>
                         <Form.Group className="mb-3" controlId="formDescription">
                             <Form.Label>Mô tả:</Form.Label>
-                            <Field as="textarea" name="description" className="form-control" placeholder="Nhập mô tả sản phẩm" maxLength={300} />
-                            <ErrorMessage name="description" component="div" className="text-danger" />
-                            <Formik.Consumer>
-                                {({ values }) => (
-                                    <div className="text-muted">{values.description.length}/300 ký tự</div>
-                                )}
-                            </Formik.Consumer>
+                            <Field as="textarea" name="description" className="form-control"
+                                   placeholder="Nhập mô tả sản phẩm" maxLength={300}/>
+                            <ErrorMessage name="description" component="div" className="text-danger"/>
+                            <div className="text-muted">{values.description.length}/300 ký tự</div>
                         </Form.Group>
 
 

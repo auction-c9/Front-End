@@ -74,6 +74,9 @@ export default {
     customers: `${API_BASE_URL}/admin/customers`,
     adminProducts: `${API_BASE_URL}/admin/products`,
     accounts: `${API_BASE_URL}/accounts`,
+    statistics: `${API_BASE_URL}/admin/statistics/`,
+
+
 };
 
 export {

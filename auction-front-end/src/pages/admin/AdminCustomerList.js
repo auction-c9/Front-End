@@ -6,7 +6,7 @@ import accountService from "../../services/accountService";
 import Modal from "react-modal";
 import "../../styles/admin.css";
 import AdminSidebar from "./AdminSidebar";
-import { FaLock, FaUnlock, FaEye } from "react-icons/fa";
+import {FaLock, FaUnlock, FaEye, FaExclamationTriangle} from "react-icons/fa";
 
 Modal.setAppElement("#root");
 
@@ -61,15 +61,40 @@ const AdminCustomerList = () => {
                     toast.success("Tài khoản đã được mở khóa!");
                 } else {
                     await accountService.lockAccount(accountId);
-                    toast.success("Tài khoản đã bị khóa!");
+                    toast.success("Tài khoản đã bị khóa và email cảnh báo đã được gửi!");
                 }
-                fetchCustomers(); // Gọi lại API để cập nhật danh sách
+                fetchCustomers();
             }
         } catch (error) {
             console.error("Lỗi khi thay đổi trạng thái tài khoản", error);
             toast.error("Đã xảy ra lỗi khi thực hiện thao tác.");
         }
     };
+
+    const handleSendWarningEmail = async (accountId) => {
+        try {
+            await adminService.sendWarningEmail(accountId);
+            toast.success("Đã gửi email cảnh cáo thành công!");
+        } catch (error) {
+            console.error("Lỗi khi gửi email cảnh cáo:", error);
+
+            // Kiểm tra nếu có response từ server
+            if (error.response) {
+                console.error("Chi tiết lỗi từ server:", error.response.data);
+                toast.error(`Lỗi: ${error.response.data.message || "Gửi email thất bại!"}`);
+            } else if (error.request) {
+                // Lỗi do không nhận được phản hồi từ server
+                console.error("Không nhận được phản hồi từ server:", error.request);
+                toast.error("Lỗi: Không nhận được phản hồi từ máy chủ!");
+            } else {
+                // Lỗi xảy ra trước khi gửi request
+                console.error("Lỗi khi chuẩn bị gửi request:", error.message);
+                toast.error(`Lỗi: ${error.message}`);
+            }
+        }
+    };
+
+
 
     return (
         <div className="admin-layout">
@@ -108,14 +133,20 @@ const AdminCustomerList = () => {
                                                 className={customer.account?.locked ? "unlock-btn" : "lock-btn"}
                                                 onClick={() => handleLockAccount(customer.account?.accountId)}
                                             >
-                                                {customer.account?.locked ? <FaUnlock /> : <FaLock />}
+                                                {customer.account?.locked ? <FaUnlock/> : <FaLock/>}
                                                 {customer.account?.locked ? " Mở khóa" : " Khóa"}
                                             </button>
                                             <button
                                                 className="detail-btn"
                                                 onClick={() => openDetailModal(customer.customerId)}
                                             >
-                                                <FaEye /> Xem chi tiết
+                                                <FaEye/> Xem chi tiết
+                                            </button>
+                                            <button
+                                                className="warning-btn"
+                                                onClick={() => handleSendWarningEmail(customer.account?.accountId)}
+                                            >
+                                                <FaExclamationTriangle/> Gửi cảnh cáo
                                             </button>
                                         </td>
                                     </tr>
@@ -125,7 +156,7 @@ const AdminCustomerList = () => {
 
                             <div className="pagination">
                                 <button onClick={() => setPage(page - 1)} disabled={page === 0}>
-                                    ❮ Trước
+                                ❮ Trước
                                 </button>
                                 <span>Trang {page + 1} / {totalPages}</span>
                                 <button onClick={() => setPage(page + 1)} disabled={page === totalPages - 1}>
