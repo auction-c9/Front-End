@@ -73,8 +73,10 @@ const AdminCustomerList = () => {
 
     const handleSendWarningEmail = async (accountId) => {
         try {
+            console.log("Bắt đầu gửi email cảnh cáo cho accountId:", accountId);
             await adminService.sendWarningEmail(accountId);
-            toast.success("Đã gửi email cảnh cáo thành công!");
+            console.log("Gửi email cảnh cáo thành công cho accountId:", accountId);
+
         } catch (error) {
             console.error("Lỗi khi gửi email cảnh cáo:", error);
 

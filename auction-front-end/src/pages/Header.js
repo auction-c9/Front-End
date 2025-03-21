@@ -1,11 +1,13 @@
-import React from 'react';
-import {Link, useNavigate} from 'react-router-dom';
-import {Formik, Form, Field, ErrorMessage} from 'formik';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import {useAuth} from '../context/AuthContext';
-import {Dropdown} from 'react-bootstrap';
-import {Search, ShoppingCart, User, Menu, Bell} from 'react-feather';
-import {User as UserIcon} from "react-feather";
+import { useAuth } from '../context/AuthContext';
+import { Dropdown } from 'react-bootstrap';
+import { Search, ShoppingCart, Bell } from 'react-feather';
+import { User as UserIcon } from "react-feather";
+import SockJS from 'sockjs-client';
+import { Client } from '@stomp/stompjs';
 import '../styles/Header.css';
 
 const searchSchema = Yup.object().shape({
@@ -14,9 +16,35 @@ const searchSchema = Yup.object().shape({
 
 const Header = () => {
     const navigate = useNavigate();
-    const {user, logout} = useAuth();
+    const { user, logout } = useAuth();
+    const [notifications, setNotifications] = useState([]); // ✅ Định nghĩa useState trước khi sử dụng
+    const [stompClient, setStompClient] = useState(null);  // ✅ Thêm state để lưu client WebSocket
 
-    const handleSearch = (values, {resetForm}) => {
+    // 🔥 Sửa lỗi: useEffect phải nằm trong component
+    useEffect(() => {
+        const socket = new SockJS('http://localhost:8080/ws-auction'); // Dùng SockJS
+        const client = new Client({
+            webSocketFactory: () => socket,
+            reconnectDelay: 5000, // Tự động kết nối lại sau 5 giây nếu mất kết nối
+        });
+
+        client.onConnect = () => {
+            console.log('WebSocket connected');
+            client.subscribe('/user/queue/notifications', (message) => {
+                const notification = JSON.parse(message.body);
+                setNotifications(prev => [notification, ...prev]);
+            });
+        };
+
+        client.activate();
+        setStompClient(client); // ✅ Lưu client vào state để quản lý
+
+        return () => {
+            client.deactivate();
+        };
+    }, []);
+
+    const handleSearch = (values, { resetForm }) => {
         navigate(`/search?query=${values.query}`);
         resetForm();
     };
@@ -33,7 +61,7 @@ const Header = () => {
                 {/* Search Bar */}
                 <div className="search-container">
                     <Formik
-                        initialValues={{query: ''}}
+                        initialValues={{ query: '' }}
                         validationSchema={searchSchema}
                         onSubmit={handleSearch}
                     >
@@ -46,9 +74,9 @@ const Header = () => {
                                     className="search-input"
                                 />
                                 <button type="submit" className="search-button">
-                                    <Search size={20}/>
+                                    <Search size={20} />
                                 </button>
-                                <ErrorMessage name="query" component="div" className="error-text"/>
+                                <ErrorMessage name="query" component="div" className="error-text" />
                             </Form>
                         )}
                     </Formik>
@@ -56,22 +84,44 @@ const Header = () => {
 
                 {/* User & Navigation */}
                 <div className="nav-icons">
-                    <Link to="/notifications" className="icon-link">
-                        <Bell size={22} />
-                    </Link>
+                    {/* Dropdown Thông báo */}
+                    <Dropdown align="end" className="icon-link">
+                        <Dropdown.Toggle as="div" style={{ cursor: "pointer" }}>
+                            <Bell size={22} />
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu style={{ minWidth: "300px" }}>
+                            <div style={{ maxHeight: "400px", overflowY: "auto" }}>
+                                {notifications.length > 0 ? (
+                                    notifications.map((notification, index) => (
+                                        <Dropdown.Item key={index}>
+                                            <div>
+                                                <strong>{notification.message}</strong>
+                                                <div style={{ fontSize: "0.9rem" }}>
+                                                    {new Date(notification.timestamp).toLocaleString()}
+                                                </div>
+                                            </div>
+                                        </Dropdown.Item>
+                                    ))
+                                ) : (
+                                    <Dropdown.Item disabled>Không có thông báo</Dropdown.Item>
+                                )}
+                            </div>
+                        </Dropdown.Menu>
+                    </Dropdown>
                     <Link to="/cart" className="icon-link">
-                        <ShoppingCart size={22}/>
+                        <ShoppingCart size={22} />
                     </Link>
 
                     {user ? (
                         <Dropdown>
                             <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center">
-                                <UserIcon size={20} className="me-2"/>
+                                <UserIcon size={20} className="me-2" />
                                 <span>
-        {user?.username
-            ? `Xin chào, ${user.username.includes('@') ? user.username.split('@')[0] : user.username}`
-            : "Tài khoản"}
-    </span>
+                                    {user?.username
+                                        ? `Xin chào, ${user.username.includes('@') ? user.username.split('@')[0] : user.username}`
+                                        : "Tài khoản"}
+                                </span>
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
                                 <Dropdown.Item as={Link} to="/profile">Thông tin tài khoản</Dropdown.Item>
@@ -84,22 +134,14 @@ const Header = () => {
                             </Dropdown.Menu>
                         </Dropdown>
                     ) : (
-                        <>
-                            <>
-                                {!user && (
-                                    <div className="auth-buttons">
-                                        <button className="btn btn-outline-primary" onClick={() => navigate('/login')}>
-                                            Đăng nhập
-                                        </button>
-                                        <button className="btn btn-primary" onClick={() => navigate('/register')}>
-                                            Đăng ký
-                                        </button>
-                                    </div>
-                                )}
-
-                            </>
-
-                        </>
+                        <div className="auth-buttons">
+                            <button className="btn btn-outline-primary" onClick={() => navigate('/login')}>
+                                Đăng nhập
+                            </button>
+                            <button className="btn btn-primary" onClick={() => navigate('/register')}>
+                                Đăng ký
+                            </button>
+                        </div>
                     )}
                 </div>
             </div>
