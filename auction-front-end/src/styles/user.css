@@ -57,7 +57,7 @@
 }
 
 .user-sidebar nav a:hover {
-    background: #2ecc71; /* Xanh lá */
+    background: #EEA019; /* Cam chủ đạo */
     color: white;
 }
 
@@ -75,7 +75,7 @@
 .user-content h2 {
     font-size: 24px;
     margin-bottom: 15px;
-    color: #2ecc71; /* Xanh lá */
+    color: #EEA019; /* Cam chủ đạo */
 }
 
 /* Bảng dữ liệu */
@@ -87,7 +87,7 @@
 }
 
 .user-content th {
-    background: #2ecc71; /* Xanh lá */
+    background: #EEA019; /* Cam chủ đạo */
     color: white;
     padding: 12px;
     text-align: left;
@@ -111,7 +111,7 @@
 }
 
 .user-content button {
-    background: #2ecc71; /* Xanh lá */
+    background: #EEA019; /* Cam chủ đạo */
     color: white;
     border: none;
     padding: 8px 12px;
@@ -120,7 +120,7 @@
 }
 
 .user-content button:hover {
-    background: #27ae60; /* Xanh lá đậm */
+    background: #d88a00; /* Cam đậm hơn */
 }
 
 .user-content button:disabled {
