@@ -141,13 +141,14 @@
 
 /* Nút Google - cách cặp link trên 15px */
 .google-button-container {
-    margin-top: 20px;
+    margin-top: 35px;
     display: flex;
     justify-content: center; /* Căn giữa theo chiều ngang */
 }
 
 /* Style nút Google */
 .google-login-btn {
+    margin-top: 35px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -164,6 +165,7 @@
 
 /* Icon Google */
 .google-logo {
+    margin-top: 35px;
     margin-right: 8px;
     font-size: 18px;
 }
@@ -181,6 +183,7 @@
     }
     /* Style cho nút Google */
     .google-login-btn {
+        margin-top: 35px;
         width: 100%;
         padding: 12px;
         border: 1px solid #ddd;

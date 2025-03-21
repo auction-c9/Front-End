@@ -26,12 +26,20 @@ const Register = () => {
         phone: Yup.string()
             .matches(/^\d{10,15}$/, 'Số điện thoại không hợp lệ')
             .required('Số điện thoại là bắt buộc'),
+        dob: Yup.date()
+            .required('Ngày sinh là bắt buộc')
+            .max(new Date(), 'Ngày sinh không hợp lệ'),
+        bankAccount: Yup.string()
+            .required('Số tài khoản là bắt buộc')
+            .matches(/^\d{10,20}$/, 'Số tài khoản phải từ 10-20 chữ số'),
+        bankName: Yup.string()
+            .required('Tên ngân hàng là bắt buộc'),
         identityCard: Yup.string()
             .matches(/^\d{9,20}$/, 'CMND/CCCD không hợp lệ')
             .required('CMND/CCCD là bắt buộc'),
         address: Yup.string()
             .required('Địa chỉ là bắt buộc')
-            .min(10, 'Tối thiểu 1 ký tự'),
+            .min(10, 'Tối thiểu 10 ký tự'),
         password: Yup.string()
             .min(6, 'Tối thiểu 6 ký tự')
             .required('Mật khẩu là bắt buộc'),
@@ -122,7 +130,10 @@ const Register = () => {
                                     password: '',
                                     confirmPassword: '',
                                     captcha: '',
-                                    avatarFile: null
+                                    avatarFile: null,
+                                    dob: '',
+                                    bankAccount: '',
+                                    bankName: ''
                                 }}
                                 validationSchema={validationSchema}
                                 onSubmit={handleSubmit}
@@ -222,10 +233,58 @@ const Register = () => {
                                                     />
                                                 </Form.Group>
                                             </Col>
+                                            <Col md={6}>
+                                            <Form.Group>
+                                                <Form.Label>Ngày sinh</Form.Label>
+                                                <Field
+                                                    name="dob"
+                                                    as={Form.Control}
+                                                    type="date"
+                                                    max={new Date().toISOString().split('T')[0]}
+                                                />
+                                                <ErrorMessage
+                                                    name="dob"
+                                                    component="div"
+                                                    className="text-danger small mt-1"
+                                                />
+                                            </Form.Group>
+                                        </Col>
                                         </Row>
 
                                         {/* Identity Info */}
                                         <Row className="mb-3">
+                                            <Col md={4}>
+                                                <Form.Group>
+                                                    <Form.Label>Số tài khoản</Form.Label>
+                                                    <Field
+                                                        name="bankAccount"
+                                                        as={Form.Control}
+                                                        type="text"
+                                                        placeholder="1234567890"
+                                                    />
+                                                    <ErrorMessage
+                                                        name="bankAccount"
+                                                        component="div"
+                                                        className="text-danger small mt-1"
+                                                    />
+                                                </Form.Group>
+                                            </Col>
+                                            <Col md={4}>
+                                                <Form.Group>
+                                                    <Form.Label>Tên ngân hàng</Form.Label>
+                                                    <Field
+                                                        name="bankName"
+                                                        as={Form.Control}
+                                                        type="text"
+                                                        placeholder="Vietcombank"
+                                                    />
+                                                    <ErrorMessage
+                                                        name="bankName"
+                                                        component="div"
+                                                        className="text-danger small mt-1"
+                                                    />
+                                                </Form.Group>
+                                            </Col>
                                             <Col md={6}>
                                                 <Form.Group>
                                                     <Form.Label>CMND/CCCD</Form.Label>

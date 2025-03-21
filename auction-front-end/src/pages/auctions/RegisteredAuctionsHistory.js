@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button } from 'react-bootstrap';
 import {api} from "../../config/apiConfig";
+import UserSidebar from "./../profile/UserSidebar";
+import "../../styles/user.css";
 
 const RegisteredAuctionsHistory = () => {
     const [auctions, setAuctions] = useState([]);
@@ -44,38 +46,47 @@ const RegisteredAuctionsHistory = () => {
     };
 
     return (
-        <Table striped bordered hover>
-            <thead>
-            <tr>
-                <th>STT</th>
-                <th>Tên sản phẩm</th>
-                <th>Thông tin sản phẩm</th>
-                <th>Ngày đăng ký</th>
-                <th>Tình trạng</th>
-                <th>Hủy đăng ký</th>
-            </tr>
-            </thead>
-            <tbody>
-            {auctions.map((auction, index) => (
-                <tr key={auction.auctionId}>
-                    <td>{index + 1}</td>
-                    <td>{auction.productName}</td>
-                    <td>{auction.productDescription}</td>
-                    <td>{auction.createdAt}</td>
-                    <td>{mapStatus(auction.status)}</td>
-                    <td>
-                        <Button
-                            variant="danger"
-                            onClick={() => handleCancel(auction.auctionId)}
-                            disabled={auction.status.toLowerCase() !== 'pending'}
-                        >
-                            Hủy
-                        </Button>
-                    </td>
-                </tr>
-            ))}
-            </tbody>
-        </Table>
+        <div className="user-layout">
+            <div className="user-container">
+                <UserSidebar />
+                <div className="user-content">
+                    <h2>Lịch sử đăng ký đấu giá</h2>
+
+                    <Table striped bordered hover>
+                        <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Thông tin sản phẩm</th>
+                            <th>Ngày đăng ký</th>
+                            <th>Tình trạng</th>
+                            <th>Hủy đăng ký</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {auctions.map((auction, index) => (
+                            <tr key={auction.auctionId}>
+                                <td>{index + 1}</td>
+                                <td>{auction.productName}</td>
+                                <td>{auction.productDescription}</td>
+                                <td>{auction.createdAt}</td>
+                                <td>{mapStatus(auction.status)}</td>
+                                <td>
+                                    <Button
+                                        variant="danger"
+                                        onClick={() => handleCancel(auction.auctionId)}
+                                        disabled={auction.status.toLowerCase() !== 'pending'}
+                                    >
+                                        Hủy
+                                    </Button>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </Table>
+                </div>
+            </div>
+        </div>
     );
 };
 

@@ -2,8 +2,23 @@ import React from "react";
 import "../../styles/AuctionRanking.css";
 
 const AuctionRanking = ({ topBids }) => {
+    // Lưu giá đấu cao nhất của mỗi người
+    const userBidsMap = {};
+
+    topBids.forEach((bid) => {
+        const username = bid.user?.username || "Ẩn danh";
+
+        // Nếu chưa có hoặc giá đấu hiện tại cao hơn thì cập nhật
+        if (!userBidsMap[username] || bid.bidAmount > userBidsMap[username].bidAmount) {
+            userBidsMap[username] = { ...bid };
+        }
+    });
+
+    // Chuyển object thành mảng và sắp xếp theo giá đấu giảm dần
+    const uniqueBids = Object.values(userBidsMap).sort((a, b) => b.bidAmount - a.bidAmount);
+
     // Giới hạn top 5
-    const limitedBids = topBids.slice(0, 5);
+    const limitedBids = uniqueBids.slice(0, 5);
 
     return (
         <div className="shield-container">
@@ -16,6 +31,7 @@ const AuctionRanking = ({ topBids }) => {
                     {/* Tiêu đề */}
                     <h2>BẢNG XẾP HẠNG</h2>
                     {/* Icon kim cương - tuỳ chỉnh URL hoặc dùng SVG */}
+                    <h2>LEADERBOARD</h2>
                     <div className="diamond-icon"></div>
 
                     {/* Bảng xếp hạng */}
@@ -46,7 +62,7 @@ const AuctionRanking = ({ topBids }) => {
                                 }
 
                                 return (
-                                    <li key={bid.bidId} className="leaderboard-item">
+                                    <li key={bid.user?.username || "anonymous"} className="leaderboard-item">
                                         <div className={`rank-icon ${iconClass}`}>
                                             {rankIcon}
                                         </div>
