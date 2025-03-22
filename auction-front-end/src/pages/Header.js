@@ -1,14 +1,17 @@
+// Header.js
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useAuth } from '../context/AuthContext';
-import { Dropdown } from 'react-bootstrap';
+import { Dropdown, Badge } from 'react-bootstrap';
 import { Search, ShoppingCart, Bell } from 'react-feather';
 import { User as UserIcon } from "react-feather";
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 import '../styles/Header.css';
+import NotificationDropdown from './notification/NotificationDropdown';
+import CustomToggle from "./notification/CustomToggle";
 
 const searchSchema = Yup.object().shape({
     query: Yup.string().required('Vui lòng nhập từ khóa tìm kiếm'),
@@ -17,48 +20,108 @@ const searchSchema = Yup.object().shape({
 const Header = () => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
-    const [notifications, setNotifications] = useState([]); // ✅ Định nghĩa useState trước khi sử dụng
-    const [stompClient, setStompClient] = useState(null);  // ✅ Thêm state để lưu client WebSocket
+    console.log("User in client:", user ? user.username : "No user");
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [notifications, setNotifications] = useState([]);
 
-    // 🔥 Sửa lỗi: useEffect phải nằm trong component
+    // Kết nối WebSocket
     useEffect(() => {
-        const socket = new SockJS('http://localhost:8080/ws-auction'); // Dùng SockJS
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const socket = new SockJS("http://localhost:8080/ws-auction");
         const client = new Client({
             webSocketFactory: () => socket,
-            reconnectDelay: 5000, // Tự động kết nối lại sau 5 giây nếu mất kết nối
+            debug: (str) => {
+                console.log(str);
+            },
+            connectHeaders: {
+                Authorization: "Bearer " + token
+            },
+            reconnectDelay: 5000,
+            onConnect: () => {
+                console.log('WebSocket connected');
+                client.subscribe('/topic/notifications', (message) => {
+                    console.log("Broadcast message:", message.body);
+                });
+
+            }
         });
 
-        client.onConnect = () => {
-            console.log('WebSocket connected');
-            client.subscribe('/user/queue/notifications', (message) => {
-                const notification = JSON.parse(message.body);
-                setNotifications(prev => [notification, ...prev]);
-            });
-        };
 
         client.activate();
-        setStompClient(client); // ✅ Lưu client vào state để quản lý
-
         return () => {
             client.deactivate();
         };
     }, []);
+    useEffect(() => {
+        console.log("Notifications updated:", notifications);
+    }, [notifications]);
+
+
+    // Fetch thông báo ban đầu khi user đã đăng nhập
+    useEffect(() => {
+        if (!user || !user.customerId) return;
+        const token = localStorage.getItem("token");
+        fetch(`http://localhost:8080/api/notifications/${user.customerId}`, {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                setNotifications(data);
+            })
+            .catch((error) => console.error("Error fetching notifications:", error));
+    }, [user]);
 
     const handleSearch = (values, { resetForm }) => {
         navigate(`/search?query=${values.query}`);
         resetForm();
     };
 
+    const handleNotificationClick = (e) => {
+        e.preventDefault();
+        setShowDropdown(prev => !prev);
+
+        const token = localStorage.getItem("token");
+        if (!user || !user.customerId) {
+            console.error("User or customerId không tồn tại");
+            return;
+        }
+        fetch(`http://localhost:8080/api/notifications/${user.customerId}`, {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                setNotifications(data);
+            })
+            .catch((error) => console.error("Error fetching notifications:", error));
+    };
+
+    // Tính số lượng thông báo chưa đọc (hoặc tổng thông báo nếu không dùng isRead)
+    const unreadCount = notifications.filter(n => !n.isRead).length;
     return (
         <header className="header">
-            {/* Top Header */}
             <div className="top-header">
-                {/* Logo */}
                 <div className="logo">
                     <Link to="/" className="logo-text">C9-Stock</Link>
                 </div>
 
-                {/* Search Bar */}
                 <div className="search-container">
                     <Formik
                         initialValues={{ query: '' }}
@@ -82,33 +145,24 @@ const Header = () => {
                     </Formik>
                 </div>
 
-                {/* User & Navigation */}
                 <div className="nav-icons">
-                    {/* Dropdown Thông báo */}
-                    <Dropdown align="end" className="icon-link">
-                        <Dropdown.Toggle as="div" style={{ cursor: "pointer" }}>
+                    <Dropdown
+                        align="end"
+                        className="icon-link"
+                        show={showDropdown}
+                        onToggle={() => setShowDropdown(prev => !prev)}
+                    >
+                        <Dropdown.Toggle as={CustomToggle} onClick={handleNotificationClick}>
                             <Bell size={22} />
+                            {unreadCount > 0 && (
+                                <Badge bg="danger" style={{ position: 'absolute', top: 0, right: 0 }}>
+                                    {unreadCount}
+                                </Badge>
+                            )}
                         </Dropdown.Toggle>
-
-                        <Dropdown.Menu style={{ minWidth: "300px" }}>
-                            <div style={{ maxHeight: "400px", overflowY: "auto" }}>
-                                {notifications.length > 0 ? (
-                                    notifications.map((notification, index) => (
-                                        <Dropdown.Item key={index}>
-                                            <div>
-                                                <strong>{notification.message}</strong>
-                                                <div style={{ fontSize: "0.9rem" }}>
-                                                    {new Date(notification.timestamp).toLocaleString()}
-                                                </div>
-                                            </div>
-                                        </Dropdown.Item>
-                                    ))
-                                ) : (
-                                    <Dropdown.Item disabled>Không có thông báo</Dropdown.Item>
-                                )}
-                            </div>
-                        </Dropdown.Menu>
+                        <NotificationDropdown notifications={notifications} />
                     </Dropdown>
+
                     <Link to="/cart" className="icon-link">
                         <ShoppingCart size={22} />
                     </Link>
@@ -118,7 +172,7 @@ const Header = () => {
                             <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center">
                                 <UserIcon size={20} className="me-2" />
                                 <span>
-                                    {user?.username
+                                    {user.username
                                         ? `Xin chào, ${user.username.includes('@') ? user.username.split('@')[0] : user.username}`
                                         : "Tài khoản"}
                                 </span>
@@ -127,7 +181,7 @@ const Header = () => {
                                 <Dropdown.Item as={Link} to="/profile">Thông tin tài khoản</Dropdown.Item>
                                 <Dropdown.Item as={Link} to="/auction-register">Lịch sử đăng ký đấu giá</Dropdown.Item>
                                 <Dropdown.Item as={Link} to="/product/add">Thêm sản phẩm đấu giá</Dropdown.Item>
-                                {user?.role === "ROLE_ADMIN" && (
+                                {user.role === "ROLE_ADMIN" && (
                                     <Dropdown.Item as={Link} to="/admin">Trang quản trị</Dropdown.Item>
                                 )}
                                 <Dropdown.Item onClick={logout}>Đăng xuất</Dropdown.Item>
@@ -146,7 +200,6 @@ const Header = () => {
                 </div>
             </div>
 
-            {/* Bottom Header (Danh mục) */}
             <div className="bottom-header">
                 <nav className="category-nav">
                     <Link to="/categories" className="nav-link">Danh mục</Link>

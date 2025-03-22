@@ -16,7 +16,7 @@ const AuctionDetailPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { token, user } = useAuth();
-    const customerId = user?.id;
+    const customerId = user?.customerId;
 
     // Khai báo state
     const [auction, setAuction] = useState(null);
