@@ -209,11 +209,25 @@
     background: #aaa;
 }
 
-/* Thêm một lớp mới cho nhóm nút để căn chỉnh ngang */
+/* Đảm bảo button-group hiển thị ngang */
 .button-group {
     display: flex;
-    justify-content: space-between;
+    justify-content: center; /* Căn giữa */
     align-items: center;
+    gap: 10px; /* Khoảng cách giữa các nút */
+    flex-wrap: wrap; /* Cho phép xuống dòng nếu không đủ chỗ */
+}
+
+/* Định dạng chung cho button */
+.button-group button {
+    display: inline-flex; /* Giữ button nằm ngang */
+    align-items: center;
+    justify-content: center;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 /* Định dạng nút */
@@ -242,3 +256,10 @@
     color: white;
     margin-left: 10px; /* Khoảng cách giữa nút khóa và nút xem chi tiết */
 }
+
+.flex {
+    display: flex;
+    justify-content: center;
+    gap: 16px !important;
+}
+

@@ -14,7 +14,7 @@ import NotificationDropdown from './notification/NotificationDropdown';
 import CustomToggle from "./notification/CustomToggle";
 
 const searchSchema = Yup.object().shape({
-    query: Yup.string().required('Vui lòng nhập từ khóa tìm kiếm'),
+    query: Yup.string(),
 });
 
 const Header = () => {
