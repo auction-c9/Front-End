@@ -25,7 +25,7 @@ export function AuthProvider({ children }) {
                     // Cập nhật state user với thông tin từ token
                     setUser({
                         username: decoded.sub,
-                        id: decoded.customerId,
+                        customerId: decoded.customerId,
                         role: decoded.role || "ROLE_USER", // Mặc định là ROLE_USER nếu không có role
                     });
                     setToken(savedToken);
@@ -50,7 +50,7 @@ export function AuthProvider({ children }) {
             // Cập nhật state user
             const newUser = {
                 username: decoded.sub,
-                id: decoded.customerId,
+                customerId: decoded.customerId,
                 role: decoded.role || "ROLE_USER", // Đảm bảo role được cập nhật
             };
             setUser(newUser); // Cập nhật state user
