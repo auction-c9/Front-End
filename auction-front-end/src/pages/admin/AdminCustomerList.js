@@ -181,10 +181,11 @@ const AdminCustomerList = () => {
                 {selectedCustomer ? (
                     <div>
                         <p><strong>Tên:</strong> {selectedCustomer.name}</p>
-                        <p><strong>Địa chỉ:</strong> {selectedCustomer.address}</p>
-                        <p><strong>Email:</strong> {selectedCustomer.email}</p>
-                        <p><strong>Số điện thoại:</strong> {selectedCustomer.phone}</p>
-                        <p><strong>Trạng thái tài khoản:</strong> {selectedCustomer.account?.locked ? "Bị khóa" : "Hoạt động"}</p>
+                        <p><strong>CCCD:</strong> {selectedCustomer.identityCard}</p>
+                        <p><strong>Số tài khảon:</strong> {selectedCustomer.bankAccount}</p>
+                        <p><strong>Tên ngân hàng:</strong> {selectedCustomer.bankName}</p>
+                        <p><strong>Trạng thái tài
+                            khoản:</strong> {selectedCustomer.account?.locked ? "Bị khóa" : "Hoạt động"}</p>
                     </div>
                 ) : (
                     <p>Đang tải thông tin chi tiết...</p>
