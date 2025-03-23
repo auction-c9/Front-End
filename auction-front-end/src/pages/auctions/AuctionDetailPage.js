@@ -8,6 +8,8 @@ import { Client } from "@stomp/stompjs";
 import { useAuth } from "../../context/AuthContext";
 import { motion } from "framer-motion";
 import "../../styles/AuctionDetailPage.css";
+import  {Link}  from 'react-router-dom';
+
 
 // Import component Bảng xếp hạng
 import AuctionRanking from "./AuctionRanking";
@@ -238,9 +240,9 @@ const AuctionDetailPage = () => {
                             <div>
                                 <strong>Người đăng bán:</strong>{" "}
                                 {auction.product?.account ? (
-                                    <a href={`/profile/${auction.product.account.accountId}`}>
+                                    <Link to={`/profile/${auction.product.account.accountId}`}>
                                         {auction.product.account.username}
-                                    </a>
+                                    </Link>
                                 ) : (
                                     <span>Chưa có thông tin</span>
                                 )}

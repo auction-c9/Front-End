@@ -75,7 +75,7 @@ export default {
     adminProducts: `${API_BASE_URL}/admin/products`,
     accounts: `${API_BASE_URL}/accounts`,
     statistics: `${API_BASE_URL}/admin/statistics/`,
-
+    profile: (accountID) => `/auctions/profile${accountID}/`
 
 };
 
