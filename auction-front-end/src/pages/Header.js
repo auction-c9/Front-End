@@ -9,7 +9,7 @@ import {User as UserIcon} from "react-feather";
 import '../styles/Header.css';
 
 const searchSchema = Yup.object().shape({
-    query: Yup.string().required('Vui lòng nhập từ khóa tìm kiếm'),
+    query: Yup.string(),
 });
 
 const Header = () => {
