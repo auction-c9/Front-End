@@ -80,7 +80,14 @@ const BidHistory = () => {
             ));
             handleCloseReviewModal();
         } catch (err) {
-            console.error('Lỗi khi gửi đánh giá:', err);
+            if (err.response?.status === 409) {
+                alert('Bạn đã đánh giá phiên đấu giá này!');
+                // Fetch lại dữ liệu để cập nhật trạng thái
+                const response = await api.get('bids/user');
+                setBidHistory(response.data);
+            } else {
+                console.error('Lỗi khi gửi đánh giá:', err);
+            }
         }
     };
 
