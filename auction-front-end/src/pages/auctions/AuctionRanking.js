@@ -32,7 +32,7 @@ const AuctionRanking = ({ topBids }) => {
                     <h2>BẢNG XẾP HẠNG</h2>
                     {/* Icon kim cương - tuỳ chỉnh URL hoặc dùng SVG */}
                     <h2>LEADERBOARD</h2>
-                    <div className="diamond-icon"></div>
+
 
                     {/* Bảng xếp hạng */}
                     {limitedBids.length === 0 ? (

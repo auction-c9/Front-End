@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button } from 'react-bootstrap';
 import {api} from "../../config/apiConfig";
-import UserSidebar from "./../profile/UserSidebar";
+import UserSidebar from "./UserSidebar";
 import "../../styles/user.css";
 
 const RegisteredAuctionsHistory = () => {
@@ -69,7 +69,7 @@ const RegisteredAuctionsHistory = () => {
                                 <td>{index + 1}</td>
                                 <td>{auction.productName}</td>
                                 <td>{auction.productDescription}</td>
-                                <td>{auction.createdAt}</td>
+                                <td>{auction.createdAt.replace("T", " vào lúc ")}</td>
                                 <td>{mapStatus(auction.status)}</td>
                                 <td>
                                     <Button

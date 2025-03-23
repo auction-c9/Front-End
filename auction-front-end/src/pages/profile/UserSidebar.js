@@ -12,7 +12,7 @@ const UserSidebar = () => {
                 <Link to="/auction-register">
                     <FaHistory /> Lịch sử đăng ký đấu giá
                 </Link>
-                <Link to="/profile/auction-history">
+                <Link to="/bid-history">
                     <FaGavel /> Lịch sử đấu giá mặt hàng
                 </Link>
             </nav>

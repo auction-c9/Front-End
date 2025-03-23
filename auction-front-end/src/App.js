@@ -18,7 +18,7 @@ import ForgotPasswordStep3 from "./pages/login/ForgotPasswordStep3";
 import ForgotPasswordStep2 from "./pages/login/ForgotPasswordStep2";
 import ForgotPasswordStep1 from "./pages/login/ForgotPasswordStep1";
 import ProfilePage from "./pages/profile/ProfilePage";
-import RegisteredAuctionsHistory from "./pages/auctions/RegisteredAuctionsHistory";
+import RegisteredAuctionsHistory from "./pages/profile/RegisteredAuctionsHistory";
 import AdminRoutes from "./pages/admin/AdminRoutes";
 import Footer from "./pages/Footer";
 import PrivacyPolicy from "./pages/auth/PrivacyPolicy";
@@ -26,6 +26,7 @@ import About from "./pages/auth/About";
 import TermOfService from "./pages/auth/TermOfService";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import BidHistory from "./pages/profile/BidHistory";
 
 
 const App = () => {
@@ -60,6 +61,7 @@ const App = () => {
                             <Route path="/about" element={<About/>}/>
                             <Route path="/terms" element={<TermOfService/>}/>
                             <Route path="/auction-register" element={<RegisteredAuctionsHistory/>}/>
+                            <Route path="/bid-history" element={<BidHistory />} />
                         </Routes>
                     </div>
                     <Footer/>
