@@ -36,13 +36,18 @@ const Header = () => {
                 console.log(str);
             },
             connectHeaders: {
-                Authorization: "Bearer " + token
+                Authorization: `Bearer ${token}`
             },
             reconnectDelay: 5000,
             onConnect: () => {
                 console.log('WebSocket connected');
-                client.subscribe('/topic/notifications', (message) => {
-                    console.log("Broadcast message:", message.body);
+                client.subscribe('/user/queue/notifications', (message) => {
+                    try {
+                        const notification = JSON.parse(message.body);
+                        setNotifications(prev => [notification, ...prev]);
+                    } catch (error) {
+                        console.error('Error parsing notification:', error);
+                    }
                 });
 
             }
@@ -53,7 +58,7 @@ const Header = () => {
         return () => {
             client.deactivate();
         };
-    }, []);
+    }, [user]);
     useEffect(() => {
         console.log("Notifications updated:", notifications);
     }, [notifications]);
@@ -66,7 +71,7 @@ const Header = () => {
         fetch(`http://localhost:8080/api/notifications/${user.customerId}`, {
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+                Authorization: "Bearer " + token
             },
         })
             .then((response) => {
@@ -179,7 +184,6 @@ const Header = () => {
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
                                 <Dropdown.Item as={Link} to="/profile">Thông tin tài khoản</Dropdown.Item>
-                                <Dropdown.Item as={Link} to="/auction-register">Lịch sử đăng ký đấu giá</Dropdown.Item>
                                 <Dropdown.Item as={Link} to="/product/add">Thêm sản phẩm đấu giá</Dropdown.Item>
                                 {user.role === "ROLE_ADMIN" && (
                                     <Dropdown.Item as={Link} to="/admin">Trang quản trị</Dropdown.Item>
