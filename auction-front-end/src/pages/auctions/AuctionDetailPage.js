@@ -26,6 +26,7 @@ const AuctionDetailPage = () => {
     const [highestBidder, setHighestBidder] = useState("Chưa có");
     const [timeLeft, setTimeLeft] = useState("");
     const [priceUpdated, setPriceUpdated] = useState(false);
+    const [showFinalPaymentOptions, setShowFinalPaymentOptions] = useState(false);
 
     // Tìm winner (nếu có)
     const winnerBid = bidHistory.reduce(
@@ -160,6 +161,8 @@ const AuctionDetailPage = () => {
             setHighestBidder("Chưa có");
         }
     };
+
+    
 
     // ===== TÍNH GIÁ TRỊ =====
     const startingPrice = parseFloat(auction?.currentPrice) || 0;
