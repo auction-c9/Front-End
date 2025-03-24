@@ -31,9 +31,9 @@ const getProducts = async (page, size) => {
     return response.data;
 };
 
-const getProductById = async (id) => {
+const getAllProductsForAdmin = async (page, size) => {
     const token = localStorage.getItem('token');
-    const response = await axios.get(`${apiConfig.adminProducts}/${id}`, {
+    const response = await axios.get(`${apiConfig.adminProducts}/all?page=${page}&size=${size}`, {
         headers: {
             Authorization: `Bearer ${token}`
         }
@@ -41,9 +41,29 @@ const getProductById = async (id) => {
     return response.data;
 };
 
-const deleteProduct = async (id) => {
+const getProductById = async (productId) => {
     const token = localStorage.getItem('token');
-    const response = await axios.delete(`${apiConfig.adminProducts}/${id}`, {
+    const response = await axios.get(`${apiConfig.adminProducts}/${productId}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+    return response.data;
+};
+
+const deleteProduct = async (productId) => {
+    const token = localStorage.getItem("token");
+    const response = await axios.delete(`${apiConfig.adminProducts}/${productId}`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return response.data;
+};
+
+const restoreProduct = async (productId) => {
+    const token = localStorage.getItem('token');
+    const response = await axios.put(`${apiConfig.adminProducts}/${productId}/restore`, {}, {
         headers: {
             Authorization: `Bearer ${token}`
         }
@@ -82,8 +102,10 @@ const adminService = {
     getCustomers,
     getCustomerById,
     getProducts,
+    getAllProductsForAdmin,
     getProductById,
     deleteProduct,
+    restoreProduct,
     sendWarningEmail,
 };
 export default adminService;

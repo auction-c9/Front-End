@@ -8,10 +8,8 @@ import { Client } from "@stomp/stompjs";
 import { useAuth } from "../../context/AuthContext";
 import { motion } from "framer-motion";
 import "../../styles/AuctionDetailPage.css";
-import  {Link}  from 'react-router-dom';
-
-
-// Import component Bảng xếp hạng
+import { Link } from 'react-router-dom';
+import { toast, ToastContainer } from "react-toastify";
 import AuctionRanking from "./AuctionRanking";
 
 const AuctionDetailPage = () => {
@@ -20,12 +18,14 @@ const AuctionDetailPage = () => {
     const { token, user } = useAuth();
     const customerId = user?.customerId;
 
-    // Khai báo state
+    // State
     const [auction, setAuction] = useState(null);
     const [bidHistory, setBidHistory] = useState([]);
     const [highestBidder, setHighestBidder] = useState("Chưa có");
     const [timeLeft, setTimeLeft] = useState("");
     const [priceUpdated, setPriceUpdated] = useState(false);
+    const [showFinalPaymentOptions, setShowFinalPaymentOptions] = useState(false);
+    const [error, setError] = useState("");
 
     // Tìm winner (nếu có)
     const winnerBid = bidHistory.reduce(
@@ -111,13 +111,12 @@ const AuctionDetailPage = () => {
         return () => client.deactivate();
     }, [id, token]);
 
-    // ===== ĐẾM NGƯỜC THỜI GIAN =====
+    // ===== ĐẾM NGƯỢC THỜI GIAN =====
     useEffect(() => {
         if (!auction) return;
         updateTimeLeft();
         const interval = setInterval(updateTimeLeft, 1000);
         return () => clearInterval(interval);
-        // eslint-disable-next-line
     }, [auction]);
 
     // ===== CÁC HÀM HỖ TRỢ =====
@@ -161,6 +160,55 @@ const AuctionDetailPage = () => {
         }
     };
 
+    // ===== XỬ LÝ THANH TOÁN CUỐI CÙNG =====
+    const handleFinalPayment = async (method, amount) => {
+        const auctionId = auction?.auctionId;
+        if (!auctionId) {
+            console.error("❌ [ERROR] auctionId bị undefined!");
+            setError("Lỗi: Không tìm thấy auctionId.");
+            return;
+        }
+
+        try {
+            console.log("🔄 [DEBUG] Gửi thanh toán cuối cùng:", { customerId, auctionId, amount, method });
+
+            const response = await axios.post(
+                `${apiConfig.transactions}/create`,
+                {
+                    customerId,
+                    auctionId,
+                    amount: parseFloat(amount),
+                    paymentMethod: method,
+                    returnUrl: window.location.href
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            const { redirectUrl } = response.data;
+            if (redirectUrl) {
+                window.location.href = redirectUrl;
+            } else {
+                alert("Không thể tạo giao dịch. Vui lòng thử lại!");
+            }
+        } catch (err) {
+            console.error("❌ [ERROR] Thanh toán cuối cùng thất bại:", err.response?.data || err.message);
+            setError("Thanh toán cuối cùng thất bại. Vui lòng thử lại.");
+        }
+    };
+
+    const [paymentSuccess, setPaymentSuccess] = useState(false);
+
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentStatus = urlParams.get('status'); // Sửa thành 'status'
+
+        if (paymentStatus === 'SUCCESS') { // Sửa thành 'SUCCESS'
+            setPaymentSuccess(true);
+            setShowFinalPaymentOptions(false); // Ẩn nút thanh toán
+            toast.success("Thanh toán thành công!");
+        }
+    }, []);
+
     // ===== TÍNH GIÁ TRỊ =====
     const startingPrice = parseFloat(auction?.currentPrice) || 0;
     const depositAmount = startingPrice * 0.1;
@@ -176,13 +224,11 @@ const AuctionDetailPage = () => {
 
     return (
         <>
-
-
             <div className="auction-detail">
                 {/* Layout 3 cột */}
-                <div className="auction-content" style={{display: "flex"}}>
+                <div className="auction-content" style={{ display: "flex" }}>
                     {/* Cột 1: Hình ảnh sản phẩm */}
-                    <div className="auction-image" style={{flex: 1}}>
+                    <div className="auction-image" style={{ flex: 1 }}>
                         {auction.product?.image && (
                             <img
                                 src={auction.product.image}
@@ -193,8 +239,7 @@ const AuctionDetailPage = () => {
                     </div>
 
                     {/* Cột 2: Thông tin sản phẩm và đấu giá */}
-
-                    <div className="auction-info" style={{flex: 2, marginLeft: "1rem"}}>
+                    <div className="auction-info" style={{ flex: 2, marginLeft: "1rem" }}>
                         <h2 className="auction-title">
                             {auction?.product?.name || "Sản phẩm chưa xác định"}
                         </h2>
@@ -214,8 +259,8 @@ const AuctionDetailPage = () => {
 
                             <motion.div
                                 className={`current-price ${priceUpdated ? "highlight" : ""}`}
-                                animate={{scale: priceUpdated ? 1.1 : 1}}
-                                transition={{duration: 0.3}}
+                                animate={{ scale: priceUpdated ? 1.1 : 1 }}
+                                transition={{ duration: 0.3 }}
                             >
                                 Giá hiện tại: {highestBidAmount.toLocaleString("vi-VN")} VNĐ
                             </motion.div>
@@ -251,7 +296,7 @@ const AuctionDetailPage = () => {
 
                         {/* Trạng thái đấu giá */}
                         {auction.status === "pending" ? (
-                            <p style={{color: "orange", fontWeight: "bold", marginTop: "1rem"}}>
+                            <p style={{ color: "orange", fontWeight: "bold", marginTop: "1rem" }}>
                                 ⚠️ Phiên đấu giá chưa bắt đầu.
                             </p>
                         ) : auction.status === "ended" ? (
@@ -271,7 +316,7 @@ const AuctionDetailPage = () => {
                                             </a>
                                         </p>
                                         {/* Kiểm tra nếu người dùng hiện tại là người thắng đấu giá */}
-                                        {user?.customerId === winnerBid.user?.accountId && (
+                                        {user?.customerId === winnerBid.user?.accountId && !paymentSuccess && (
                                             <div style={{ backgroundColor: "#e0ffe0", padding: "1rem", borderRadius: "5px" }}>
                                                 <h3>Chúc mừng bạn đã đấu giá thành công!</h3>
                                                 <p>
@@ -283,6 +328,37 @@ const AuctionDetailPage = () => {
                                                     VNĐ
                                                 </p>
                                                 <p>Vui lòng thực hiện thanh toán số tiền còn lại để hoàn tất giao dịch.</p>
+
+                                                {/* Nút để hiển thị tùy chọn thanh toán */}
+                                                <button
+                                                    onClick={() => setShowFinalPaymentOptions(true)}
+                                                    style={{ padding: "0.5rem 1rem", backgroundColor: "#0070ba", color: "#fff" }}
+                                                >
+                                                    Thanh toán số tiền còn lại
+                                                </button>
+
+                                                {/* Hiển thị tùy chọn thanh toán (VNPay hoặc PayPal) */}
+                                                {showFinalPaymentOptions && (
+                                                    <div style={{ marginTop: "1rem" }}>
+                                                        <h3>Chọn phương thức thanh toán:</h3>
+                                                        <p>
+                                                            <strong>Số tiền thanh toán:</strong>{" "}
+                                                            {(winnerBid.bidAmount - depositAmount).toLocaleString('vi-VN')} VNĐ
+                                                        </p>
+                                                        <button
+                                                            onClick={() => handleFinalPayment("PAYPAL", winnerBid.bidAmount - depositAmount)}
+                                                            style={{ padding: "0.5rem 1rem", marginRight: "0.5rem", backgroundColor: "#0070ba", color: "#fff" }}
+                                                        >
+                                                            Thanh toán bằng PayPal
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleFinalPayment("VNPAY", winnerBid.bidAmount - depositAmount)}
+                                                            style={{ padding: "0.5rem 1rem", backgroundColor: "#e41e25", color: "#fff" }}
+                                                        >
+                                                            Thanh toán bằng VNPAY
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
                                     </>
@@ -292,7 +368,7 @@ const AuctionDetailPage = () => {
                             </div>
                         ) : customerId !== undefined && customerId !== null ? (
                             customerId === auction.product?.account?.accountId ? (
-                                <p style={{color: "red", fontWeight: "bold", marginTop: "1rem"}}>
+                                <p style={{ color: "red", fontWeight: "bold", marginTop: "1rem" }}>
                                     ⚠️ Bạn là chủ bài đăng, không thể tham gia đấu giá.
                                 </p>
                             ) : (
@@ -308,19 +384,18 @@ const AuctionDetailPage = () => {
                                 />
                             )
                         ) : token ? (
-                            <p style={{color: "blue", fontWeight: "bold", marginTop: "1rem"}}>
+                            <p style={{ color: "blue", fontWeight: "bold", marginTop: "1rem" }}>
                                 🔹 Đang tải thông tin người dùng...
                             </p>
                         ) : (
-                            <p style={{color: "blue", fontWeight: "bold", marginTop: "1rem"}}>
+                            <p style={{ color: "blue", fontWeight: "bold", marginTop: "1rem" }}>
                                 🔹 Vui lòng đăng nhập để tham gia đấu giá.
                             </p>
                         )}
                     </div>
 
-
                     {/* Cột 3: Gọi component Bảng xếp hạng */}
-                    <AuctionRanking topBids={topBids}/>
+                    <AuctionRanking topBids={topBids} />
                 </div>
 
                 {/* Lịch sử đấu giá (nếu muốn để dưới) */}
@@ -335,6 +410,8 @@ const AuctionDetailPage = () => {
                     ))}
                 </ul>
             </div>
+
+            <ToastContainer position="top-right" autoClose={2000} />
         </>
     );
 };
