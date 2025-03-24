@@ -3,6 +3,7 @@ import AdminSidebar from "./AdminSidebar";
 import "../../styles/admin.css";
 import UserStatistics from "./UserStatistics";
 import AuctionStatistics from "./AuctionStatistics";
+import TransactionStatistics from "./TransactionStatistics";
 
 const AdminDashboard = () => {
     const [selectedTab, setSelectedTab] = useState("user");
@@ -29,13 +30,22 @@ const AdminDashboard = () => {
                             }`}
                             onClick={() => setSelectedTab("auction")}
                         >
-                             Thống kê Đấu giá
+                            Thống kê Đấu giá
+                        </button>
+                        <button
+                            className={`px-6 py-2 rounded-lg font-semibold transition bg-gray-200 hover:bg-gray-300 mx-3 ${
+                                selectedTab === "transaction" ? "bg-blue-600 text-white shadow-md" : "bg-gray-200 hover:bg-gray-300"
+                            }`}
+                            onClick={() => setSelectedTab("transaction")}
+                        >
+                            Thống kê Giao dịch
                         </button>
                     </div>
 
                     {/* Hiển thị thống kê theo lựa chọn */}
                     {selectedTab === "user" && <UserStatistics/>}
                     {selectedTab === "auction" && <AuctionStatistics/>}
+                    {selectedTab === "transaction" && <TransactionStatistics/>}
                 </div>
             </div>
         </div>

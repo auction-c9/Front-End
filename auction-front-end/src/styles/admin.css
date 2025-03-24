@@ -142,71 +142,47 @@
     cursor: not-allowed;
 }
 
-/* Định dạng overlay cho modal */
-.overlay-modal {
+.modal-overlay {
+    background: rgba(0, 0, 0, 0.5);
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
 }
 
-/* Định dạng modal */
-.custom-modal {
+.modal-content {
     background: white;
     padding: 20px;
+    border-radius: 8px;
     width: 400px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* Nút trong modal */
-.modal-actions {
+.modal-buttons {
     display: flex;
-    justify-content: center;
-    gap: 15px; /* Tăng khoảng cách giữa hai nút */
-    margin-top: 20px;
+    justify-content: center; 
+    gap: 10px;
 }
 
-.modal-actions button {
-    flex: 1; /* Cả hai nút có độ rộng bằng nhau */
-    padding: 10px 15px;
-    font-size: 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-}
-
-/* Nút xác nhận (OK, Xóa, ...) */
-.modal-actions .confirm-btn {
-    background: #EEA019; /* Màu cam chủ đạo */
+.confirm-delete {
+    background: red;
     color: white;
     border: none;
+    padding: 10px 20px;
+    cursor: pointer;
 }
 
-.modal-actions .confirm-btn:hover {
-    background: #d88a00; /* Màu cam đậm hơn */
-}
-
-/* Nút hủy (Cancel) */
-.modal-actions .cancel-btn {
-    background: #ccc;
-    color: #333;
+.cancel-delete {
+    background: gray;
+    color: white;
     border: none;
-}
-
-.modal-actions .cancel-btn:hover {
-    background: #aaa;
+    padding: 10px 20px;
+    cursor: pointer;
 }
 
 /* Đảm bảo button-group hiển thị ngang */
@@ -276,5 +252,15 @@
     padding: 5px;
     background: #f9f9f9;
     border-radius: 5px;
+}
+.auction-link {
+    color: black;
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+.auction-link:hover {
+    color: #bab562;
+    text-decoration: underline;
 }
 
