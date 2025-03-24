@@ -27,6 +27,7 @@ import TermOfService from "./pages/auth/TermOfService";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BidHistory from "./pages/profile/BidHistory";
+import UserProfilePage from "./pages/profile/UserProfilePage";
 
 
 const App = () => {
@@ -62,6 +63,7 @@ const App = () => {
                             <Route path="/terms" element={<TermOfService/>}/>
                             <Route path="/auction-register" element={<RegisteredAuctionsHistory/>}/>
                             <Route path="/bid-history" element={<BidHistory />} />
+                            <Route path="/profile/:accountID" element={<UserProfilePage />} />
                         </Routes>
                     </div>
                     <Footer/>

@@ -49,8 +49,7 @@ const PlaceBid = ({
     // Hàm kiểm tra đặt cọc
     const checkDeposit = async () => {
         try {
-            const response = await axios.get(`${apiConfig.bids}/deposit/check`, {
-                params: { auctionId },
+            const response = await axios.get(`${apiConfig.bids}/deposit/check/${auctionId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             return response.data; // true hoặc false
@@ -59,6 +58,7 @@ const PlaceBid = ({
             return false;
         }
     };
+
 
     const handleBidSubmit = async (e) => {
         e.preventDefault();

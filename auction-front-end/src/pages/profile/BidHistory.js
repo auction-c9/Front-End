@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Spinner, Alert, Container } from 'react-bootstrap';
+import { Table, Spinner, Alert, Container, Button, Modal, Form } from 'react-bootstrap';
 import { api } from "../../config/apiConfig";
 import UserSidebar from "./UserSidebar"; // Import sidebar
 import "../../styles/user.css"; // Import CSS
@@ -8,6 +8,10 @@ const BidHistory = () => {
     const [bidHistory, setBidHistory] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showReviewModal, setShowReviewModal] = useState(false);
+    const [selectedBidId, setSelectedBidId] = useState(null);
+    const [rating, setRating] = useState(5);
+    const [comment, setComment] = useState('');
 
     useEffect(() => {
         const fetchBidHistory = async () => {
@@ -43,6 +47,50 @@ const BidHistory = () => {
         return <Alert variant="danger" className="mt-4">Error: {error}</Alert>;
     }
 
+    // Thêm hàm mở modal
+    const handleOpenReviewModal = (bidId) => {
+        setSelectedBidId(bidId);
+        setShowReviewModal(true);
+    };
+
+    // Thêm hàm đóng modal
+    const handleCloseReviewModal = () => {
+        setShowReviewModal(false);
+        setSelectedBidId(null);
+        setRating(5);
+        setComment('');
+    };
+
+    // Thêm hàm gửi đánh giá
+    const handleSubmitReview = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            await api.post('/reviews', {
+                bidId: selectedBidId,
+                rating,
+                comment
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            // Cập nhật UI sau khi gửi thành công
+            setBidHistory(prev => prev.map(bid =>
+                bid.bidId === selectedBidId ? {...bid, hasReviewed: true} : bid
+            ));
+            handleCloseReviewModal();
+        } catch (err) {
+            if (err.response?.status === 409) {
+                alert('Bạn đã đánh giá phiên đấu giá này!');
+                // Fetch lại dữ liệu để cập nhật trạng thái
+                const response = await api.get('bids/user');
+                setBidHistory(response.data);
+            } else {
+                console.error('Lỗi khi gửi đánh giá:', err);
+            }
+        }
+    };
+
     return (
         <div className="user-layout">
             <div className="user-container">
@@ -63,6 +111,7 @@ const BidHistory = () => {
                             <th>Ngày đăng ký</th>
                             <th>Trạng thái</th>
                             <th>Kết quả</th>
+                            <th>Đánh giá</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -76,11 +125,65 @@ const BidHistory = () => {
                                 <td>{new Date(bid.registrationDate).toLocaleDateString()}</td>
                                 <td>{bid.auctionStatus === "active" ? "Đang đấu giá" : "Đã kết thúc"}</td>
                                 <td>{bid.isWinner ? 'Thắng' : 'Không thành công'}</td>
+                                <td>
+                                    {bid.auctionStatus === 'ended' && bid.isWinner && (
+                                        <Button
+                                            variant="primary"
+                                            onClick={() => handleOpenReviewModal(bid.bidId)}
+                                            disabled={bid.hasReviewed}
+                                        >
+                                            {bid.hasReviewed ? 'Đã đánh giá' : 'Đánh giá'}
+                                        </Button>
+                                    )}
+                                </td>
                             </tr>
                         ))}
                         </tbody>
                     </Table>
                 </div>
+
+                {/* Thêm modal đánh giá */}
+                <Modal show={showReviewModal} onHide={handleCloseReviewModal}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Đánh giá sản phẩm</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Điểm đánh giá</Form.Label>
+                                <div>
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <Button
+                                            key={star}
+                                            variant={star <= rating ? 'warning' : 'secondary'}
+                                            onClick={() => setRating(star)}
+                                            className="me-2"
+                                        >
+                                            {star}
+                                        </Button>
+                                    ))}
+                                </div>
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Bình luận</Form.Label>
+                                <Form.Control
+                                    as="textarea"
+                                    rows={3}
+                                    value={comment}
+                                    onChange={(e) => setComment(e.target.value)}
+                                />
+                            </Form.Group>
+                        </Form>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleCloseReviewModal}>
+                            Hủy
+                        </Button>
+                        <Button variant="primary" onClick={handleSubmitReview}>
+                            Gửi đánh giá
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
         </div>
     );

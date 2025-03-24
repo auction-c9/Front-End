@@ -8,6 +8,8 @@ import { Client } from "@stomp/stompjs";
 import { useAuth } from "../../context/AuthContext";
 import { motion } from "framer-motion";
 import "../../styles/AuctionDetailPage.css";
+import  {Link}  from 'react-router-dom';
+
 
 // Import component Bảng xếp hạng
 import AuctionRanking from "./AuctionRanking";
@@ -238,9 +240,9 @@ const AuctionDetailPage = () => {
                             <div>
                                 <strong>Người đăng bán:</strong>{" "}
                                 {auction.product?.account ? (
-                                    <a href={`/profile/${auction.product.account.accountId}`}>
+                                    <Link to={`/profile/${auction.product.account.accountId}`}>
                                         {auction.product.account.username}
-                                    </a>
+                                    </Link>
                                 ) : (
                                     <span>Chưa có thông tin</span>
                                 )}
@@ -253,23 +255,41 @@ const AuctionDetailPage = () => {
                                 ⚠️ Phiên đấu giá chưa bắt đầu.
                             </p>
                         ) : auction.status === "ended" ? (
-                            <p style={{color: "red", fontWeight: "bold", marginTop: "1rem"}}>
-                                ⚠️ Phiên đấu giá đã kết thúc.
+                            <div style={{ marginTop: "1rem" }}>
+                                <p style={{ color: "red", fontWeight: "bold" }}>
+                                    ⚠️ Phiên đấu giá đã kết thúc.
+                                </p>
                                 {winnerBid ? (
                                     <>
-                                        {" "}
-                                        Người thắng:{" "}
-                                        <a
-                                            href={`/profile/${winnerBid.user?.accountId}`}
-                                            className="highest-bidder"
-                                        >
-                                            {winnerBid.user?.username || "Ẩn danh"}
-                                        </a>
+                                        <p>
+                                            Người thắng:{" "}
+                                            <a
+                                                href={`/profile/${winnerBid.user?.accountId}`}
+                                                className="highest-bidder"
+                                            >
+                                                {winnerBid.user?.username || "Ẩn danh"}
+                                            </a>
+                                        </p>
+                                        {/* Kiểm tra nếu người dùng hiện tại là người thắng đấu giá */}
+                                        {user?.customerId === winnerBid.user?.accountId && (
+                                            <div style={{ backgroundColor: "#e0ffe0", padding: "1rem", borderRadius: "5px" }}>
+                                                <h3>Chúc mừng bạn đã đấu giá thành công!</h3>
+                                                <p>
+                                                    Số tiền thanh toán còn lại là:{" "}
+                                                    {(
+                                                        winnerBid.bidAmount -
+                                                        depositAmount
+                                                    ).toLocaleString("vi-VN")}{" "}
+                                                    VNĐ
+                                                </p>
+                                                <p>Vui lòng thực hiện thanh toán số tiền còn lại để hoàn tất giao dịch.</p>
+                                            </div>
+                                        )}
                                     </>
                                 ) : (
-                                    "Không có người thắng."
+                                    <p>Không có người thắng.</p>
                                 )}
-                            </p>
+                            </div>
                         ) : customerId !== undefined && customerId !== null ? (
                             customerId === auction.product?.account?.accountId ? (
                                 <p style={{color: "red", fontWeight: "bold", marginTop: "1rem"}}>

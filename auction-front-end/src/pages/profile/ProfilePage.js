@@ -76,18 +76,7 @@ const ProfilePage = () => {
                     formData.append(key, value);
                 }
             });
-            // fields.forEach(key => {
-            //     if (values[key] !== null && values[key] !== undefined) {
-            //         // Xử lý đặc biệt cho trường dob
-            //         if (key === 'dob' && values[key] instanceof Date) {
-            //             formData.append(key, values[key].toISOString());
-            //         } else {
-            //             formData.append(key, values[key]);
-            //         }
-            //     }
-            // });
 
-            // Thêm file ảnh nếu có
             if (values.avatarFile) {
                 formData.append('avatarFile', values.avatarFile);
             }
@@ -103,7 +92,6 @@ const ProfilePage = () => {
         } catch (err) {
             console.error('Error updating profile:', err);
             toast.error(err.response?.data?.error || '❌ Cập nhật thất bại');
-            setError(err.response?.data?.error || 'Cập nhật thất bại');
         } finally {
             setSubmitting(false);
         }
