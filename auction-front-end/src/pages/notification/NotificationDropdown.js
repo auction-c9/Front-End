@@ -44,7 +44,7 @@ const NotificationDropdown = ({ notifications, updateNotifications }) => {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 // Sau khi cập nhật, fetch lại danh sách thông báo
-                updateNotifications(auctionId);
+                updateNotifications(auctionId, customerId);
                 // Điều hướng sang trang chi tiết phiên đấu giá
                 navigate(`/auction/${auctionId}`);
             })

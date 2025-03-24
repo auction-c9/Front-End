@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
-import {Container, Row, Col, Card, Table, Image, Spinner, Alert, ListGroup} from 'react-bootstrap';
+import {Container, Row, Col, Card, Table, Image, Spinner, Alert, ListGroup, Button} from 'react-bootstrap';
 import {api} from '../../config/apiConfig';
 import "../../styles/profile.css";
 
@@ -10,6 +10,7 @@ const UserProfilePage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [reviews, setReviews] = useState([]);
+    const [isFollowing, setIsFollowing] = useState(false);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -37,6 +38,32 @@ const UserProfilePage = () => {
         };
         fetchReviews();
     }, [accountID]);
+
+    useEffect(() => {
+        const checkFollowStatus = async () => {
+            try {
+                const response = await api.get(`/follows/check/${accountID}`);
+                setIsFollowing(response.data.isFollowing);
+            } catch (err) {
+                console.error('Error checking follow status:', err);
+            }
+        };
+        checkFollowStatus();
+    }, [accountID]);
+
+
+    const handleFollow = async () => {
+        try {
+            if (isFollowing) {
+                await api.delete(`/follows/${accountID}`);
+            } else {
+                await api.post(`/follows/${accountID}`);
+            }
+            setIsFollowing(!isFollowing);
+        } catch (err) {
+            console.error('Error updating follow status:', err);
+        }
+    };
 
     if (loading) {
         return (
@@ -72,6 +99,12 @@ const UserProfilePage = () => {
                         <Col md={9}>
                             <h2>{profile.fullName}</h2>
                             <p className="text-muted">@{profile.username}</p>
+                            <Button
+                                variant={isFollowing ? "secondary" : "primary"}
+                                onClick={handleFollow}
+                            >
+                                {isFollowing ? "Đã theo dõi" : "Theo dõi"}
+                            </Button>
                         </Col>
                     </Row>
                 </Card.Body>
