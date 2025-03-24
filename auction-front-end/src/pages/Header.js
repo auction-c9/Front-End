@@ -203,9 +203,9 @@ const Header = () => {
                         />
                     </Dropdown>
 
-                    <Link to="/cart" className="icon-link">
-                        <ShoppingCart size={22} />
-                    </Link>
+                    {/*<Link to="/cart" className="icon-link">*/}
+                    {/*    <ShoppingCart size={22} />*/}
+                    {/*</Link>*/}
 
                     {user ? (
                         <Dropdown>

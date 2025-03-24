@@ -97,8 +97,8 @@
 }
 
 .admin-content th {
-    background: #EEA019; /* Cam chủ đạo */
-    color: white;
+    background: wheat;
+    color: black;
     padding: 12px;
     text-align: left;
 }
@@ -246,20 +246,35 @@
 }
 
 .unlock-btn {
-    background-color: green;
+    background-color: green !important;
     color: white;
 }
 
 /* Định dạng nút xem chi tiết */
 .detail-btn {
-    background-color: #007bff;
+    background-color: #bab562 !important;
     color: white;
     margin-left: 10px; /* Khoảng cách giữa nút khóa và nút xem chi tiết */
+    margin-right: 10px;
+}
+
+.warning-btn {
+    background-color: #f86b6b !important;
+    color: white;
+    margin-left: 10px;
 }
 
 .flex {
     display: flex;
     justify-content: center;
     gap: 16px !important;
+}
+
+.product-description {
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 5px;
+    background: #f9f9f9;
+    border-radius: 5px;
 }
 

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import {useNavigate} from "react-router-dom";
+import {toast, ToastContainer} from "react-toastify";
 import apiConfig from "../../config/apiConfig";
 
 const PlaceBid = ({
@@ -50,7 +50,7 @@ const PlaceBid = ({
     const checkDeposit = async () => {
         try {
             const response = await axios.get(`${apiConfig.bids}/deposit/check/${auctionId}`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: {Authorization: `Bearer ${token}`}
             });
             return response.data; // true hoặc false
         } catch (err) {
@@ -98,8 +98,8 @@ const PlaceBid = ({
         try {
             await axios.post(
                 `${apiConfig.bids}/auction/${auctionId}`,
-                { bidAmount: numericBid },
-                { headers: { Authorization: `Bearer ${token}` } }
+                {bidAmount: numericBid},
+                {headers: {Authorization: `Bearer ${token}`}}
             );
 
             setBidAmount("");
@@ -121,23 +121,24 @@ const PlaceBid = ({
             setError("Lỗi: Không tìm thấy auctionId.");
             return;
         }
+        const finalDepositAmount = Math.max(depositAmount, 10000);
 
         try {
-            console.log("🔄 [DEBUG] Gửi thanh toán:", { customerId, auctionId, depositAmount, method });
+            console.log("🔄 [DEBUG] Gửi thanh toán:", {customerId, auctionId, depositAmount, method});
 
             const response = await axios.post(
                 `${apiConfig.transactions}/create`,
                 {
                     customerId,
                     auctionId,
-                    amount: parseFloat(depositAmount), // ✅ Dùng từ props
+                    amount: finalDepositAmount, // ✅ Dùng từ props
                     paymentMethod: method,
                     returnUrl: window.location.href
                 },
-                { headers: { Authorization: `Bearer ${token}` } }
+                {headers: {Authorization: `Bearer ${token}`}}
             );
 
-            const { redirectUrl } = response.data;
+            const {redirectUrl} = response.data;
             if (redirectUrl) {
                 window.location.href = redirectUrl;
             } else {
@@ -151,49 +152,58 @@ const PlaceBid = ({
 
     return (
         <>
-            <form onSubmit={handleBidSubmit} style={{ marginTop: "1rem" }}>
+            <form onSubmit={handleBidSubmit} style={{marginTop: "1rem"}}>
                 <input
                     type="number"
                     placeholder={`Nhập từ ${minBid.toLocaleString()} VNĐ`}
                     value={bidAmount}
                     onChange={(e) => setBidAmount(e.target.value)}
                     min={minBid}
-                    style={{ padding: "0.5rem", marginRight: "0.5rem" }}
+                    style={{padding: "0.5rem", marginRight: "0.5rem"}}
                     disabled={isOwner} // ❌ Không cho nhập nếu là chủ bài
                 />
-                <button type="submit" style={{ padding: "0.5rem 1rem" }} disabled={isOwner}>
+                <button type="submit" style={{padding: "0.5rem 1rem"}} disabled={isOwner}>
                     Đặt giá
                 </button>
-                {error && <p style={{ color: "red", marginTop: "0.5rem" }}>{error}</p>}
+                {error && <p style={{color: "red", marginTop: "0.5rem"}}>{error}</p>}
                 {isOwner && (
-                    <p style={{ color: "orange", marginTop: "0.5rem" }}>
+                    <p style={{color: "orange", marginTop: "0.5rem"}}>
                         Bạn không thể đấu giá sản phẩm do chính mình đăng.
                     </p>
                 )}
             </form>
 
             {showPaymentOptions && (
-                <div style={{ marginTop: "1rem" }}>
+                <div style={{marginTop: "1rem"}}>
                     <h3>Chọn phương thức thanh toán:</h3>
                     <p>
-                        <strong>Số tiền đặt cọc:</strong> {depositAmount.toLocaleString('vi-VN')} VNĐ
+                        <strong>Số tiền đặt
+                            cọc:</strong> {Math.max(depositAmount, 10000).toLocaleString('vi-VN')} VNĐ
+                    </p>
+                    <p style={{fontSize: "0.9rem", color: "gray", marginTop: "-0.5rem"}}>
+                        (Lưu ý: Số tiền đặt cọc tối thiểu là 10,000 VNĐ)
                     </p>
                     <button
                         onClick={() => handlePayment("PAYPAL")}
-                        style={{ padding: "0.5rem 1rem", marginRight: "0.5rem", backgroundColor: "#0070ba", color: "#fff" }}
+                        style={{
+                            padding: "0.5rem 1rem",
+                            marginRight: "0.5rem",
+                            backgroundColor: "#0070ba",
+                            color: "#fff"
+                        }}
                     >
                         Thanh toán bằng PayPal
                     </button>
                     <button
                         onClick={() => handlePayment("VNPAY")}
-                        style={{ padding: "0.5rem 1rem", backgroundColor: "#e41e25", color: "#fff" }}
+                        style={{padding: "0.5rem 1rem", backgroundColor: "#e41e25", color: "#fff"}}
                     >
                         Thanh toán bằng VNPAY
                     </button>
                 </div>
             )}
 
-            <ToastContainer position="top-right" autoClose={2000} />
+            <ToastContainer position="top-right" autoClose={2000}/>
         </>
     );
 };
