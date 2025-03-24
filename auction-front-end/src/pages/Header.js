@@ -23,7 +23,7 @@ const Header = () => {
     const [showDropdown, setShowDropdown] = useState(false);
     const [notifications, setNotifications] = useState([]);
 
-    // Kết nối WebSocket
+    // kết nối WebSocket
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (!token) return;
@@ -65,8 +65,10 @@ const Header = () => {
 
     // Fetch thông báo ban đầu khi user đã đăng nhập
     useEffect(() => {
+        console.log("User object:", user);
         if (!user || !user.customerId) return;
         const token = localStorage.getItem("token");
+        console.log("Token:", token);
         fetch(`http://localhost:8080/api/notifications/${user.customerId}`, {
             headers: {
                 "Content-Type": "application/json",
@@ -75,7 +77,11 @@ const Header = () => {
         })
             .then((response) => {
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    // Đọc nội dung phản hồi để biết thêm chi tiết lỗi
+                    return response.text().then(text => {
+                        console.error("Error response:", text);
+                        throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+                    });
                 }
                 return response.json();
             })
@@ -120,9 +126,16 @@ const Header = () => {
     // Tính số lượng thông báo chưa đọc (hoặc tổng thông báo nếu không dùng isRead)
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
-    const updateNotifications = (auctionId) => {
+    const updateNotifications = (auctionId, customerId) => {
+        setNotifications(prev => prev.map(n => {
+            if (n.auction?.auctionId === auctionId && n.customer?.customerId === customerId) {
+                return { ...n, isRead: true };
+            }
+            return n;
+        }));
         const token = localStorage.getItem("token");
         fetch(`http://localhost:8080/api/notifications/${user.customerId}`, {
+            method: "PUT",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
