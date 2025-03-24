@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import './styles/main.css';
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import Home from './pages/Home';
-import AuctionList from "./pages/AuctionList";
+import AuctionListPage from "./pages/auctions/AuctionListPage";
 import AddProduct from './pages/AddProduct';
 import AuctionDetailPage from './pages/auctions/AuctionDetailPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -30,6 +30,7 @@ import BidHistory from "./pages/profile/BidHistory";
 import UserProfilePage from "./pages/profile/UserProfilePage";
 
 
+
 const App = () => {
     useEffect(() => {
         localStorage.removeItem('refreshToken');
@@ -44,7 +45,7 @@ const App = () => {
                     <div className="content-container">
                         <Routes>
                             <Route path="/" element={<Home/>}/>
-                            <Route path="/auctions" element={<AuctionList/>}/>
+                            <Route path="/auctions" element={<AuctionListPage/>}/>
                             <Route path="/product/add" element={<AddProduct/>}/>
                             <Route path="/auction/:id" element={<AuctionDetailPage/>}/>
                             <Route path="/login" element={<Login/>}/>

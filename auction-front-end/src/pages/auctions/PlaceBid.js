@@ -3,15 +3,17 @@ import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import {toast, ToastContainer} from "react-toastify";
 import apiConfig from "../../config/apiConfig";
+import Confetti from "react-confetti"; // Import thư viện confetti
+
 
 const PlaceBid = ({
                       auctionId,
                       currentPrice,
                       bidStep,
-                      depositAmount, // ✅ Nhận từ props
+                      depositAmount,
                       token: propToken,
                       customerId: propCustomerId,
-                      ownerId // 👈 Thêm ownerId để kiểm tra người đăng bài
+                      ownerId
                   }) => {
     const navigate = useNavigate();
     const [bidAmount, setBidAmount] = useState("");
@@ -19,9 +21,11 @@ const PlaceBid = ({
     const [error, setError] = useState("");
     const [token, setToken] = useState(propToken || localStorage.getItem("token"));
     const [customerId, setCustomerId] = useState(propCustomerId || localStorage.getItem("customerId"));
+    const [showConfetti, setShowConfetti] = useState(false); // State để hiển thị confetti
+
 
     const minBid = currentPrice + bidStep;
-    const isOwner = customerId === ownerId; // ✅ Kiểm tra chủ sản phẩm
+    const isOwner = customerId === ownerId;
 
     useEffect(() => {
         console.log("[DEBUG] Token từ props:", propToken);
@@ -52,18 +56,16 @@ const PlaceBid = ({
             const response = await axios.get(`${apiConfig.bids}/deposit/check/${auctionId}`, {
                 headers: {Authorization: `Bearer ${token}`}
             });
-            return response.data; // true hoặc false
+            return response.data;
         } catch (err) {
             console.error("❌ [ERROR] Kiểm tra đặt cọc:", err);
             return false;
         }
     };
 
-
     const handleBidSubmit = async (e) => {
         e.preventDefault();
 
-        // ✅ Kiểm tra trước: Nếu là chủ sản phẩm, không cho đấu giá
         if (isOwner) {
             setError("Bạn không thể tham gia đấu giá sản phẩm của chính mình.");
             return;
@@ -87,7 +89,7 @@ const PlaceBid = ({
             return;
         }
 
-        // ✅ Kiểm tra đặt cọc *sau* khi đã xác nhận không phải chủ sản phẩm
+        // Kiểm tra đặt cọc
         const hasDeposit = await checkDeposit();
         if (!hasDeposit) {
             setError("Bạn cần thanh toán đặt cọc để đấu giá!");
@@ -102,13 +104,18 @@ const PlaceBid = ({
                 {headers: {Authorization: `Bearer ${token}`}}
             );
 
-            setBidAmount("");
-            setError("");
+            // Hiển thị hiệu ứng confetti khi đặt giá thành công
+            setShowConfetti(true);
             toast.success("🎉 Đặt giá thành công!");
 
+            // Sau 3 giây, tắt confetti và chuyển hướng
             setTimeout(() => {
-                navigate('/auctions');
-            }, 2000);
+                setShowConfetti(false);
+                navigate("/auctions");
+            }, 6000);
+
+            setBidAmount("");
+            setError("");
         } catch (err) {
             console.error("❌ [ERROR] Bid thất bại:", err.response?.data || err.message);
             setError(err.response?.data?.message || "Gửi giá đấu thất bại. Vui lòng thử lại.");
@@ -126,6 +133,7 @@ const PlaceBid = ({
         try {
             console.log("🔄 [DEBUG] Gửi thanh toán:", {customerId, auctionId, depositAmount, method});
 
+            console.log("🔄 [DEBUG] Gửi thanh toán:", { customerId, auctionId, depositAmount, method });
             const response = await axios.post(
                 `${apiConfig.transactions}/create`,
                 {
@@ -137,7 +145,6 @@ const PlaceBid = ({
                 },
                 {headers: {Authorization: `Bearer ${token}`}}
             );
-
             const {redirectUrl} = response.data;
             if (redirectUrl) {
                 window.location.href = redirectUrl;
@@ -152,6 +159,10 @@ const PlaceBid = ({
 
     return (
         <>
+            {/* Hiển thị confetti khi đặt giá thành công */}
+            {showConfetti && (
+                <Confetti width={window.innerWidth} height={window.innerHeight} recycle={false} numberOfPieces={200} />
+            )}
             <form onSubmit={handleBidSubmit} style={{marginTop: "1rem"}}>
                 <input
                     type="number"
@@ -159,24 +170,25 @@ const PlaceBid = ({
                     value={bidAmount}
                     onChange={(e) => setBidAmount(e.target.value)}
                     min={minBid}
-                    style={{padding: "0.5rem", marginRight: "0.5rem"}}
-                    disabled={isOwner} // ❌ Không cho nhập nếu là chủ bài
+                    style={{ padding: "0.5rem", marginRight: "0.5rem" }}
+                    disabled={isOwner}
                 />
-                <button type="submit" style={{padding: "0.5rem 1rem"}} disabled={isOwner}>
+                <button type="submit" style={{ padding: "0.5rem 1rem" }} disabled={isOwner}>
                     Đặt giá
                 </button>
-                {error && <p style={{color: "red", marginTop: "0.5rem"}}>{error}</p>}
+                {error && <p style={{ color: "red", marginTop: "0.5rem" }}>{error}</p>}
                 {isOwner && (
-                    <p style={{color: "orange", marginTop: "0.5rem"}}>
+                    <p style={{ color: "orange", marginTop: "0.5rem" }}>
                         Bạn không thể đấu giá sản phẩm do chính mình đăng.
                     </p>
                 )}
             </form>
 
             {showPaymentOptions && (
-                <div style={{marginTop: "1rem"}}>
+                <div style={{ marginTop: "1rem" }}>
                     <h3>Chọn phương thức thanh toán:</h3>
                     <p>
+                        <strong>Số tiền đặt cọc:</strong> {depositAmount.toLocaleString("vi-VN")} VNĐ
                         <strong>Số tiền đặt
                             cọc:</strong> {Math.max(depositAmount, 10000).toLocaleString('vi-VN')} VNĐ
                     </p>
@@ -196,14 +208,14 @@ const PlaceBid = ({
                     </button>
                     <button
                         onClick={() => handlePayment("VNPAY")}
-                        style={{padding: "0.5rem 1rem", backgroundColor: "#e41e25", color: "#fff"}}
+                        style={{ padding: "0.5rem 1rem", backgroundColor: "#e41e25", color: "#fff" }}
                     >
                         Thanh toán bằng VNPAY
                     </button>
                 </div>
             )}
 
-            <ToastContainer position="top-right" autoClose={2000}/>
+            <ToastContainer position="top-right" autoClose={2000} />
         </>
     );
 };

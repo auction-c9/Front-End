@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {jwtDecode} from "jwt-decode";
+import jwtDecode from "jwt-decode";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api';
 
@@ -18,7 +18,7 @@ const isUnauthorizedRoute = (url) => {
         '/auth/register',
         '/auth/register-question',
         '/api/auth/google'
-];
+    ];
     return unauthorizedRoutes.some(route => url?.includes(route));
 };
 
@@ -39,16 +39,14 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-// Xử lý lỗi (Không còn refreshToken nên chỉ redirect nếu 401)
+// Xử lý lỗi: redirect nếu gặp 401 (Unauthorized)
 api.interceptors.response.use(
     (response) => response,
     (error) => {
         const originalRequest = error.config;
-
         if (isUnauthorizedRoute(originalRequest.url)) {
             return Promise.reject(error);
         }
-
         if (error.response?.status === 401) {
             clearTokens();
             window.location.href = "/login";
@@ -57,7 +55,7 @@ api.interceptors.response.use(
     }
 );
 
-// ========== Export ========== //
+// ========== Export các endpoint API ========== //
 export default {
     products: `${API_BASE_URL}/products`,
     categories: `${API_BASE_URL}/categories`,
@@ -76,8 +74,13 @@ export default {
     adminProducts: `${API_BASE_URL}/admin/products`,
     accounts: `${API_BASE_URL}/accounts`,
     statistics: `${API_BASE_URL}/admin/statistics/`,
+    // Endpoint cho notifications
+    notifications: `${API_BASE_URL}/notifications`,
+    notificationsRead: `${API_BASE_URL}/notifications/read`,
+    // Endpoint cho search: tìm kiếm phiên đấu giá theo tên, danh mục và giá khởi điểm
+    searchAuctions: `${API_BASE_URL}/auctions/search`,
+    // Nếu cần định nghĩa lại route cho profile:
     profile: (accountID) => `/auctions/profile${accountID}/`
-
 };
 
 export {
