@@ -4,7 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import adminService from "../../services/adminService";
 import "../../styles/admin.css";
 import AdminSidebar from "./AdminSidebar";
-import { FaTrash, FaUndo } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 
 const AdminProductList = () => {
     const [products, setProducts] = useState([]);
@@ -30,25 +30,16 @@ const AdminProductList = () => {
         }
     };
 
-    const handleHideProduct = async (productId) => {
-        try {
-            await adminService.hideProduct(productId);
-            toast.success("Sản phẩm đã bị ẩn!");
-            fetchProducts();
-        } catch (error) {
-            console.error("Lỗi khi ẩn sản phẩm", error);
-            toast.error("Đã xảy ra lỗi khi ẩn sản phẩm.");
-        }
-    };
-
-    const handleRestoreProduct = async (productId) => {
-        try {
-            await adminService.restoreProduct(productId);
-            toast.success("Sản phẩm đã được khôi phục!");
-            fetchProducts();
-        } catch (error) {
-            console.error("Lỗi khi khôi phục sản phẩm", error);
-            toast.error("Đã xảy ra lỗi khi khôi phục sản phẩm.");
+    const handleDeleteProduct = async (productId) => {
+        if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này vĩnh viễn?")) {
+            try {
+                await adminService.deleteProduct(productId);
+                toast.success("Sản phẩm đã bị xóa vĩnh viễn!");
+                fetchProducts();
+            } catch (error) {
+                console.error("Lỗi khi xóa sản phẩm", error);
+                toast.error("Đã xảy ra lỗi khi xóa sản phẩm.");
+            }
         }
     };
 
@@ -71,7 +62,6 @@ const AdminProductList = () => {
                                     <th>Người đăng</th>
                                     <th>Danh mục</th>
                                     <th>Mô tả</th>
-                                    <th>Trạng thái</th>
                                     <th>Hành động</th>
                                 </tr>
                                 </thead>
@@ -82,24 +72,14 @@ const AdminProductList = () => {
                                         <td>{product.name}</td>
                                         <td>{product.account?.customer?.name}</td>
                                         <td>{product.category?.name}</td>
-                                        <td>{product.description}</td> {/* Hiển thị mô tả đầy đủ */}
-                                        <td>{product.isDeleted ? "Đã ẩn" : "Đang hoạt động"}</td>
+                                        <td>{product.description}</td>
                                         <td>
-                                            {product.isDeleted ? (
-                                                <button
-                                                    className="restore-btn"
-                                                    onClick={() => handleRestoreProduct(product.productId)}
-                                                >
-                                                    <FaUndo /> Khôi phục
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    className="delete-btn"
-                                                    onClick={() => handleHideProduct(product.productId)}
-                                                >
-                                                    <FaTrash /> Ẩn
-                                                </button>
-                                            )}
+                                            <button
+                                                className="delete-btn"
+                                                onClick={() => handleDeleteProduct(product.productId)}
+                                            >
+                                                <FaTrash /> Xóa
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}

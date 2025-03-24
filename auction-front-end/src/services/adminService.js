@@ -51,12 +51,12 @@ const getProductById = async (productId) => {
     return response.data;
 };
 
-const hideProduct = async (productId) => {
-    const token = localStorage.getItem('token');
-    const response = await axios.put(`${apiConfig.adminProducts}/${productId}/hide`, {},{
+const deleteProduct = async (productId) => {
+    const token = localStorage.getItem("token");
+    const response = await axios.delete(`${apiConfig.adminProducts}/${productId}`, {
         headers: {
-            Authorization: `Bearer ${token}`
-        }
+            Authorization: `Bearer ${token}`,
+        },
     });
     return response.data;
 };
@@ -104,7 +104,7 @@ const adminService = {
     getProducts,
     getAllProductsForAdmin,
     getProductById,
-    hideProduct,
+    deleteProduct,
     restoreProduct,
     sendWarningEmail,
 };
