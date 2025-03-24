@@ -20,7 +20,6 @@ const searchSchema = Yup.object().shape({
 const Header = () => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
-    console.log("User in client:", user ? user.username : "No user");
     const [showDropdown, setShowDropdown] = useState(false);
     const [notifications, setNotifications] = useState([]);
 
@@ -60,7 +59,7 @@ const Header = () => {
         };
     }, [user]);
     useEffect(() => {
-        console.log("Notifications updated:", notifications);
+
     }, [notifications]);
 
 
@@ -120,6 +119,26 @@ const Header = () => {
 
     // Tính số lượng thông báo chưa đọc (hoặc tổng thông báo nếu không dùng isRead)
     const unreadCount = notifications.filter(n => !n.isRead).length;
+
+    const updateNotifications = (auctionId) => {
+        const token = localStorage.getItem("token");
+        fetch(`http://localhost:8080/api/notifications/${user.customerId}`, {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                setNotifications(data);
+            })
+            .catch((error) => console.error("Error updating notifications:", error));
+    };
     return (
         <header className="header">
             <div className="top-header">
@@ -165,7 +184,10 @@ const Header = () => {
                                 </Badge>
                             )}
                         </Dropdown.Toggle>
-                        <NotificationDropdown notifications={notifications} />
+                        <NotificationDropdown
+                            notifications={notifications}
+                            updateNotifications={updateNotifications}
+                        />
                     </Dropdown>
 
                     <Link to="/cart" className="icon-link">
