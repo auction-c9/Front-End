@@ -9,7 +9,7 @@ import { useAuth } from "../../context/AuthContext";
 import { motion } from "framer-motion";
 import "../../styles/AuctionDetailPage.css";
 import ImageGallery from "./ImageGallery";
-import { Link } from 'react-router-dom';
+
 import { toast, ToastContainer } from "react-toastify";
 import AuctionRanking from "./AuctionRanking";
 
@@ -352,7 +352,6 @@ const AuctionDetailPage = () => {
             </div>
 
             <ToastContainer position="top-right" autoClose={2000} />
-        </>
         </div>
     );
 };
