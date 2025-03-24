@@ -25,7 +25,7 @@ const AdminCustomerList = () => {
     const fetchCustomers = async () => {
         try {
             setLoading(true);
-            const data = await adminService.getCustomers(page, 5);
+            const data = await adminService.getCustomers(page, 10);
             setCustomers(data.content);
             setTotalPages(data.totalPages);
         } catch (error) {
@@ -136,19 +136,19 @@ const AdminCustomerList = () => {
                                                 onClick={() => handleLockAccount(customer.account?.accountId)}
                                             >
                                                 {customer.account?.locked ? <FaUnlock/> : <FaLock/>}
-                                                {customer.account?.locked ? " Mở khóa" : " Khóa"}
+
                                             </button>
                                             <button
                                                 className="detail-btn"
                                                 onClick={() => openDetailModal(customer.customerId)}
                                             >
-                                                <FaEye/> Xem chi tiết
+                                                <FaEye/>
                                             </button>
                                             <button
                                                 className="warning-btn"
                                                 onClick={() => handleSendWarningEmail(customer.account?.accountId)}
                                             >
-                                                <FaExclamationTriangle/> Gửi cảnh cáo
+                                                <FaExclamationTriangle/>
                                             </button>
                                         </td>
                                     </tr>

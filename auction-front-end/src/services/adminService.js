@@ -1,5 +1,6 @@
 import apiConfig from "../config/apiConfig";
 import axios from "axios";
+import * as response from "framer-motion/m";
 
 const getCustomers = async (page, size) => {
     const token = localStorage.getItem('token');
@@ -14,16 +15,6 @@ const getCustomers = async (page, size) => {
 const getCustomerById = async (id) => {
     const token = localStorage.getItem('token');
     const response = await axios.get(`${apiConfig.customers}/${id}`, {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    });
-    return response.data;
-};
-
-const getProducts = async (page, size) => {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(`${apiConfig.adminProducts}?page=${page}&size=${size}`, {
         headers: {
             Authorization: `Bearer ${token}`
         }
@@ -61,16 +52,6 @@ const deleteProduct = async (productId) => {
     return response.data;
 };
 
-const restoreProduct = async (productId) => {
-    const token = localStorage.getItem('token');
-    const response = await axios.put(`${apiConfig.adminProducts}/${productId}/restore`, {}, {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    });
-    return response.data;
-};
-
 const sendWarningEmail = async (accountId) => {
     const token = localStorage.getItem('token');
 
@@ -97,15 +78,24 @@ const sendWarningEmail = async (accountId) => {
     }
 };
 
+const getAllTransactions = async (page, size) => {
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`${apiConfig.adminTransactions}?page=${page}&size=${size}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+    return response.data;
+}
+
 
 const adminService = {
     getCustomers,
     getCustomerById,
-    getProducts,
     getAllProductsForAdmin,
     getProductById,
     deleteProduct,
-    restoreProduct,
     sendWarningEmail,
+    getAllTransactions,
 };
 export default adminService;

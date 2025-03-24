@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line, PieChart, Pie, Cell, Legend } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { format } from "date-fns"; // Import thư viện format ngày
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
@@ -22,13 +23,29 @@ const UserStatistics = () => {
             .then((response) => {
                 const data = response.data; // API trả về [{date: "2025-03-17", count: 5}, {...}]
 
-                let formattedData = [];
+                // Tạo danh sách 7 ngày gần nhất
+                let dateMap = {};
                 let total = 0;
+                let today = new Date();
 
+                for (let i = 0; i < days; i++) {
+                    let date = new Date();
+                    date.setDate(today.getDate() - i);
+                    let formattedDate = format(date, "dd/MM/yyyy"); // Format ngày đúng định dạng
+                    dateMap[formattedDate] = 0; // Mặc định là 0
+                }
+
+                // Gán dữ liệu từ API vào danh sách
                 data.forEach(item => {
-                    formattedData.push({ name: item.date, value: item.count });
-                    total += item.count; // Tính tổng số user
+                    let formattedDate = format(new Date(item.date), "dd/MM/yyyy");
+                    dateMap[formattedDate] = item.count;
+                    total += item.count;
                 });
+
+                // Chuyển thành mảng để hiển thị và sắp xếp theo thứ tự ngày
+                const formattedData = Object.keys(dateMap)
+                    .map(date => ({ name: date, value: dateMap[date] }))
+                    .reverse(); // Đảo ngược để ngày gần nhất nằm bên phải
 
                 setChartData(formattedData);
                 setTotalUsers(total);
@@ -45,7 +62,7 @@ const UserStatistics = () => {
                 <label className="text-lg">Chọn số ngày:</label>
                 <select
                     value={days}
-                    onChange={(e) => setDays(e.target.value)}
+                    onChange={(e) => setDays(Number(e.target.value))}
                     className="p-2 border rounded-lg"
                 >
                     {[7, 14, 30, 90].map((d) => (
@@ -64,35 +81,12 @@ const UserStatistics = () => {
             <div className="flex justify-center mb-6">
                 <BarChart width={600} height={300} data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
+                    <XAxis dataKey="name" tick={{ fontSize: 16 }} angle={0} textAnchor="end" />
                     <YAxis />
-                    <Tooltip />
+                    <Tooltip cursor={{ fill: "transparent" }} />
                     <Bar dataKey="value" fill="#82ca9d" />
                 </BarChart>
             </div>
-
-            {/*/!* Biểu đồ đường *!/*/}
-            {/*<div className="flex justify-center mb-6">*/}
-            {/*    <LineChart width={600} height={300} data={chartData}>*/}
-            {/*        <XAxis dataKey="name" />*/}
-            {/*        <YAxis />*/}
-            {/*        <Tooltip />*/}
-            {/*        <Line type="monotone" dataKey="value" stroke="#FF8042" strokeWidth={2} />*/}
-            {/*    </LineChart>*/}
-            {/*</div>*/}
-
-            {/*/!* Biểu đồ tròn *!/*/}
-            {/*<div className="flex justify-center">*/}
-            {/*    <PieChart width={300} height={300}>*/}
-            {/*        <Pie data={chartData} cx="50%" cy="50%" outerRadius={100} fill="#8884d8" dataKey="value">*/}
-            {/*            {chartData.map((_, index) => (*/}
-            {/*                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />*/}
-            {/*            ))}*/}
-            {/*        </Pie>*/}
-            {/*        <Tooltip />*/}
-            {/*        <Legend />*/}
-            {/*    </PieChart>*/}
-            {/*</div>*/}
         </div>
     );
 };

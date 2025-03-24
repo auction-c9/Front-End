@@ -4,6 +4,7 @@ import AdminDashboard from './AdminDashboard';
 import AdminCustomerList from './AdminCustomerList';
 import { useAuth } from '../../context/AuthContext';
 import AdminProductList from "./AdminProductList";
+import AdminTransactionList from "./AdminTransactionList";
 
 const AdminRoutes = () => {
     const { user } = useAuth();
@@ -32,6 +33,7 @@ const AdminRoutes = () => {
             <Route path="/" element={<AdminDashboard />} />
             <Route path="/customers" element={<AdminCustomerList />} />
             <Route path="/products" element={<AdminProductList/>} />
+            <Route path="/transactions" element={<AdminTransactionList />} />
         </Routes>
     );
 };

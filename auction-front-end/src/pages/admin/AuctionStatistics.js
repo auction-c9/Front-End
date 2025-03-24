@@ -67,7 +67,7 @@ const AuctionStatistics = () => {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
-                    <Tooltip />
+                    <Tooltip cursor={{ fill: "transparent" }} />
                     <Bar dataKey="value" fill="#82ca9d" />
                 </BarChart>
             </div>

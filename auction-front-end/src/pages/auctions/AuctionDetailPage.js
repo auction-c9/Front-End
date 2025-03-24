@@ -211,7 +211,7 @@ const AuctionDetailPage = () => {
 
     // ===== TÍNH GIÁ TRỊ =====
     const startingPrice = parseFloat(auction?.currentPrice) || 0;
-    const depositAmount = startingPrice * 0.1;
+    const depositAmount = Math.max(startingPrice * 0.1, 10000);
     const bidStep = parseFloat(auction?.bidStep) || 0;
     const highestBidAmount = bidHistory[0]?.bidAmount || startingPrice;
 

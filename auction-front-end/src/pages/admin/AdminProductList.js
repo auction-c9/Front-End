@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Modal from "react-modal";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import adminService from "../../services/adminService";
@@ -6,11 +7,15 @@ import "../../styles/admin.css";
 import AdminSidebar from "./AdminSidebar";
 import { FaTrash } from "react-icons/fa";
 
+Modal.setAppElement("#root"); // Cấu hình Modal để tránh lỗi accessibility
+
 const AdminProductList = () => {
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
 
     useEffect(() => {
         fetchProducts();
@@ -19,7 +24,7 @@ const AdminProductList = () => {
     const fetchProducts = async () => {
         try {
             setLoading(true);
-            const data = await adminService.getAllProductsForAdmin(page, 5);
+            const data = await adminService.getAllProductsForAdmin(page, 10);
             setProducts(data.content);
             setTotalPages(data.totalPages);
         } catch (error) {
@@ -30,16 +35,28 @@ const AdminProductList = () => {
         }
     };
 
-    const handleDeleteProduct = async (productId) => {
-        if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này vĩnh viễn?")) {
-            try {
-                await adminService.deleteProduct(productId);
-                toast.success("Sản phẩm đã bị xóa vĩnh viễn!");
-                fetchProducts();
-            } catch (error) {
-                console.error("Lỗi khi xóa sản phẩm", error);
-                toast.error("Đã xảy ra lỗi khi xóa sản phẩm.");
-            }
+    const openModal = (product) => {
+        setSelectedProduct(product);
+        setModalIsOpen(true);
+    };
+
+    const closeModal = () => {
+        setSelectedProduct(null);
+        setModalIsOpen(false);
+    };
+
+    const handleDeleteProduct = async () => {
+        if (!selectedProduct) return;
+
+        try {
+            await adminService.deleteProduct(selectedProduct.productId);
+            toast.success("Sản phẩm đã bị xóa vĩnh viễn!");
+            fetchProducts();
+        } catch (error) {
+            console.error("Lỗi khi xóa sản phẩm", error);
+            toast.error("Đã xảy ra lỗi khi xóa sản phẩm.");
+        } finally {
+            closeModal();
         }
     };
 
@@ -76,9 +93,9 @@ const AdminProductList = () => {
                                         <td>
                                             <button
                                                 className="delete-btn"
-                                                onClick={() => handleDeleteProduct(product.productId)}
+                                                onClick={() => openModal(product)}
                                             >
-                                                <FaTrash /> Xóa
+                                                <FaTrash />
                                             </button>
                                         </td>
                                     </tr>
@@ -99,6 +116,22 @@ const AdminProductList = () => {
                     )}
                 </div>
             </div>
+
+            {/* Modal Xác nhận xóa */}
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                contentLabel="Xác nhận xóa sản phẩm"
+                className="modal-content"
+                overlayClassName="modal-overlay"
+            >
+                <h2>Xác nhận xóa</h2>
+                <p>Bạn có chắc chắn muốn xóa sản phẩm "<b>{selectedProduct?.name}</b>" không?</p>
+                <div className="modal-buttons">
+                    <button className="confirm-delete" onClick={handleDeleteProduct}>Xóa</button>
+                    <button className="cancel-delete" onClick={closeModal}>Hủy</button>
+                </div>
+            </Modal>
         </div>
     );
 };
