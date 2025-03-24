@@ -15,7 +15,12 @@ const NotificationDropdown = ({ notifications, updateNotifications }) => {
         }
 
         // Lấy customerId từ đối tượng notification (giả sử chúng ta dùng tin đầu tiên trong nhóm)
-        const customerId = notificationGroup.customer?.customerId || notificationGroup.customerId;
+        let customerId;
+        if (typeof notificationGroup.customer === 'object' && notificationGroup.customer !== null) {
+            customerId = notificationGroup.customer.customerId;
+        } else if (typeof notificationGroup.customer === 'number') {
+            customerId = notificationGroup.customer;
+        }
         if (!customerId) {
             console.error('customerId không tồn tại');
             return;
