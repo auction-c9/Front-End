@@ -47,6 +47,15 @@ const BidHistory = () => {
         return <Alert variant="danger" className="mt-4">Error: {error}</Alert>;
     }
 
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('vi-VN').format(price) + ' VNĐ';
+    };
+
+    // Hàm định dạng ngày: Chuyển sang định dạng ngày/tháng/năm
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString('vi-VN');
+    };
+
     // Thêm hàm mở modal
     const handleOpenReviewModal = (bidId) => {
         setSelectedBidId(bidId);
@@ -91,6 +100,13 @@ const BidHistory = () => {
         }
     };
 
+    const formatDateTime = (dateTimeString) => {
+
+        const [datePart, timePart] = dateTimeString.split("T");
+        const [month, day, year] = datePart.split("-");
+        return `ngày ${day}/${month}/${year} vào lúc ${timePart}`;
+    };
+
     return (
         <div className="user-layout">
             <div className="user-container">
@@ -105,7 +121,6 @@ const BidHistory = () => {
                         <tr>
                             <th>STT</th>
                             <th>Số đơn hàng</th>
-                            <th>Tên người đấu giá</th>
                             <th>Tên sản phẩm</th>
                             <th>Giá đăng ký</th>
                             <th>Ngày đăng ký</th>
@@ -119,7 +134,6 @@ const BidHistory = () => {
                             <tr key={bid.bidId}>
                                 <td>{index + 1}</td>
                                 <td>{bid.auctionId}</td>
-                                <td>{bid.user?.username || "Không xác định"}</td>
                                 <td>{bid.productName || "Không có thông tin"}</td>
                                 <td>{bid.bidAmount}</td>
                                 <td>{new Date(bid.registrationDate).toLocaleDateString()}</td>

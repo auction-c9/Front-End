@@ -127,3 +127,19 @@
     background: #ccc;
     cursor: not-allowed;
 }
+.pagination .page-item .page-link {
+    background-color: #EEA019;
+    color: white;
+    border: none;
+}
+
+.pagination .page-item .page-link:hover {
+    background-color: #D88A00;
+    color: white;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #D88A00;
+    color: white;
+    border: none;
+}

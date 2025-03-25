@@ -1,6 +1,23 @@
 .profile-avatar {
-    border: 3px solid #dee2e6;
+    border: 3px solid #EEA019 !important;
 }
+
+#avatarFile + label {
+    background-color: #EEA019 !important;
+    color: white !important;
+    border: 2px solid #EEA019 !important;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-block;
+    margin-top: 8px;
+}
+
+#avatarFile + label:hover {
+    background-color: #d89217 !important;
+    border-color: #d89217 !important;
+}
+
 
 .status-badge {
     text-transform: capitalize;

@@ -111,20 +111,21 @@ export default function Login() {
                                                 Đăng ký ngay
                                             </a>
                                         </div>
-
-                                        <GoogleLogin
-                                            onSuccess={async (credentialResponse) => {
-                                                try {
-                                                    await loginWithGoogle(credentialResponse.credential);
-                                                    navigate('/');
-                                                } catch (error) {
-                                                    setError('Đăng nhập bằng Google thất bại');
-                                                }
-                                            }}
-                                            onError={() => {
-                                                setError('Đăng nhập Google không thành công');
-                                            }}
-                                        />
+                                        <div className="google-button-container">
+                                            <GoogleLogin
+                                                onSuccess={async (credentialResponse) => {
+                                                    try {
+                                                        await loginWithGoogle(credentialResponse.credential);
+                                                        navigate('/');
+                                                    } catch (error) {
+                                                        setError('Đăng nhập bằng Google thất bại');
+                                                    }
+                                                }}
+                                                onError={() => {
+                                                    setError('Đăng nhập Google không thành công');
+                                                }}
+                                            />
+                                        </div>
                                     </Form>
                                 </Card.Body>
                             </Card>
