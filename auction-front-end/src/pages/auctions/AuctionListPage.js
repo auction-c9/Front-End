@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import apiConfig from '../../config/apiConfig';
 import { Link, useLocation } from 'react-router-dom';
-
-// React Bootstrap
 import { Container, Row, Col, Card } from 'react-bootstrap';
 
 const AuctionListPage = () => {
@@ -41,28 +39,35 @@ const AuctionListPage = () => {
         return { time: `${label}${hours > 0 ? `${hours}g ` : ''}${minutes}p ${seconds}s`, highlight };
     };
 
+    // Hàm tính giá hiện tại của phiên đấu giá
+    const getCurrentPrice = (auction) => {
+        if (auction.bids && auction.bids.length > 0) {
+            // Lấy giá bid cao nhất từ danh sách bids
+            const highestBid = Math.max(...auction.bids.map(bid => bid.bidAmount));
+            return highestBid;
+        }
+        return auction.currentPrice;
+    };
+
     // Gọi API và lọc kết quả dựa trên tham số tìm kiếm
     useEffect(() => {
         const params = new URLSearchParams(location.search);
-        const queryParam = params.get('query'); // Từ khóa tìm kiếm (nếu có)
-        const categoriesParam = params.get('categories'); // Các categoryId được chọn
-        const priceParam = params.get('price'); // Mức giá được chọn
-        const statusParam = params.get('status'); // Trạng thái được chọn (upcoming, ongoing, ending)
+        const queryParam = params.get('query');
+        const categoriesParam = params.get('categories');
+        const priceParam = params.get('price');
+        const statusParam = params.get('status');
         const apiUrl = `${apiConfig.auctions}?${params.toString()}`;
 
         axios.get(apiUrl)
             .then(response => {
-                console.log("JSON response:", response.data); // In ra dữ liệu JSON
                 let auctionsData = response.data;
 
-                // Lọc theo từ khóa (nếu có)
                 if (queryParam) {
                     auctionsData = auctionsData.filter(auction =>
                         auction.product?.name.toLowerCase().includes(queryParam.toLowerCase())
                     );
                 }
 
-                // Lọc theo category nếu có tham số categories trong URL
                 if (categoriesParam) {
                     const selectedCategoryIds = categoriesParam.split(',').map(Number);
                     auctionsData = auctionsData.filter(auction =>
@@ -70,26 +75,19 @@ const AuctionListPage = () => {
                     );
                 }
 
-                // Lọc theo mức giá nếu có tham số price trong URL
                 if (priceParam) {
                     if (priceParam === "1") {
-                        // Dưới 1 triệu
                         auctionsData = auctionsData.filter(auction => auction.currentPrice < 1000000);
                     } else if (priceParam === "2") {
-                        // Từ 1 đến dưới 3 triệu
                         auctionsData = auctionsData.filter(auction => auction.currentPrice >= 1000000 && auction.currentPrice < 3000000);
                     } else if (priceParam === "3") {
-                        // Từ 3 đến dưới 5 triệu
                         auctionsData = auctionsData.filter(auction => auction.currentPrice >= 3000000 && auction.currentPrice < 5000000);
                     } else if (priceParam === "4") {
-                        // Trên 5 triệu
                         auctionsData = auctionsData.filter(auction => auction.currentPrice >= 5000000);
                     }
                 }
 
-                // Lọc theo trạng thái nếu có tham số status trong URL
                 if (statusParam) {
-                    // Mapping giữa giá trị từ SearchBar và giá trị thực tế trong Auction
                     const statusMapping = {
                         "upcoming": "pending",
                         "ongoing": "active",
@@ -102,7 +100,6 @@ const AuctionListPage = () => {
 
                 setAuctions(auctionsData);
 
-                // Tạo danh sách thời gian ban đầu cho từng phiên đấu giá
                 const initialTimeLeft = {};
                 auctionsData.forEach(auction => {
                     initialTimeLeft[auction.auctionId] = calculateTimeLeft(auction);
@@ -112,7 +109,6 @@ const AuctionListPage = () => {
             .catch(error => console.error('Lỗi khi tải phiên đấu giá:', error));
     }, [location.search]);
 
-    // Cập nhật thời gian đếm ngược mỗi giây
     useEffect(() => {
         const interval = setInterval(() => {
             setTimeLeftMap(prevMap => {
@@ -153,7 +149,7 @@ const AuctionListPage = () => {
                                             {auction.product?.name}
                                         </Card.Title>
                                         <Card.Text style={{ fontSize: '1rem', fontWeight: 'bold', color: '#007bff' }}>
-                                            {auction.currentPrice.toLocaleString('vi-VN')} VNĐ
+                                            {getCurrentPrice(auction).toLocaleString('vi-VN')} VNĐ
                                         </Card.Text>
                                         <Card.Text
                                             style={{
@@ -175,7 +171,6 @@ const AuctionListPage = () => {
                                         >
                                             Xem chi tiết
                                         </Link>
-
                                     </Card.Body>
                                 </Card>
                             </Link>

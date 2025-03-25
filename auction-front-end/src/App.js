@@ -28,6 +28,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BidHistory from "./pages/profile/BidHistory";
 import UserProfilePage from "./pages/profile/UserProfilePage";
+import PrivateRoute from "./pages/login/PrivateRoute";
 
 
 
@@ -46,7 +47,9 @@ const App = () => {
                         <Routes>
                             <Route path="/" element={<Home/>}/>
                             <Route path="/auctions" element={<AuctionListPage/>}/>
-                            <Route path="/product/add" element={<AddProduct/>}/>
+                            <Route path="/product/add" element={<PrivateRoute />}>
+                                <Route path="" element={<AddProduct />} />
+                            </Route>
                             <Route path="/auction/:id" element={<AuctionDetailPage/>}/>
                             <Route path="/login" element={<Login/>}/>
                             <Route path="/register" element={<Register/>}/>
