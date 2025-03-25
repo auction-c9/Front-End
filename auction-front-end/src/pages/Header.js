@@ -1,7 +1,6 @@
 // Header.js
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useAuth } from '../context/AuthContext';
 import { Dropdown, Badge } from 'react-bootstrap';
@@ -12,6 +11,7 @@ import { Client } from '@stomp/stompjs';
 import '../styles/Header.css';
 import NotificationDropdown from './notification/NotificationDropdown';
 import CustomToggle from "./notification/CustomToggle";
+import SearchBar from './search/SearchBar'; // Đường dẫn tùy theo cấu trúc thư mục
 
 const searchSchema = Yup.object().shape({
     query: Yup.string(),
@@ -159,28 +159,7 @@ const Header = () => {
                     <Link to="/" className="logo-text">C9-Stock</Link>
                 </div>
 
-                <div className="search-container">
-                    <Formik
-                        initialValues={{ query: '' }}
-                        validationSchema={searchSchema}
-                        onSubmit={handleSearch}
-                    >
-                        {() => (
-                            <Form className="search-form">
-                                <Field
-                                    type="text"
-                                    name="query"
-                                    placeholder="Tìm kiếm sản phẩm..."
-                                    className="search-input"
-                                />
-                                <button type="submit" className="search-button">
-                                    <Search size={20} />
-                                </button>
-                                <ErrorMessage name="query" component="div" className="error-text" />
-                            </Form>
-                        )}
-                    </Formik>
-                </div>
+
 
                 <div className="nav-icons">
                     <Dropdown
@@ -242,12 +221,9 @@ const Header = () => {
             </div>
 
             <div className="bottom-header">
-                <nav className="category-nav">
-                    <Link to="/categories" className="nav-link">Danh mục</Link>
-                    <Link to="/auctions/live" className="nav-link">Đang diễn ra</Link>
-                    <Link to="/auctions/upcoming" className="nav-link">Sắp diễn ra</Link>
-                    <Link to="/auctions/ended" className="nav-link">Đã diễn ra</Link>
-                </nav>
+                <div style={{display: 'flex', justifyContent: 'center'}}>
+                    <SearchBar/>
+                </div>
             </div>
         </header>
     );
