@@ -209,23 +209,22 @@ const AuctionDetailPage = () => {
 
     return (
         <div className="auction-detail">
-
             {/* Hàng đầu tiên: Ảnh nằm ở giữa */}
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>
-                <div style={{ maxWidth: "800px", width: "100%" }}>
+            <div className="auction-row">
+                <div className="image-wrapper">
                     <ImageGallery images={auction.product?.images} productName={auction.product?.name} />
                 </div>
             </div>
 
             {/* Hàng thứ hai: 3 cột (Ranking - Thông tin - Lịch sử) */}
-            <div style={{ display: "flex", gap: "1rem" }}>
+            <div className="auction-content">
                 {/* Cột 1: Ranking */}
-                <div style={{ flex: 1, minWidth: "250px" }}>
+                <div className="ranking">
                     <AuctionRanking topBids={topBids} />
                 </div>
 
                 {/* Cột 2: Thông tin sản phẩm & đấu giá */}
-                <div style={{ flex: 2, minWidth: "400px" }}>
+                <div className="auction-info">
                     <h2 className="auction-title">
                         {auction?.product?.name || "Sản phẩm chưa xác định"}
                     </h2>
@@ -266,8 +265,8 @@ const AuctionDetailPage = () => {
                         </div>
                         <motion.div
                             className={`current-price ${priceUpdated ? "highlight" : ""}`}
-                            animate={{scale: priceUpdated ? 1.1 : 1}}
-                            transition={{duration: 0.3}}
+                            animate={{ scale: priceUpdated ? 1.1 : 1 }}
+                            transition={{ duration: 0.3 }}
                         >
                             Giá hiện tại: {highestBidAmount.toLocaleString("vi-VN")} VNĐ
                         </motion.div>
@@ -275,11 +274,11 @@ const AuctionDetailPage = () => {
 
                     {/* Trạng thái đấu giá */}
                     {auction.status === "pending" ? (
-                        <p style={{color: "orange", fontWeight: "bold", marginTop: "1rem"}}>
+                        <p style={{ color: "orange", fontWeight: "bold", marginTop: "1rem" }}>
                             ⚠️ Phiên đấu giá chưa bắt đầu.
                         </p>
                     ) : auction.status === "ended" ? (
-                        <div style={{marginTop: "1rem" }}>
+                        <div style={{ marginTop: "1rem" }}>
                             <p style={{ color: "red", fontWeight: "bold" }}>⚠️ Phiên đấu giá đã kết thúc.</p>
                             {winnerBid ? (
                                 <>
@@ -384,9 +383,9 @@ const AuctionDetailPage = () => {
                 </div>
 
                 {/* Cột 3: Lịch sử đấu giá */}
-                <div style={{ flex: 1, minWidth: "250px" }}>
+                <div className="bid-history">
                     <h3 className="bid-history-title">Lịch sử đấu giá</h3>
-                    <ul className="bid-history">
+                    <ul className="bid-history-list">
                         {bidHistory.map((bid) => (
                             <li key={bid.bidId}>
                                 <strong>{bid.user?.username || "Ẩn danh"}</strong> -{" "}

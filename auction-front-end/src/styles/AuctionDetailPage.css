@@ -1,37 +1,93 @@
+/* Đảm bảo phần container tổng thể */
 .auction-detail {
     padding: 0 1rem;
     max-width: 100%;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
 }
 
+/* Dòng chứa ảnh */
+.auction-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.image-wrapper {
+    max-width: 800px;
+    width: 100%;
+}
+
+/* Container 3 cột */
 .auction-content {
     display: flex;
-    gap: 20px;
-    margin-top: 20px;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    gap: 1rem;
 }
 
-.auction-info {
+/* Mỗi cột */
+.ranking,
+.auction-info,
+.bid-history {
     flex: 1;
+    min-width: 280px; /* giảm một chút để dễ co giãn */
     background: #fff;
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.auction-image {
-    flex: 1;
+/* Riêng phần danh sách lịch sử */
+.bid-history-list {
+    margin-top: 20px;
+    list-style: none;
+    padding: 0;
+}
+
+.bid-history-list li {
+    padding: 0.25rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.bid-history-list li strong {
+    color: #333;
+}
+
+.bid-history-list li span {
+    color: green;
+    font-weight: bold;
+}
+
+.bid-history-list li em {
+    color: gray;
+    font-style: italic;
+}
+
+/* Tiêu đề */
+.auction-title {
+    margin-bottom: 16px;
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+/* Thông tin sản phẩm */
+.info-section {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
-.product-image {
-    max-height: 400px;
-    object-fit: contain;
+.info-section > div {
+    flex: 1 1 45%;
 }
 
 .current-price {
-    color: #B71C12;  /* Màu đỏ trầm hơn */
+    color: #B71C12; /* Màu đỏ trầm hơn */
     font-size: 1.5rem;
     margin: 10px 0;
     font-weight: bold;
@@ -44,7 +100,7 @@
 }
 
 .highest-bidder {
-    color: #004466;  /* Màu xanh đậm */
+    color: #004466; /* Màu xanh đậm */
     font-weight: bold;
 }
 
@@ -53,132 +109,171 @@
     color: #E65100; /* Cam đậm hơn để nổi bật */
 }
 
-.bid-history {
-    margin-top: 20px;
-    list-style: none;
-    padding: 0;
-}
-
-.bid-history li {
-    padding: 0.25rem 0;
-    border-bottom: 1px solid #eee;
-}
-
-.bid-history li strong {
-    color: #333;
-}
-
-.bid-history li span {
-    color: #004466; /* Xanh đậm */
-    font-weight: bold;
-}
-
-.bid-history li em {
-    color: gray;
-    font-style: italic;
-}
-
-h2, h3 {
-    margin-bottom: 16px;
-}
-
-
-.info-right {
-    flex: 1 1 40%;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-.info-left {
-    flex: 1 1 50%;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-.info-section {
-    display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-}
-.container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 1rem;
-}
-
-.auction-images {
-    display: flex;
-    gap: 1rem; /* Khoảng cách giữa carousel và thanh thumbnail */
-}
-
-/* Container cho carousel chính */
-.carousel-container {
-    flex: 3; /* Chiếm nhiều không gian hơn */
-    max-width: 70%; /* Giới hạn chiều rộng */
-}
-
-/* Container cho danh sách thumbnail */
-.thumbnail-list {
-    flex: 1; /* Chiếm ít không gian hơn */
-    display: flex;
-    flex-direction: column; /* Xếp từ trên xuống dưới */
-    gap: 0.5rem;
-    max-height: 400px;
-    overflow-y: auto; /* Cho phép cuộn nếu thumbnail nhiều */
-}
-
-.thumbnail-item img {
-    width: 100px;
-    height: 70px;
-    object-fit: cover;
-    cursor: pointer;
-    border: 2px solid transparent;
-}
-
-.thumbnail-item img:hover {
-    border-color: #007bff; /* Hover highlight */
-}
-
-.auction-detail {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-}
-
-.image-container {
-    width: 100%;
-    max-width: 600px; /* Để ảnh không quá to */
-    text-align: center;
-}
-
-.auction-content {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-    gap: 1rem;
-}
-
-.ranking,
-.auction-info,
-.bid-history {
-    flex: 1;
-    min-width: 300px;
-}
-
-@media (max-width: 768px) {
+/* Media Query cho màn hình nhỏ */
+@media (max-width: 1200px) {
     .auction-content {
         flex-direction: column;
+    }
+
+    .bid-history {
+        margin-top: 20px;
+        list-style: none;
+        padding: 0;
+    }
+
+    .bid-history li {
+        padding: 0.25rem 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .bid-history li strong {
+        color: #333;
+    }
+
+    .bid-history li span {
+        color: #004466; /* Xanh đậm */
+        font-weight: bold;
+    }
+
+    .bid-history li em {
+        color: gray;
+        font-style: italic;
+    }
+
+    h2, h3 {
+        margin-bottom: 16px;
+    }
+
+
+    .info-right {
+        flex: 1 1 40%;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .info-left {
+        flex: 1 1 50%;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .info-section {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+
+    .auction-images {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* canh giữa theo chiều ngang */
+        width: 100%;
+        max-width: 800px; /* Giới hạn độ rộng tối đa nếu muốn */
+        margin: 0 auto; /* canh giữa theo lề trang */
+    }
+
+    /* Phần Carousel chính */
+    .carousel-container {
+        width: 100%; /* Cho nó full chiều rộng của container */
+        margin-bottom: 1rem; /* Khoảng cách dưới carousel */
+    }
+
+    /* Ảnh lớn trong carousel */
+    .carousel-image {
+        max-height: 400px;
+        object-fit: contain;
+        background-color: #fff;
+    }
+
+    /* Danh sách thumbnail */
+    .thumbnail-list {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;  /* không cho xuống hàng */
+        overflow-x: auto;   /* thanh cuộn ngang khi nhiều ảnh */
+        gap: 0.5rem;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    /* Mỗi thumbnail item */
+    .thumbnail-item {
+        flex: 0 0 auto;  /* cố định kích thước, không co giãn */
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: border 0.2s ease;
+    }
+
+    /* Ảnh thumbnail bên trong */
+    .thumbnail-item img {
+        width: 100px;
+        height: 70px;
+        object-fit: cover;
+    }
+
+    .thumbnail-item.active {
+        border: 2px solid #007bff;
+    }
+
+    .thumbnail-item img:hover {
+        border-color: #007bff; /* Hover highlight */
+    }
+
+    .auction-detail {
+        display: flex;
+        flex-direction: column;
         align-items: center;
+        gap: 1rem;
+    }
+
+    .image-container {
+        width: 100%;
+        max-width: 600px; /* Để ảnh không quá to */
+        text-align: center;
+    }
+
+    .auction-content {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
+        gap: 1rem;
+    }
+
+    .ranking,
+    .auction-info,
+    .bid-history {
+        min-width: 100%; /* Mỗi cột chiếm 100% chiều ngang */
+        margin-bottom: 1rem; /* Thêm khoảng cách giữa các cột khi xếp dọc */
+    }
+}
+
+@media (max-width: 480px) {
+    .auction-detail {
+        padding: 0.5rem;
+    }
+
+    .auction-title {
+        font-size: 1.2rem;
+    }
+
+    .current-price {
+        font-size: 1.3rem;
     }
 }
 
 
-
 .payment-buttons {
     display: flex;
-    gap: 12px;  /* Khoảng cách giữa hai nút */
+    gap: 12px; /* Khoảng cách giữa hai nút */
     justify-content: flex-start;
     margin-top: 20px;
 }
@@ -188,7 +283,7 @@ h2, h3 {
     display: flex;
     align-items: center;
     padding: 12px 18px;
-    background-color: #004488;  /* Xanh navy đậm */
+    background-color: #004488; /* Xanh navy đậm */
     color: white;
     font-weight: 600;
     border: 2px solid #003366; /* Viền xanh đậm hơn */
@@ -217,6 +312,10 @@ h2, h3 {
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s, box-shadow 0.3s;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+
+    .info-section > div {
+        flex: 1 1 100%; /* Các khối thông tin xếp dọc hoàn toàn */
+    }
 }
 
 .btn-vnpay:hover {
