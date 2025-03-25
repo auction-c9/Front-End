@@ -92,50 +92,50 @@ const RegisteredAuctionsHistory = () => {
                         </Alert>
                     )}
                     {!isLoading && auctions.length > 0 && (
-                    <>
-                    <Table striped bordered hover>
-                        <thead>
-                        <tr>
-                            <th>STT</th>
-                            <th>Tên sản phẩm</th>
-                            <th>Thông tin sản phẩm</th>
-                            <th>Ngày Bắt đầu</th>
-                            <th>Ngày kết thúc</th>
-                            <th>Tình trạng</th>
-                            <th>Giá khởi điểm</th>
-                            <th>Hủy đăng ký</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {auctions.map((auction, index) => (
-                            <tr key={auction.auctionId}>
-                                <td>{index + 1}</td>
-                                <td>{auction.productName}</td>
-                                <td>{auction.productDescription}</td>
-                                <td>{formatDateTime(auction.auctionStartTime).replace("T", " vào lúc ")}</td>
-                                <td>{formatDateTime(auction.auctionEndTime)}</td>
-                                <td>{mapStatus(auction.status)}</td>
-                                <td>{formatPrice(auction.basePrice)}</td>
-                                <td>
+                        <>
+                            <Table striped bordered hover>
+                                <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Thông tin sản phẩm</th>
+                                    <th>Ngày Bắt đầu</th>
+                                    <th>Ngày kết thúc</th>
+                                    <th>Tình trạng</th>
+                                    <th>Giá khởi điểm</th>
+                                    <th>Hủy đăng ký</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {auctions.map((auction, index) => (
+                                    <tr key={auction.auctionId}>
+                                        <td>{index + 1}</td>
+                                        <td>{auction.productName}</td>
+                                        <td>{auction.productDescription}</td>
+                                        <td>{formatDateTime(auction.auctionStartTime).replace("T", " vào lúc ")}</td>
+                                        <td>{formatDateTime(auction.auctionEndTime)}</td>
+                                        <td>{mapStatus(auction.status)}</td>
+                                        <td>{formatPrice(auction.basePrice)}</td>
+                                        <td>
 
-                                    <Button
-                                        variant="danger"
-                                        onClick={() => handleCancel(auction.auctionId)}
-                                        disabled={auction.status.toLowerCase() !== 'pending'}
-                                    >
-                                        Hủy
-                                    </Button>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </Table>
+                                            <Button
+                                                variant="danger"
+                                                onClick={() => handleCancel(auction.auctionId)}
+                                                disabled={auction.status.toLowerCase() !== 'pending'}
+                                            >
+                                                Hủy
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </Table>
 
-                        <CustomPagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={setCurrentPage}
-                        />
+                            <CustomPagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={setCurrentPage}
+                            />
                         </>
                     )}
                 </div>
