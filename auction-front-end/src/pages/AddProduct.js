@@ -1,26 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { Formik, Field, ErrorMessage } from 'formik';
+import React, {useEffect, useState} from 'react';
+import {Formik, Field, ErrorMessage} from 'formik';
 import * as Yup from 'yup';
-import { useNavigate } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
+import {useNavigate} from 'react-router-dom';
+import {toast, ToastContainer} from 'react-toastify';
 import {
     Container,
     Row,
     Col,
     Form,
     Button,
-    Image
+    Image,
+    Modal
 } from 'react-bootstrap';
 import productService from '../services/productService';
 import categoryService from '../services/categoryService';
 import 'react-toastify/dist/ReactToastify.css';
-import { parse, isValid, format } from 'date-fns';
-
+import {parse, isValid, format} from 'date-fns';
 
 // Hàm parse chuỗi 'dd/MM/yyyy HH:mm' -> Date
 const parseDateTime = (value) => {
-    // Tùy bạn muốn format: 'dd/MM/yyyy HH:mm' hay chỉ 'dd/MM/yyyy'
-    // Ở đây demo HH:mm
     const parsed = parse(value, 'dd/MM/yyyy HH:mm', new Date());
     return isValid(parsed) ? parsed : null;
 };
@@ -31,7 +29,7 @@ const dateTimeField = Yup.string()
     .test('is-valid-datetime', 'Định dạng ngày giờ không hợp lệ (dd/MM/yyyy HH:mm)', (value) => {
         if (!value) return false;
         const parsed = parseDateTime(value);
-        return !!parsed; // true nếu parse được, false nếu ko
+        return !!parsed;
     });
 
 const ProductSchema = Yup.object().shape({
@@ -49,11 +47,8 @@ const ProductSchema = Yup.object().shape({
     bidStep: Yup.number()
         .positive('Bước giá phải lớn hơn 0')
         .required('Bước giá là bắt buộc'),
-
-    // Sử dụng kiểu string + custom validation
     auctionStartTime: dateTimeField,
     auctionEndTime: dateTimeField,
-
     imageFiles: Yup.array().min(1, 'Ít nhất một ảnh sản phẩm là bắt buộc')
 });
 
@@ -61,6 +56,9 @@ const AddProduct = () => {
     const navigate = useNavigate();
     const [categories, setCategories] = useState([]);
     const [imagePreviews, setImagePreviews] = useState([]);
+    // State cho modal phóng to ảnh
+    const [showModal, setShowModal] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -82,6 +80,11 @@ const AddProduct = () => {
         setImagePreviews(previews);
     };
 
+    const handleImageClick = (src) => {
+        setSelectedImage(src);
+        setShowModal(true);
+    };
+
     return (
         <Container className="py-4">
             <h2 className="mb-4">Thêm sản phẩm mới</h2>
@@ -92,19 +95,15 @@ const AddProduct = () => {
                     description: '',
                     basePrice: '',
                     bidStep: '',
-                    // Lưu chuỗi date/time
                     auctionStartTime: '',
                     auctionEndTime: '',
                     imageFiles: []
                 }}
                 validationSchema={ProductSchema}
-                onSubmit={async (values, { setSubmitting, resetForm }) => {
+                onSubmit={async (values, {setSubmitting, resetForm}) => {
                     try {
-                        // Parse chuỗi theo định dạng 'dd/MM/yyyy HH:mm'
                         const startDateObj = parseDateTime(values.auctionStartTime);
                         const endDateObj = parseDateTime(values.auctionEndTime);
-
-                        // Định dạng lại theo mẫu ISO không chứa offset
                         const startFormatted = format(startDateObj, "yyyy-MM-dd'T'HH:mm:ss");
                         const endFormatted = format(endDateObj, "yyyy-MM-dd'T'HH:mm:ss");
 
@@ -114,11 +113,12 @@ const AddProduct = () => {
                         formData.append('description', values.description);
                         formData.append('basePrice', values.basePrice);
                         formData.append('bidStep', values.bidStep);
-                        // Gửi chuỗi đã định dạng
                         formData.append('auctionStartTime', startFormatted);
                         formData.append('auctionEndTime', endFormatted);
 
-                        values.imageFiles.forEach((file) => formData.append('imageFiles', file));
+                        values.imageFiles.forEach((file) =>
+                            formData.append('imageFiles', file)
+                        );
 
                         await productService.createProduct(formData);
                         toast.success('🎉 Thêm sản phẩm thành công!');
@@ -132,55 +132,61 @@ const AddProduct = () => {
                         setSubmitting(false);
                     }
                 }}
-
             >
-                {({ isSubmitting, setFieldValue, handleSubmit, values }) => (
+                {({isSubmitting, setFieldValue, handleSubmit, values}) => (
                     <Form noValidate onSubmit={handleSubmit}>
-                        <Form.Group className="mb-3" controlId="formName">
-                            <Form.Label>Tên sản phẩm:</Form.Label>
-                            <Field
-                                name="name"
-                                as={Form.Control}
-                                type="text"
-                                placeholder="Nhập tên sản phẩm"
-                            />
-                            <ErrorMessage name="name" component="div" className="text-danger" />
-                        </Form.Group>
+                        {/* Hàng 1: Tên sản phẩm và Danh mục */}
+                        <Row>
+                            <Col md={6}>
+                                <Form.Group className="mb-3" controlId="formName">
+                                    <Form.Label>Tên sản phẩm:</Form.Label>
+                                    <Field
+                                        name="name"
+                                        as={Form.Control}
+                                        type="text"
+                                        placeholder="Nhập tên sản phẩm"
+                                    />
+                                    <ErrorMessage
+                                        name="name"
+                                        component="div"
+                                        className="text-danger"
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col md={6}>
+                                <Form.Group className="mb-3" controlId="formCategory">
+                                    <Form.Label>Danh mục:</Form.Label>
+                                    <Field
+                                        as={Form.Select}
+                                        name="categoryId"
+                                        onChange={(e) =>
+                                            setFieldValue('categoryId', e.target.value)
+                                        }
+                                    >
+                                        <option value="">-- Chọn danh mục --</option>
+                                        {categories.length > 0 ? (
+                                            categories.map((category) => (
+                                                <option
+                                                    key={category.categoryId}
+                                                    value={String(category.categoryId)}
+                                                >
+                                                    {category.name}
+                                                </option>
+                                            ))
+                                        ) : (
+                                            <option disabled>Không có danh mục nào</option>
+                                        )}
+                                    </Field>
+                                    <ErrorMessage
+                                        name="categoryId"
+                                        component="div"
+                                        className="text-danger"
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
 
-                        <Form.Group className="mb-3" controlId="formDescription">
-                            <Form.Label>Mô tả:</Form.Label>
-                            <Field
-                                as="textarea"
-                                name="description"
-                                className="form-control"
-                                placeholder="Nhập mô tả sản phẩm"
-                                maxLength={300}
-                            />
-                            <ErrorMessage name="description" component="div" className="text-danger" />
-                            <div className="text-muted">{values.description.length}/300 ký tự</div>
-                        </Form.Group>
-
-                        <Form.Group className="mb-3" controlId="formCategory">
-                            <Form.Label>Danh mục:</Form.Label>
-                            <Field
-                                as={Form.Select}
-                                name="categoryId"
-                                onChange={(e) => setFieldValue('categoryId', e.target.value)}
-                            >
-                                <option value="">-- Chọn danh mục --</option>
-                                {categories.length > 0 ? (
-                                    categories.map((category) => (
-                                        <option key={category.categoryId} value={String(category.categoryId)}>
-                                            {category.name}
-                                        </option>
-                                    ))
-                                ) : (
-                                    <option disabled>Không có danh mục nào</option>
-                                )}
-                            </Field>
-                            <ErrorMessage name="categoryId" component="div" className="text-danger" />
-                        </Form.Group>
-
+                        {/* Hàng 2: Giá khởi điểm và Bước giá */}
                         <Row>
                             <Col md={6}>
                                 <Form.Group className="mb-3" controlId="formBasePrice">
@@ -191,7 +197,11 @@ const AddProduct = () => {
                                         type="number"
                                         placeholder="Nhập giá khởi điểm"
                                     />
-                                    <ErrorMessage name="basePrice" component="div" className="text-danger" />
+                                    <ErrorMessage
+                                        name="basePrice"
+                                        component="div"
+                                        className="text-danger"
+                                    />
                                 </Form.Group>
                             </Col>
                             <Col md={6}>
@@ -203,80 +213,173 @@ const AddProduct = () => {
                                         type="number"
                                         placeholder="Nhập bước giá"
                                     />
-                                    <ErrorMessage name="bidStep" component="div" className="text-danger" />
+                                    <ErrorMessage
+                                        name="bidStep"
+                                        component="div"
+                                        className="text-danger"
+                                    />
                                 </Form.Group>
                             </Col>
                         </Row>
 
+                        {/* Hàng 3: Thời gian bắt đầu và kết thúc đấu giá */}
                         <Row>
                             <Col md={6}>
                                 <Form.Group className="mb-3" controlId="formAuctionStartTime">
-                                    <Form.Label>Thời gian bắt đầu đấu giá (dd/MM/yyyy HH:mm):</Form.Label>
-                                    {/* Input text thay vì datetime-local */}
+                                    <Form.Label>
+                                        Thời gian bắt đầu đấu giá (dd/MM/yyyy HH:mm):
+                                    </Form.Label>
                                     <Field
                                         name="auctionStartTime"
                                         as={Form.Control}
                                         type="text"
                                         placeholder="Ví dụ: 31/12/2025 13:45"
                                     />
-                                    <ErrorMessage name="auctionStartTime" component="div" className="text-danger" />
+                                    <ErrorMessage
+                                        name="auctionStartTime"
+                                        component="div"
+                                        className="text-danger"
+                                    />
                                 </Form.Group>
                             </Col>
                             <Col md={6}>
                                 <Form.Group className="mb-3" controlId="formAuctionEndTime">
-                                    <Form.Label>Thời gian kết thúc đấu giá (dd/MM/yyyy HH:mm):</Form.Label>
+                                    <Form.Label>
+                                        Thời gian kết thúc đấu giá (dd/MM/yyyy HH:mm):
+                                    </Form.Label>
                                     <Field
                                         name="auctionEndTime"
                                         as={Form.Control}
                                         type="text"
                                         placeholder="Ví dụ: 01/01/2026 08:00"
                                     />
-                                    <ErrorMessage name="auctionEndTime" component="div" className="text-danger" />
+                                    <ErrorMessage
+                                        name="auctionEndTime"
+                                        component="div"
+                                        className="text-danger"
+                                    />
                                 </Form.Group>
                             </Col>
                         </Row>
 
-                        <Form.Group className="mb-3" controlId="formImageFiles">
-                            <Form.Label>Ảnh sản phẩm:</Form.Label>
-                            <Form.Control
-                                type="file"
-                                accept="image/*"
-                                multiple
-                                onChange={(e) => {
-                                    const files = Array.from(e.currentTarget.files);
-                                    setFieldValue('imageFiles', files);
-                                    const previews = files.map((file) => URL.createObjectURL(file));
-                                    setImagePreviews(previews);
-                                }}
-                            />
-                            <div className="d-flex flex-wrap gap-2 mt-2">
-                                {imagePreviews.map((src, index) => (
-                                    <Image
-                                        key={index}
-                                        src={src}
-                                        alt={`Ảnh ${index}`}
-                                        thumbnail
-                                        style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                        {/* Hàng 4: Trường Mô tả và Ảnh sản phẩm */}
+                        <Row>
+                            <Col md={6}>
+                                {/* Trường Mô tả nằm dưới ô thời gian bắt đầu đấu giá */}
+                                <Form.Group className="mb-3" controlId="formDescription">
+                                    <Form.Label>Mô tả:</Form.Label>
+                                    <Field
+                                        as="textarea"
+                                        name="description"
+                                        className="form-control"
+                                        placeholder="Nhập mô tả sản phẩm"
+                                        maxLength={300}
+                                        style={{ height: '147px' }} // Cùng kích thước với ô thời gian bắt đầu đấu giá
                                     />
-                                ))}
-                            </div>
-                            <ErrorMessage name="imageFiles" component="div" className="text-danger" />
-                        </Form.Group>
+                                    <ErrorMessage
+                                        name="description"
+                                        component="div"
+                                        className="text-danger"
+                                    />
+                                    <div className="text-muted">
+                                        {values.description.length}/300 ký tự
+                                    </div>
+                                </Form.Group>
+                            </Col>
+                            <Col md={6}>
+                                {/* Trường Ảnh sản phẩm nằm dưới ô thời gian kết thúc đấu giá */}
+                                <Form.Group className="mb-3" controlId="formImageFiles">
+                                    <Form.Label>Ảnh sản phẩm:</Form.Label>
+                                    <Form.Control
+                                        type="file"
+                                        accept="image/*"
+                                        multiple
+                                        onChange={(e) => {
+                                            const files = Array.from(e.currentTarget.files);
+                                            setFieldValue('imageFiles', files);
+                                            const previews = files.map((file) => URL.createObjectURL(file));
+                                            setImagePreviews(previews);
+                                        }}
+                                        style={{ height: '38px' }} // Cùng kích thước với ô thời gian kết thúc đấu giá
+                                    />
+                                    <div className="d-flex flex-wrap gap-2 mt-2">
+                                        {imagePreviews.map((src, index) => (
+                                            <div
+                                                key={index}
+                                                style={{ position: 'relative', display: 'inline-block' }}
+                                            >
+                                                <Image
+                                                    src={src}
+                                                    alt={`Ảnh ${index}`}
+                                                    thumbnail
+                                                    style={{
+                                                        width: '100px',
+                                                        height: '100px',
+                                                        objectFit: 'cover',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                    onClick={() => handleImageClick(src)}
+                                                />
+                                                {/* Nút xóa ảnh */}
+                                                <Button
+                                                    variant="danger"
+                                                    size="sm"
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: '2px',
+                                                        right: '2px',
+                                                        borderRadius: '50%',
+                                                        padding: '0 6px'
+                                                    }}
+                                                    onClick={() => {
+                                                        // Xóa preview ảnh tại index này
+                                                        const newPreviews = imagePreviews.filter((_, i) => i !== index);
+                                                        setImagePreviews(newPreviews);
+                                                        // Cập nhật giá trị field imageFiles tương ứng
+                                                        const newFiles = values.imageFiles.filter((_, i) => i !== index);
+                                                        setFieldValue('imageFiles', newFiles);
+                                                    }}
+                                                >
+                                                    x
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <ErrorMessage
+                                        name="imageFiles"
+                                        component="div"
+                                        className="text-danger"
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
 
                         <Button
                             type="submit"
                             disabled={isSubmitting}
-                            style={{ backgroundColor: '#965E00', borderColor: '#965E00' }}
+                            style={{backgroundColor: '#965E00', borderColor: '#965E00'}}
                         >
                             {isSubmitting ? 'Đang xử lý...' : 'Thêm sản phẩm'}
                         </Button>
-
                     </Form>
                 )}
             </Formik>
-            <ToastContainer position="top-right" autoClose={2000} />
+            <ToastContainer position="top-right" autoClose={2000}/>
+
+            {/* Modal hiển thị ảnh phóng to */}
+            <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+                <Modal.Body className="p-0">
+                    {selectedImage && (
+                        <Image src={selectedImage} alt="Phóng to ảnh" fluid/>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModal(false)}>
+                        Đóng
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
-};
-
+}
 export default AddProduct;
