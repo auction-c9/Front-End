@@ -30,28 +30,27 @@
     object-fit: contain;
 }
 
-
 .current-price {
-    color: red;
+    color: #B71C12;  /* Màu đỏ trầm hơn */
     font-size: 1.5rem;
     margin: 10px 0;
     font-weight: bold;
 }
 
 .current-price.highlight {
-    background: #ffe8e8;
+    background: #FDECEA; /* Màu nền nhạt hơn để dễ nhìn */
     padding: 5px 10px;
     border-radius: 8px;
 }
 
 .highest-bidder {
-    color: #007bff;
+    color: #004466;  /* Màu xanh đậm */
     font-weight: bold;
 }
 
 .time-left {
     font-weight: bold;
-    color: #ff5722;
+    color: #E65100; /* Cam đậm hơn để nổi bật */
 }
 
 .bid-history {
@@ -70,7 +69,7 @@
 }
 
 .bid-history li span {
-    color: green;
+    color: #004466; /* Xanh đậm */
     font-weight: bold;
 }
 
@@ -176,4 +175,53 @@ h2, h3 {
 }
 
 
+
+.payment-buttons {
+    display: flex;
+    gap: 12px;  /* Khoảng cách giữa hai nút */
+    justify-content: flex-start;
+    margin-top: 20px;
+}
+
+/* PayPal Button */
+.btn-paypal {
+    display: flex;
+    align-items: center;
+    padding: 12px 18px;
+    background-color: #004488;  /* Xanh navy đậm */
+    color: white;
+    font-weight: 600;
+    border: 2px solid #003366; /* Viền xanh đậm hơn */
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s, box-shadow 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-paypal:hover {
+    background-color: #003366;
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* VNPAY Button */
+.btn-vnpay {
+    display: flex;
+    align-items: center;
+    padding: 12px 18px;
+    background-color: #b54d49; /* Đỏ trầm hơn */
+    color: white;
+    font-weight: 600;
+    border: 2px solid #7A140E; /* Viền đỏ đậm hơn */
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s, box-shadow 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-vnpay:hover {
+    background-color: #7A140E;
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
 

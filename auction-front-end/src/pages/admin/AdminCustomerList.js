@@ -182,7 +182,7 @@ const AdminCustomerList = () => {
                     <div>
                         <p><strong>Tên:</strong> {selectedCustomer.name}</p>
                         <p><strong>CCCD:</strong> {selectedCustomer.identityCard}</p>
-                        <p><strong>Số tài khảon:</strong> {selectedCustomer.bankAccount}</p>
+                        <p><strong>Số tài khoản:</strong> {selectedCustomer.bankAccount}</p>
                         <p><strong>Tên ngân hàng:</strong> {selectedCustomer.bankName}</p>
                         <p><strong>Trạng thái tài
                             khoản:</strong> {selectedCustomer.account?.locked ? "Bị khóa" : "Hoạt động"}</p>

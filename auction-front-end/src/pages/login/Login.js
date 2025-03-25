@@ -42,10 +42,6 @@ export default function Login() {
         <GoogleOAuthProvider clientId="227675714691-n86lpo59sf1t9id3el9p82hcf9aokihu.apps.googleusercontent.com">
             <div className="login-page">
                 <div className="background-image">
-                    <img
-                        src="/static/breker_auctionteam_hero.jpg"
-                        alt="Background"
-                    />
                 </div>
 
                 <Container className="login-container">

@@ -263,9 +263,14 @@ const AddProduct = () => {
                             <ErrorMessage name="imageFiles" component="div" className="text-danger" />
                         </Form.Group>
 
-                        <Button variant="primary" type="submit" disabled={isSubmitting}>
+                        <Button
+                            type="submit"
+                            disabled={isSubmitting}
+                            style={{ backgroundColor: '#965E00', borderColor: '#965E00' }}
+                        >
                             {isSubmitting ? 'Đang xử lý...' : 'Thêm sản phẩm'}
                         </Button>
+
                     </Form>
                 )}
             </Formik>

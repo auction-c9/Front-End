@@ -82,7 +82,7 @@ const UserStatistics = () => {
                 <BarChart width={600} height={300} data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" tick={{ fontSize: 16 }} angle={0} textAnchor="end" />
-                    <YAxis />
+                    <YAxis allowDecimals={false} />
                     <Tooltip cursor={{ fill: "transparent" }} />
                     <Bar dataKey="value" fill="#82ca9d" />
                 </BarChart>

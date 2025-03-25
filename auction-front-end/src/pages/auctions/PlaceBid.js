@@ -3,7 +3,9 @@ import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import {toast, ToastContainer} from "react-toastify";
 import apiConfig from "../../config/apiConfig";
-import Confetti from "react-confetti"; // Import thư viện confetti
+import Confetti from "react-confetti";
+import {FaPaypal} from "react-icons/fa";
+import {AiOutlineCreditCard} from "react-icons/ai"; // Import thư viện confetti
 
 
 const PlaceBid = ({
@@ -164,54 +166,69 @@ const PlaceBid = ({
                 <Confetti width={window.innerWidth} height={window.innerHeight} recycle={false} numberOfPieces={200} />
             )}
             <form onSubmit={handleBidSubmit} style={{marginTop: "1rem"}}>
-                <input
-                    type="number"
-                    placeholder={`Nhập từ ${minBid.toLocaleString()} VNĐ`}
-                    value={bidAmount}
-                    onChange={(e) => setBidAmount(e.target.value)}
-                    min={minBid}
-                    style={{ padding: "0.5rem", marginRight: "0.5rem" }}
-                    disabled={isOwner}
-                />
-                <button type="submit" style={{ padding: "0.5rem 1rem" }} disabled={isOwner}>
-                    Đặt giá
-                </button>
-                {error && <p style={{ color: "red", marginTop: "0.5rem" }}>{error}</p>}
-                {isOwner && (
-                    <p style={{ color: "orange", marginTop: "0.5rem" }}>
-                        Bạn không thể đấu giá sản phẩm do chính mình đăng.
-                    </p>
-                )}
+                <div style={{display: "flex", alignItems: "center"}}>
+                    <input
+                        type="number"
+                        placeholder={`Nhập từ ${minBid.toLocaleString()} VNĐ`}
+                        value={bidAmount}
+                        onChange={(e) => setBidAmount(e.target.value)}
+                        min={minBid}
+                        style={{padding: "0.5rem", marginRight: "0.5rem"}}
+                        disabled={isOwner}
+                    />
+                    <button
+                        type="submit"
+                        style={{
+                            padding: "0.5rem 1rem",
+                            backgroundColor: "#f0c674",
+                            color: "black",
+                            border: "none",
+                            borderRadius: "5px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            cursor: isOwner ? "not-allowed" : "pointer",
+                            opacity: isOwner ? 0.6 : 1,
+                            whiteSpace: "nowrap"
+                        }}
+                        disabled={isOwner}
+                    > Đặt giá
+                    </button>
+                </div>
+                    {error && <p style={{color: "red", marginTop: "0.5rem"}}>{error}</p>}
+                    {isOwner && (
+                        <p style={{color: "orange", marginTop: "0.5rem"}}>
+                            Bạn không thể đấu giá sản phẩm do chính mình đăng.
+                        </p>
+                    )}
             </form>
 
             {showPaymentOptions && (
-                <div style={{ marginTop: "1rem" }}>
+                <div style={{marginTop: "1rem"}}>
                     <h3>Chọn phương thức thanh toán:</h3>
                     <p>
-                        <strong>Số tiền đặt cọc:</strong> {depositAmount.toLocaleString("vi-VN")} VNĐ
                         <strong>Số tiền đặt
                             cọc:</strong> {Math.max(depositAmount, 10000).toLocaleString('vi-VN')} VNĐ
                     </p>
                     <p style={{fontSize: "0.9rem", color: "gray", marginTop: "-0.5rem"}}>
                         (Lưu ý: Số tiền đặt cọc tối thiểu là 10,000 VNĐ)
                     </p>
-                    <button
-                        onClick={() => handlePayment("PAYPAL")}
-                        style={{
-                            padding: "0.5rem 1rem",
-                            marginRight: "0.5rem",
-                            backgroundColor: "#0070ba",
-                            color: "#fff"
-                        }}
-                    >
-                        Thanh toán bằng PayPal
-                    </button>
-                    <button
-                        onClick={() => handlePayment("VNPAY")}
-                        style={{ padding: "0.5rem 1rem", backgroundColor: "#e41e25", color: "#fff" }}
-                    >
-                        Thanh toán bằng VNPAY
-                    </button>
+                    <div className="payment-buttons">
+                        <button
+                            className="btn-paypal"
+                            onClick={() => handlePayment("PAYPAL")}
+                        ><FaPaypal size={24} style={{marginRight: 8}}/>
+                            PayPal
+                        </button>
+                        <button
+                            className="btn-vnpay"
+                            onClick={() => handlePayment("VNPAY")}
+                        >
+                            <AiOutlineCreditCard size={24}
+                                                 style={{marginRight: 8}}/>
+                            VNPAY
+                        </button>
+                    </div>
                 </div>
             )}
 

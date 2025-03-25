@@ -12,6 +12,8 @@ import ImageGallery from "./ImageGallery";
 
 import { toast, ToastContainer } from "react-toastify";
 import AuctionRanking from "./AuctionRanking";
+import {AiOutlineCreditCard} from "react-icons/ai";
+import {FaPaypal} from "react-icons/fa";
 
 const AuctionDetailPage = () => {
     const { id } = useParams();
@@ -188,7 +190,7 @@ const AuctionDetailPage = () => {
         const urlParams = new URLSearchParams(window.location.search);
         const paymentStatus = urlParams.get('status'); // Sửa thành 'status'
 
-        if (paymentStatus === 'SUCCESS') { // Sửa thành 'SUCCESS'
+        if (paymentStatus === 'SUCCESS') {
             setPaymentSuccess(true);
             setShowFinalPaymentOptions(false); // Ẩn nút thanh toán
             toast.success("Thanh toán thành công!");
@@ -287,20 +289,65 @@ const AuctionDetailPage = () => {
                                             {winnerBid.user?.username || "Ẩn danh"}
                                         </Link>
                                     </p>
-                                    {user?.customerId === winnerBid.user?.accountId && (
-                                        <div
-                                            style={{
-                                                backgroundColor: "#e0ffe0",
-                                                padding: "1rem",
-                                                borderRadius: "5px",
-                                            }}
-                                        >
+                                    {user?.customerId === winnerBid.user?.accountId && !paymentSuccess && (
+                                        <div style={{ backgroundColor: "#e0ffe0", padding: "1rem", borderRadius: "5px" }}>
                                             <h3>Chúc mừng bạn đã đấu giá thành công!</h3>
                                             <p>
                                                 Số tiền thanh toán còn lại là:{" "}
-                                                {(winnerBid.bidAmount - depositAmount).toLocaleString("vi-VN")} VNĐ
+                                                {(
+                                                    winnerBid.bidAmount -
+                                                    depositAmount
+                                                ).toLocaleString("vi-VN")}{" "}
+                                                VNĐ
                                             </p>
                                             <p>Vui lòng thực hiện thanh toán số tiền còn lại để hoàn tất giao dịch.</p>
+
+                                            {/* Nút để hiển thị tùy chọn thanh toán */}
+                                            <button
+                                                onClick={() => setShowFinalPaymentOptions(true)}
+                                                style={{
+                                                    padding: "0.5rem 1rem",
+                                                    backgroundColor: "#f0c674",
+                                                    color: "black",
+                                                    border: "none",
+                                                    borderRadius: "5px",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: "8px"
+                                                }}
+                                            >
+                                                Thanh toán
+                                            </button>
+
+                                            {/* Hiển thị tùy chọn thanh toán (VNPay hoặc PayPal) */}
+                                            {showFinalPaymentOptions && (
+                                                <div style={{marginTop: "1rem"}}>
+                                                    <h3>Chọn phương thức thanh toán:</h3>
+                                                    <p>
+                                                        <strong>Số tiền thanh toán:</strong>{" "}
+                                                        {(winnerBid.bidAmount - depositAmount).toLocaleString('vi-VN')} VNĐ
+                                                    </p>
+                                                    <div className="payment-buttons">
+                                                        <button
+                                                            className="btn-paypal"
+                                                            onClick={() => handleFinalPayment("PAYPAL", highestBidAmount)}
+                                                        >
+                                                            <FaPaypal size={24} style={{marginRight: 8}}/>
+                                                            PayPal
+                                                        </button>
+
+                                                        <button
+                                                            className="btn-vnpay"
+                                                            onClick={() => handleFinalPayment("VNPAY", highestBidAmount)}
+                                                        >
+                                                            <AiOutlineCreditCard size={24}
+                                                                                 style={{marginRight: 8}}/>
+                                                            VNPAY
+                                                        </button>
+                                                    </div>
+
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </>
