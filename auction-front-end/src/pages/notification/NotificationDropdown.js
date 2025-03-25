@@ -15,19 +15,17 @@ const NotificationDropdown = ({ notifications, updateNotifications }) => {
         }
 
         // Lấy customerId từ đối tượng notification (giả sử chúng ta dùng tin đầu tiên trong nhóm)
-        let customerId;
-        if (typeof notificationGroup.customer === 'object' && notificationGroup.customer !== null) {
-            customerId = notificationGroup.customer.customerId;
-        } else if (typeof notificationGroup.customer === 'number') {
-            customerId = notificationGroup.customer;
-        }
+        const customerId = notificationGroup.customerId;
         if (!customerId) {
             console.error('customerId không tồn tại');
             return;
         }
-        const auctionId = notificationGroup.auction?.auctionId;
+
+        console.log("Notification group:", notificationGroup);
+        console.log("Auction field:", notificationGroup.auction);
+        const auctionId = notificationGroup.auction.auctionId;
         if (!auctionId) {
-            console.error('auctionId không tồn tại');
+            console.error('auctionId không tồn tại trong notification:', notificationGroup);
             return;
         }
         const token = localStorage.getItem("token");

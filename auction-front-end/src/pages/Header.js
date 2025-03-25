@@ -128,19 +128,20 @@ const Header = () => {
 
     const updateNotifications = (auctionId, customerId) => {
         setNotifications(prev => prev.map(n => {
-            if (n.auction?.auctionId === auctionId && n.customer?.customerId === customerId) {
+            if (n.auctionId === auctionId && n.customerId === customerId) {
                 return { ...n, isRead: true };
             }
             return n;
         }));
         const token = localStorage.getItem("token");
-        fetch(`http://localhost:8080/api/notifications/${user.customerId}`, {
+        fetch(`http://localhost:8080/api/notifications/read/${customerId}/${auctionId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
-            },
+            }
         })
+
             .then((response) => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
