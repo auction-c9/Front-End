@@ -54,7 +54,9 @@ const App = () => {
                             <Route path="/login" element={<Login/>}/>
                             <Route path="/register" element={<Register/>}/>
                             <Route path="/logout" element={<Logout/>}/>
-                            <Route path="/profile" element={<ProfilePage/>}/>
+                            <Route path="/profile" element={<PrivateRoute />}>
+                                <Route path="" element={<ProfilePage />} />
+                            </Route>
                             <Route path="/forgot-password" element={<ForgotPasswordStep1/>}/>
                             <Route path="/forgot-password/step2" element={<ForgotPasswordStep2/>}/>
                             <Route path="/forgot-password/step3" element={<ForgotPasswordStep3/>}/>
