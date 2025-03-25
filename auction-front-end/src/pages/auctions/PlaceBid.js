@@ -166,39 +166,41 @@ const PlaceBid = ({
                 <Confetti width={window.innerWidth} height={window.innerHeight} recycle={false} numberOfPieces={200} />
             )}
             <form onSubmit={handleBidSubmit} style={{marginTop: "1rem"}}>
-                <input
-                    type="number"
-                    placeholder={`Nhập từ ${minBid.toLocaleString()} VNĐ`}
-                    value={bidAmount}
-                    onChange={(e) => setBidAmount(e.target.value)}
-                    min={minBid}
-                    style={{ padding: "0.5rem", marginRight: "0.5rem" }}
-                    disabled={isOwner}
-                />
-                <button
-                    type="submit"
-                    style={{
-                        padding: "0.5rem 1rem",
-                        backgroundColor: "#f0c674",
-                        color: "black",
-                        border: "none",
-                        borderRadius: "5px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        cursor: isOwner ? "not-allowed" : "pointer",
-                        opacity: isOwner ? 0.6 : 1,
-                        whiteSpace: "nowrap"
-                    }}
-                    disabled={isOwner}
-                > Đặt giá
-                </button>
-                {error && <p style={{color: "red", marginTop: "0.5rem"}}>{error}</p>}
-                {isOwner && (
-                    <p style={{color: "orange", marginTop: "0.5rem"}}>
-                        Bạn không thể đấu giá sản phẩm do chính mình đăng.
-                    </p>
-                )}
+                <div style={{display: "flex", alignItems: "center"}}>
+                    <input
+                        type="number"
+                        placeholder={`Nhập từ ${minBid.toLocaleString()} VNĐ`}
+                        value={bidAmount}
+                        onChange={(e) => setBidAmount(e.target.value)}
+                        min={minBid}
+                        style={{padding: "0.5rem", marginRight: "0.5rem"}}
+                        disabled={isOwner}
+                    />
+                    <button
+                        type="submit"
+                        style={{
+                            padding: "0.5rem 1rem",
+                            backgroundColor: "#f0c674",
+                            color: "black",
+                            border: "none",
+                            borderRadius: "5px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            cursor: isOwner ? "not-allowed" : "pointer",
+                            opacity: isOwner ? 0.6 : 1,
+                            whiteSpace: "nowrap"
+                        }}
+                        disabled={isOwner}
+                    > Đặt giá
+                    </button>
+                </div>
+                    {error && <p style={{color: "red", marginTop: "0.5rem"}}>{error}</p>}
+                    {isOwner && (
+                        <p style={{color: "orange", marginTop: "0.5rem"}}>
+                            Bạn không thể đấu giá sản phẩm do chính mình đăng.
+                        </p>
+                    )}
             </form>
 
             {showPaymentOptions && (
