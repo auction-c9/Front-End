@@ -77,23 +77,33 @@
 
 /* Nút Đăng nhập (center) - cách checkbox 15px */
 .login-button-container {
-    margin-top: 15px;
-    text-align: center;
+
+    display: flex;
+    justify-content: center
 }
 
+.google-button-container {
+    /* Tăng chiều cao nút */
+    padding: 5px 24px; /* Tăng padding để nút cao hơn */
+    font-size: 16px;    /* Tăng cỡ chữ */
+    border-radius: 6px; /* Tăng bo góc */
+    cursor: pointer;
+    /* Nếu muốn thay màu nền, màu viền,... cũng chỉnh ở đây */
+}
 /* Style nút Đăng nhập */
 .login-btn {
-    background-color: #007bff;
+    background-color: #EEA019;
     border: none;
     font-size: 16px;
     font-weight: 500;
     padding: 8px 24px;
     border-radius: 6px;
     transition: background-color 0.3s ease;
+    color: white; /* Giữ chữ màu trắng */
 }
 
 .login-btn:hover {
-    background-color: #0056b3;
+    background-color: #d88a00;
 }
 
 /* Quên mật khẩu? (trái) + Đăng ký ngay (phải) - cách nút Đăng nhập 10px */
@@ -108,12 +118,14 @@
 .forgot-password,
 .register-link {
     font-size: 14px;
-    color: #007bff;
+    color: #EEA019; /* Màu cam chủ đạo */
     text-decoration: none;
+    font-weight: 500;
 }
 
 .forgot-password:hover,
 .register-link:hover {
+    color: #d88a00; /* Màu cam đậm hơn khi hover */
     text-decoration: underline;
 }
 
