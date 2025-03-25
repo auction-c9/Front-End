@@ -1,5 +1,5 @@
 .header {
-    background: white;
+    background: #ece8e8;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 
 }
@@ -9,6 +9,27 @@
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
+}
+
+.left-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-link {
+    color: #965E00 !important;
+    font-weight: bold !important;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.3s;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.nav-link:hover {
+    background-color: #CC8400 !important;
+    color: white !important;
 }
 
 .logo-text {
@@ -93,18 +114,6 @@
     gap: 20px;
     flex-wrap: wrap;
     font-size: 18px;
-}
-
-.nav-link {
-    padding: 10px 20px;
-    text-decoration: none;
-    color: white;
-    font-weight: 500;
-    transition: color 0.3s;
-}
-
-.nav-link:hover {
-    color: #FFD580;
 }
 
 .auth-buttons {

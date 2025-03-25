@@ -6,6 +6,8 @@ import adminService from "../../services/adminService";
 import "../../styles/admin.css";
 import AdminSidebar from "./AdminSidebar";
 import { FaTrash } from "react-icons/fa";
+import CustomPagination from "../profile/CustomPagination";
+
 
 Modal.setAppElement("#root");
 
@@ -120,6 +122,10 @@ const AdminProductList = () => {
         }
     };
 
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+    };
+
     return (
         <div className="admin-layout">
             <div className="admin-container">
@@ -171,25 +177,12 @@ const AdminProductList = () => {
                                         </tbody>
                                     </table>
 
-                                    <div className="pagination" style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                                        <button
-                                            onClick={() => setPage(page - 1)}
-                                            disabled={page === 0}
-                                            style={{ padding: '5px 10px' }}
-                                        >
-                                            ❮ Trước
-                                        </button>
-                                        <span style={{ padding: '5px 10px' }}>
-                                            Trang {page + 1} / {totalPages}
-                                        </span>
-                                        <button
-                                            onClick={() => setPage(page + 1)}
-                                            disabled={page >= totalPages - 1}
-                                            style={{ padding: '5px 10px' }}
-                                        >
-                                            Sau ❯
-                                        </button>
-                                    </div>
+                                    <CustomPagination
+                                        currentPage={page}
+                                        totalPages={totalPages}
+                                        onPageChange={handlePageChange}
+                                        maxVisiblePages={5}
+                                    />
                                 </>
                             )}
                         </>

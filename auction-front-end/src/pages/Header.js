@@ -155,11 +155,11 @@ const Header = () => {
     return (
         <header className="header">
             <div className="top-header">
-                <div className="logo">
+                <div className="left-nav">
                     <Link to="/" className="logo-text">C9-Stock</Link>
+                    <Link to="/" className="nav-link">Trang chủ</Link>
+                    <Link to="/about" className="nav-link">Giới thiệu</Link>
                 </div>
-
-
 
                 <div className="nav-icons">
                     <Dropdown
@@ -169,9 +169,9 @@ const Header = () => {
                         onToggle={() => setShowDropdown(prev => !prev)}
                     >
                         <Dropdown.Toggle as={CustomToggle} onClick={handleNotificationClick}>
-                            <Bell size={22} />
+                            <Bell size={22}/>
                             {unreadCount > 0 && (
-                                <Badge bg="danger" style={{ position: 'absolute', top: 0, right: 0 }}>
+                                <Badge bg="danger" style={{position: 'absolute', top: 0, right: 0}}>
                                     {unreadCount}
                                 </Badge>
                             )}
@@ -189,7 +189,7 @@ const Header = () => {
                     {user ? (
                         <Dropdown>
                             <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center">
-                                <UserIcon size={20} className="me-2" />
+                                <UserIcon size={20} className="me-2"/>
                                 <span>
                                     {user.username
                                         ? `Xin chào, ${user.username.includes('@') ? user.username.split('@')[0] : user.username}`
@@ -217,12 +217,6 @@ const Header = () => {
                             </button>
                         </div>
                     )}
-                </div>
-            </div>
-
-            <div className="bottom-header">
-                <div style={{display: 'flex', justifyContent: 'center'}}>
-                    <SearchBar/>
                 </div>
             </div>
         </header>

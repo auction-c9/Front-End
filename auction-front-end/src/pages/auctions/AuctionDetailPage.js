@@ -330,7 +330,7 @@ const AuctionDetailPage = () => {
                                                     <div className="payment-buttons">
                                                         <button
                                                             className="btn-paypal"
-                                                            onClick={() => handleFinalPayment("PAYPAL", highestBidAmount)}
+                                                            onClick={() => handleFinalPayment("PAYPAL", (winnerBid.bidAmount - depositAmount).toLocaleString('vi-VN'))}
                                                         >
                                                             <FaPaypal size={24} style={{marginRight: 8}}/>
                                                             PayPal
@@ -338,7 +338,7 @@ const AuctionDetailPage = () => {
 
                                                         <button
                                                             className="btn-vnpay"
-                                                            onClick={() => handleFinalPayment("VNPAY", highestBidAmount)}
+                                                            onClick={() => handleFinalPayment("VNPAY", (winnerBid.bidAmount - depositAmount).toLocaleString('vi-VN'))}
                                                         >
                                                             <AiOutlineCreditCard size={24}
                                                                                  style={{marginRight: 8}}/>
