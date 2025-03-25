@@ -73,12 +73,22 @@ const AdminTransactionList = () => {
                                 </tbody>
                             </table>
 
-                            <div className="pagination">
-                                <button onClick={() => setPage(page - 1)} disabled={page === 0}>
+                            <div className="pagination" style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                                <button
+                                    onClick={() => setPage(page - 1)}
+                                    disabled={page === 0}
+                                    style={{ padding: '5px 10px' }}
+                                >
                                     ❮ Trước
                                 </button>
-                                <span>Trang {page + 1} / {totalPages}</span>
-                                <button onClick={() => setPage(page + 1)} disabled={page >= totalPages - 1}>
+                                <span style={{padding: '5px 10px'}}>
+                                            Trang {page + 1} / {totalPages}
+                                        </span>
+                                <button
+                                    onClick={() => setPage(page + 1)}
+                                    disabled={page >= totalPages - 1}
+                                    style={{padding: '5px 10px'}}
+                                >
                                     Sau ❯
                                 </button>
                             </div>

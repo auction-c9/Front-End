@@ -7,7 +7,7 @@ import "../../styles/admin.css";
 import AdminSidebar from "./AdminSidebar";
 import { FaTrash } from "react-icons/fa";
 
-Modal.setAppElement("#root"); // Cấu hình Modal để tránh lỗi accessibility
+Modal.setAppElement("#root");
 
 const AdminProductList = () => {
     const [products, setProducts] = useState([]);
@@ -18,21 +18,75 @@ const AdminProductList = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
 
     useEffect(() => {
+        console.log("Fetching products for page:", page);
         fetchProducts();
     }, [page]);
 
     const fetchProducts = async () => {
         try {
             setLoading(true);
-            const data = await adminService.getAllProductsForAdmin(page, 10);
-            setProducts(data.content);
-            setTotalPages(data.totalPages);
+            console.log("Starting to fetch products...");
+
+            const response = await adminService.getAllProductsForAdmin(page, 10);
+            console.log("API response:", response);
+
+            if (!response || !response.content) {
+                throw new Error("Dữ liệu trả về không hợp lệ");
+            }
+
+            // Debug chi tiết từng sản phẩm
+            response.content.forEach(p => {
+                console.log(`Product ${p.productId}:`, {
+                    name: p.name,
+                    accountId: p.account?.accountId,
+                    customer: p.account?.customer,
+                    customerType: typeof p.account?.customer
+                });
+            });
+
+            setProducts(response.content);
+            setTotalPages(response.totalPages);
+
         } catch (error) {
-            console.error("Lỗi khi lấy sản phẩm", error);
-            toast.error("Lỗi khi lấy sản phẩm!");
+            console.error("Error fetching products:", error);
+            toast.error(`Lỗi khi tải sản phẩm: ${error.message}`);
+            setProducts([]);
+            setTotalPages(0);
         } finally {
+            console.log("Fetch completed, setting loading to false");
             setLoading(false);
         }
+    };
+
+    const getCustomerName = (product) => {
+        try {
+            // Kiểm tra null/undefined
+            if (!product?.account) return 'Không xác định';
+
+            // Nếu customer là object đầy đủ
+            if (product.account.customer && typeof product.account.customer === 'object') {
+                return product.account.customer.name || `Khách hàng #${product.account.customer.customerId}`;
+            }
+
+            // Nếu customer chỉ là ID (number)
+            if (typeof product.account.customer === 'number') {
+                // Tìm trong danh sách đã load
+                const fullCustomer = products.find(
+                    p => p.account?.customer?.customerId === product.account.customer
+                )?.account?.customer;
+
+                return fullCustomer?.name || `Khách hàng #${product.account.customer}`;
+            }
+
+            return 'Không xác định';
+        } catch (error) {
+            console.error('Error getting customer name:', error);
+            return 'Lỗi xác định';
+        }
+    };
+
+    const getCategoryName = (product) => {
+        return product.category?.name || 'Không có danh mục';
     };
 
     const openModal = (product) => {
@@ -50,11 +104,17 @@ const AdminProductList = () => {
 
         try {
             await adminService.deleteProduct(selectedProduct.productId);
-            toast.success("Sản phẩm đã bị xóa vĩnh viễn!");
-            fetchProducts();
+            toast.success("Sản phẩm đã bị xóa thành công!");
+
+            // Nếu xóa sản phẩm cuối cùng trên trang
+            if (products.length === 1 && page > 0) {
+                setPage(page - 1);
+            } else {
+                fetchProducts();
+            }
         } catch (error) {
-            console.error("Lỗi khi xóa sản phẩm", error);
-            toast.error("Đã xảy ra lỗi khi xóa sản phẩm.");
+            console.error("Error deleting product:", error);
+            toast.error(`Xóa sản phẩm thất bại: ${error.message}`);
         } finally {
             closeModal();
         }
@@ -68,68 +128,105 @@ const AdminProductList = () => {
                     <h2>Danh sách sản phẩm của khách hàng</h2>
 
                     {loading ? (
-                        <div className="loading">Đang tải...</div>
+                        <div className="loading" style={{ padding: '20px', textAlign: 'center' }}>
+                            Đang tải dữ liệu...
+                        </div>
                     ) : (
                         <>
-                            <table className="product-table">
-                                <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Tên sản phẩm</th>
-                                    <th>Người đăng</th>
-                                    <th>Danh mục</th>
-                                    <th>Mô tả</th>
-                                    <th>Hành động</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {products.map((product) => (
-                                    <tr key={product.productId}>
-                                        <td>{product.productId}</td>
-                                        <td>{product.name}</td>
-                                        <td>{product.account?.customer?.name}</td>
-                                        <td>{product.category?.name}</td>
-                                        <td>{product.description}</td>
-                                        <td>
-                                            <button
-                                                className="delete-btn"
-                                                onClick={() => openModal(product)}
-                                            >
-                                                <FaTrash />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>
+                            {products.length === 0 ? (
+                                <div className="no-products" style={{ padding: '20px', textAlign: 'center' }}>
+                                    Không tìm thấy sản phẩm nào
+                                </div>
+                            ) : (
+                                <>
+                                    <table className="product-table" style={{ width: '100%', marginTop: '20px' }}>
+                                        <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Tên sản phẩm</th>
+                                            <th>Người đăng</th>
+                                            <th>Danh mục</th>
+                                            <th>Mô tả</th>
+                                            <th>Hành động</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {products.map((product) => (
+                                            <tr key={product.productId}>
+                                                <td>{product.productId}</td>
+                                                <td>{product.name}</td>
+                                                <td>{getCustomerName(product)}</td>
+                                                <td>{getCategoryName(product)}</td>
+                                                <td>{product.description || 'Không có mô tả'}</td>
+                                                <td>
+                                                    <button
+                                                        className="delete-btn"
+                                                        onClick={() => openModal(product)}
+                                                    >
+                                                        <FaTrash  />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        </tbody>
+                                    </table>
 
-                            <div className="pagination">
-                                <button onClick={() => setPage(page - 1)} disabled={page === 0}>
-                                    ❮ Trước
-                                </button>
-                                <span>Trang {page + 1} / {totalPages}</span>
-                                <button onClick={() => setPage(page + 1)} disabled={page >= totalPages - 1}>
-                                    Sau ❯
-                                </button>
-                            </div>
+                                    <div className="pagination" style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                                        <button
+                                            onClick={() => setPage(page - 1)}
+                                            disabled={page === 0}
+                                            style={{ padding: '5px 10px' }}
+                                        >
+                                            ❮ Trước
+                                        </button>
+                                        <span style={{ padding: '5px 10px' }}>
+                                            Trang {page + 1} / {totalPages}
+                                        </span>
+                                        <button
+                                            onClick={() => setPage(page + 1)}
+                                            disabled={page >= totalPages - 1}
+                                            style={{ padding: '5px 10px' }}
+                                        >
+                                            Sau ❯
+                                        </button>
+                                    </div>
+                                </>
+                            )}
                         </>
                     )}
                 </div>
             </div>
 
-            {/* Modal Xác nhận xóa */}
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
-                contentLabel="Xác nhận xóa sản phẩm"
-                className="modal-content"
-                overlayClassName="modal-overlay"
+                style={{
+                    content: {
+                        top: '50%',
+                        left: '50%',
+                        right: 'auto',
+                        bottom: 'auto',
+                        marginRight: '-50%',
+                        transform: 'translate(-50%, -50%)',
+                        maxWidth: '500px'
+                    }
+                }}
             >
                 <h2>Xác nhận xóa</h2>
                 <p>Bạn có chắc chắn muốn xóa sản phẩm "<b>{selectedProduct?.name}</b>" không?</p>
-                <div className="modal-buttons">
-                    <button className="confirm-delete" onClick={handleDeleteProduct}>Xóa</button>
-                    <button className="cancel-delete" onClick={closeModal}>Hủy</button>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
+                    <button
+                        onClick={closeModal}
+                        style={{ padding: '5px 15px', background: '#ccc' }}
+                    >
+                        Hủy
+                    </button>
+                    <button
+                        onClick={handleDeleteProduct}
+                        style={{ padding: '5px 15px', background: '#ff4444', color: 'white' }}
+                    >
+                        Xóa
+                    </button>
                 </div>
             </Modal>
         </div>
