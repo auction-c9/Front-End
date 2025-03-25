@@ -78,7 +78,7 @@ const AuctionListPage = () => {
             ) : (
                 <Row>
                     {auctions.map(auction => (
-                        <Col xs={12} sm={6} md={4} lg={3} className="mb-6" key={auction.auctionId}>
+                        <Col xs={12} sm={6} md={4} lg={3} className="mb-4" key={auction.auctionId}>
                             <Link to={`/auction/${auction.auctionId}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                 <Card className="h-100">
                                     <Card.Img
@@ -103,6 +103,18 @@ const AuctionListPage = () => {
                                         >
                                             {timeLeftMap[auction.auctionId]?.time || 'Đang tải...'}
                                         </Card.Text>
+                                        <Link
+                                            to={`/auction/${auction.auctionId}`}
+                                            className="btn btn-sm mt-2"
+                                            style={{
+                                                backgroundColor: '#965E00',
+                                                color: 'white',
+                                                border: 'none'
+                                            }}
+                                        >
+                                            Xem chi tiết
+                                        </Link>
+
                                     </Card.Body>
                                 </Card>
                             </Link>

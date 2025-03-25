@@ -219,7 +219,9 @@ const Header = () => {
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
                                 <Dropdown.Item as={Link} to="/profile">Thông tin tài khoản</Dropdown.Item>
-                                <Dropdown.Item as={Link} to="/product/add">Thêm sản phẩm đấu giá</Dropdown.Item>
+                                {user.role === "ROLE_USER" && (
+                                    <Dropdown.Item as={Link} to="/product/add">Thêm sản phẩm đấu giá</Dropdown.Item>
+                                )}
                                 {user.role === "ROLE_ADMIN" && (
                                     <Dropdown.Item as={Link} to="/admin">Trang dành cho admin</Dropdown.Item>
                                 )}

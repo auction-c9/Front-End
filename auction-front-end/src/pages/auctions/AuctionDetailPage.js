@@ -11,6 +11,8 @@ import "../../styles/AuctionDetailPage.css";
 import { Link } from 'react-router-dom';
 import { toast, ToastContainer } from "react-toastify";
 import AuctionRanking from "./AuctionRanking";
+import { AiOutlineCreditCard } from "react-icons/ai";
+import { FaPaypal} from "react-icons/fa";
 
 const AuctionDetailPage = () => {
     const { id } = useParams();
@@ -332,31 +334,47 @@ const AuctionDetailPage = () => {
                                                 {/* Nút để hiển thị tùy chọn thanh toán */}
                                                 <button
                                                     onClick={() => setShowFinalPaymentOptions(true)}
-                                                    style={{ padding: "0.5rem 1rem", backgroundColor: "#0070ba", color: "#fff" }}
+                                                    style={{
+                                                        padding: "0.5rem 1rem",
+                                                        backgroundColor: "#f0c674",
+                                                        color: "black",
+                                                        border: "none",
+                                                        borderRadius: "5px",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        gap: "8px"
+                                                    }}
                                                 >
                                                     Thanh toán số tiền còn lại
                                                 </button>
 
                                                 {/* Hiển thị tùy chọn thanh toán (VNPay hoặc PayPal) */}
                                                 {showFinalPaymentOptions && (
-                                                    <div style={{ marginTop: "1rem" }}>
+                                                    <div style={{marginTop: "1rem"}}>
                                                         <h3>Chọn phương thức thanh toán:</h3>
                                                         <p>
                                                             <strong>Số tiền thanh toán:</strong>{" "}
                                                             {(winnerBid.bidAmount - depositAmount).toLocaleString('vi-VN')} VNĐ
                                                         </p>
-                                                        <button
-                                                            onClick={() => handleFinalPayment("PAYPAL", winnerBid.bidAmount - depositAmount)}
-                                                            style={{ padding: "0.5rem 1rem", marginRight: "0.5rem", backgroundColor: "#0070ba", color: "#fff" }}
-                                                        >
-                                                            Thanh toán bằng PayPal
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleFinalPayment("VNPAY", winnerBid.bidAmount - depositAmount)}
-                                                            style={{ padding: "0.5rem 1rem", backgroundColor: "#e41e25", color: "#fff" }}
-                                                        >
-                                                            Thanh toán bằng VNPAY
-                                                        </button>
+                                                        <div className="payment-buttons">
+                                                            <button
+                                                                className="btn-paypal"
+                                                                onClick={() => handleFinalPayment("PAYPAL", highestBidAmount)}
+                                                            >
+                                                                <FaPaypal size={24} style={{marginRight: 8}}/>
+                                                                PayPal
+                                                            </button>
+
+                                                            <button
+                                                                className="btn-vnpay"
+                                                                onClick={() => handleFinalPayment("VNPAY", highestBidAmount)}
+                                                            >
+                                                                <AiOutlineCreditCard size={24}
+                                                                                     style={{marginRight: 8}}/>
+                                                                VNPAY
+                                                            </button>
+                                                        </div>
+
                                                     </div>
                                                 )}
                                             </div>
