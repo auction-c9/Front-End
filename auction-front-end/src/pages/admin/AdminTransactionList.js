@@ -60,33 +60,52 @@ const AdminTransactionList = () => {
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {transactions.map((tx) => (
-                                    <tr key={tx.id}>
-                                        <td>{tx.id}</td>
-                                        <td>{tx.customerName}</td>
-                                        <td>
-                                            <a href={`/auction/${tx.auctionId}`} className="auction-link">
-                                                {tx.productName}
-                                            </a>
-                                        </td>
-                                        <td>{tx.amount.toLocaleString("vi-VN")} VNĐ</td>
-                                        <td>{tx.transactionType}</td>
-                                        <td>{tx.paymentMethod}</td>
-                                        <td>{tx.status}</td>
-                                        <td>{new Date(tx.createdAt).toLocaleDateString("vi-VN")}</td>
+                                {transactions.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="8" className="no-data">Không có giao dịch nào.</td>
                                     </tr>
-                                ))}
+                                ) : (
+                                    transactions.map((tx) => (
+                                        <tr key={tx.id}>
+                                            <td>{tx.id}</td>
+                                            <td>{tx.customerName}</td>
+                                            <td>
+                                                <a href={`/auction/${tx.auctionId}`} className="auction-link">
+                                                    {tx.productName}
+                                                </a>
+                                            </td>
+                                            <td>{tx.amount.toLocaleString("vi-VN")} VNĐ</td>
+                                            <td>{tx.transactionType}</td>
+                                            <td>{tx.paymentMethod}</td>
+                                            <td>{tx.status}</td>
+                                            <td>
+                                                {new Date(tx.createdAt).toLocaleString("vi-VN", {
+                                                    day: "2-digit",
+                                                    month: "2-digit",
+                                                    year: "numeric",
+                                                })}{" "}
+                                                {new Date(tx.createdAt).toLocaleTimeString("vi-VN", {
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                    second: "2-digit",
+                                                })}
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
                                 </tbody>
                             </Table>
 
-                            <div className="pagination" style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                                <CustomPagination
-                                    currentPage={page}
-                                    totalPages={totalPages}
-                                    onPageChange={handlePageChange}
-                                    maxVisiblePages={5}
-                                />
-                            </div>
+                            {transactions.length > 0 && (
+                                <div className="pagination" style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                                    <CustomPagination
+                                        currentPage={page}
+                                        totalPages={totalPages}
+                                        onPageChange={handlePageChange}
+                                        maxVisiblePages={5}
+                                    />
+                                </div>
+                            )}
                         </>
                     )}
                 </div>

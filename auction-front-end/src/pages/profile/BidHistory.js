@@ -175,8 +175,19 @@ const BidHistory = () => {
                                 <td>{currentPage * 5 + index + 1}</td>
                                 <td>{bid.auctionId}</td>
                                 <td>{bid.productName || "Không có thông tin"}</td>
-                                <td>{bid.bidAmount}</td>
-                                <td>{new Date(bid.registrationDate).toLocaleDateString()}</td>
+                                <td>{bid.bidAmount.toLocaleString("vi-VN")} VNĐ</td>
+                                <td>
+                                    {new Date(bid.registrationDate).toLocaleString("vi-VN", {
+                                        day: "2-digit",
+                                        month: "2-digit",
+                                        year: "numeric",
+                                    })}{" "}
+                                    {new Date(bid.registrationDate).toLocaleTimeString("vi-VN", {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                        second: "2-digit",
+                                    })}
+                                </td>
                                 <td>{bid.auctionStatus === "active" ? "Đang đấu giá" : "Đã kết thúc"}</td>
                                 <td className="text-center">
                                     {bid.isWinner ? (

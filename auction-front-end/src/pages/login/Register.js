@@ -52,8 +52,8 @@ const Register = () => {
             .required('Ảnh đại diện là bắt buộc')
             .test(
                 'fileType',
-                'Chỉ chấp nhận ảnh (JPEG, PNG)',
-                value => value && ['image/jpeg', 'image/png'].includes(value.type)
+                'Chỉ chấp nhận ảnh (JPEG, PNG, JPG, GIF, BMP)',
+                value => value && value.type.startsWith('image/')
             )
     });
 
@@ -415,8 +415,11 @@ const Register = () => {
                                                 required
                                             />
                                             <Form.Label>
-                                                Tôi đồng ý với các điều khoản sử dụng
+                                                Tôi đồng ý với các <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ fontWeight: 'bold', textDecoration: 'none', color: 'black' }}>
+                                                điều khoản
+                                            </a>  sử dụng và cam kết khai báo đúng thông tin
                                             </Form.Label>
+
                                         </Form.Group>
 
                                         {/* Submit Button */}
@@ -425,6 +428,16 @@ const Register = () => {
                                                 variant="primary"
                                                 type="submit"
                                                 disabled={isSubmitting}
+                                                style={{
+                                                    backgroundColor: '#EEA019',
+                                                    borderColor: '#EEA019',
+                                                    width: '150px',
+                                                    padding: '0.25rem 0.5rem',
+                                                    fontSize: '1.1rem',
+                                                    display: 'block',
+                                                    marginLeft: 'auto',
+                                                    marginRight: 'auto'
+                                                }}
                                             >
                                                 {isSubmitting ? 'Đang xử lý...' : 'Đăng ký'}
                                             </Button>
