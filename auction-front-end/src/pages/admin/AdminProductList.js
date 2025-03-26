@@ -209,7 +209,7 @@ const AdminProductList = () => {
             >
                 <h2>Xác nhận xóa</h2>
                 <p>Bạn có chắc chắn muốn xóa sản phẩm "<b>{selectedProduct?.name}</b>" không?</p>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '15px', marginTop: '20px' }}>
                     <button
                         onClick={closeModal}
                         style={{ padding: '5px 15px', background: '#ccc' }}
