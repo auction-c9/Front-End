@@ -7,6 +7,8 @@ import Modal from "react-modal";
 import "../../styles/admin.css";
 import AdminSidebar from "./AdminSidebar";
 import {FaLock, FaUnlock, FaEye, FaExclamationTriangle} from "react-icons/fa";
+import CustomPagination from "../profile/CustomPagination";
+import {Button, Table} from "react-bootstrap";
 
 Modal.setAppElement("#root");
 
@@ -76,6 +78,7 @@ const AdminCustomerList = () => {
             console.log("Bắt đầu gửi email cảnh cáo cho accountId:", accountId);
             await adminService.sendWarningEmail(accountId);
             console.log("Gửi email cảnh cáo thành công cho accountId:", accountId);
+            toast.success("Đã gửi email cảnh cáo thành công!");
 
         } catch (error) {
             console.error("Lỗi khi gửi email cảnh cáo:", error);
@@ -96,7 +99,9 @@ const AdminCustomerList = () => {
         }
     };
 
-
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+    }
 
     return (
         <div className="admin-layout">
@@ -109,7 +114,7 @@ const AdminCustomerList = () => {
                         <div className="loading">Đang tải...</div>
                     ) : (
                         <>
-                            <table className="customer-table">
+                            <Table striped bordered hover className="customer-table">
                                 <thead>
                                 <tr>
                                     <th>ID</th>
@@ -131,50 +136,38 @@ const AdminCustomerList = () => {
                                         <td>{customer.phone}</td>
                                         <td>{customer.account?.locked ? "Bị khóa" : "Hoạt động"}</td>
                                         <td>
-                                            <button
+                                            <Button
                                                 className={customer.account?.locked ? "unlock-btn" : "lock-btn"}
                                                 onClick={() => handleLockAccount(customer.account?.accountId)}
                                             >
                                                 {customer.account?.locked ? <FaUnlock/> : <FaLock/>}
 
-                                            </button>
-                                            <button
+                                            </Button>
+                                            <Button
                                                 className="detail-btn"
                                                 onClick={() => openDetailModal(customer.customerId)}
                                             >
                                                 <FaEye/>
-                                            </button>
-                                            <button
+                                            </Button>
+                                            <Button
                                                 className="warning-btn"
                                                 onClick={() => handleSendWarningEmail(customer.account?.accountId)}
                                             >
                                                 <FaExclamationTriangle/>
-                                            </button>
+                                            </Button>
                                         </td>
                                     </tr>
                                 ))}
                                 </tbody>
-                            </table>
+                            </Table>
 
-                            <div className="pagination" style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                                <button
-                                    onClick={() => setPage(page - 1)}
-                                    disabled={page === 0}
-                                    style={{padding: '5px 10px'}}
-                                >
-                                    ❮ Trước
-                                </button>
-                                <span style={{padding: '5px 10px'}}>
-                                            Trang {page + 1} / {totalPages}
-                                        </span>
-                                <button
-                                    onClick={() => setPage(page + 1)}
-                                    disabled={page >= totalPages - 1}
-                                    style={{padding: '5px 10px'}}
-                                >
-                                    Sau ❯
-                                </button>
-                            </div>
+
+                            <CustomPagination
+                                currentPage={page}
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
+                                maxVisiblePages={5}
+                            />
                         </>
                     )}
                 </div>

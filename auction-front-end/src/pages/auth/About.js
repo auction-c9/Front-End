@@ -43,15 +43,6 @@ const AboutAuction = () => {
                 <p>Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn và áp dụng các biện pháp bảo mật cao cấp để đảm bảo an toàn giao dịch.</p>
             </section>
 
-            <section className="mb-4">
-                <h2 className="text-xl font-semibold">6. Liên Hệ</h2>
-                <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua:</p>
-                <ul className="list-disc pl-5">
-                    <li><strong>Email:</strong> daugia123@gmail.com</li>
-                    <li><strong>Hotline:</strong> 0123 456 789</li>
-                    <li><strong>Fanpage:</strong> fb.com/[tenwebsite]</li>
-                </ul>
-            </section>
         </div>
     );
 };

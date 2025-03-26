@@ -54,11 +54,11 @@ const UserStatistics = () => {
     };
 
     return (
-        <div className="p-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-2xl font-semibold text-center mb-6">Thống kê người dùng đăng ký</h2>
+        <div className="p-6 bg-white rounded-lg shadow-md space-y-6">
+            <h2 className="text-2xl font-semibold text-center mb-8">Thống kê người dùng đăng ký</h2>
 
             {/* Chọn số ngày thống kê */}
-            <div className="flex justify-center gap-4 mb-6">
+            <div className="flex justify-center gap-4 mb-9">
                 <label className="text-lg">Chọn số ngày:</label>
                 <select
                     value={days}

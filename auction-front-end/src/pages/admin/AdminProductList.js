@@ -7,6 +7,7 @@ import "../../styles/admin.css";
 import AdminSidebar from "./AdminSidebar";
 import { FaTrash } from "react-icons/fa";
 import CustomPagination from "../profile/CustomPagination";
+import {Button, Table} from "react-bootstrap";
 
 
 Modal.setAppElement("#root");
@@ -106,7 +107,7 @@ const AdminProductList = () => {
 
         try {
             await adminService.deleteProduct(selectedProduct.productId);
-            toast.success("Sản phẩm đã bị xóa thành công!");
+            toast.success("Sản phẩm đã bị xóa thành công! Email đã gửi đến người đăng bài.");
 
             // Nếu xóa sản phẩm cuối cùng trên trang
             if (products.length === 1 && page > 0) {
@@ -145,7 +146,7 @@ const AdminProductList = () => {
                                 </div>
                             ) : (
                                 <>
-                                    <table className="product-table" style={{ width: '100%', marginTop: '20px' }}>
+                                    <Table striped bordered hover className="product-table" style={{ width: '100%', marginTop: '20px' }}>
                                         <thead>
                                         <tr>
                                             <th>ID</th>
@@ -165,17 +166,17 @@ const AdminProductList = () => {
                                                 <td>{getCategoryName(product)}</td>
                                                 <td>{product.description || 'Không có mô tả'}</td>
                                                 <td>
-                                                    <button
+                                                    <Button
                                                         className="delete-btn"
                                                         onClick={() => openModal(product)}
                                                     >
                                                         <FaTrash  />
-                                                    </button>
+                                                    </Button>
                                                 </td>
                                             </tr>
                                         ))}
                                         </tbody>
-                                    </table>
+                                    </Table>
 
                                     <CustomPagination
                                         currentPage={page}
@@ -195,6 +196,7 @@ const AdminProductList = () => {
                 onRequestClose={closeModal}
                 style={{
                     content: {
+                        overlay: { zIndex: 1050, backgroundColor: "rgba(0, 0, 0, 0.5)" },
                         top: '50%',
                         left: '50%',
                         right: 'auto',

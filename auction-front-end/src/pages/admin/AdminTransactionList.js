@@ -4,6 +4,8 @@ import "react-toastify/dist/ReactToastify.css";
 import adminService from "../../services/adminService";
 import "../../styles/admin.css";
 import AdminSidebar from "./AdminSidebar";
+import CustomPagination from "../profile/CustomPagination";
+import {Table} from "react-bootstrap";
 
 const AdminTransactionList = () => {
     const [transactions, setTransactions] = useState([]);
@@ -29,6 +31,10 @@ const AdminTransactionList = () => {
         }
     };
 
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+    }
+
     return (
         <div className="admin-layout">
             <div className="admin-container">
@@ -40,7 +46,7 @@ const AdminTransactionList = () => {
                         <div className="loading">Đang tải...</div>
                     ) : (
                         <>
-                            <table className="transaction-table">
+                            <Table striped bordered hover className="transaction-table">
                                 <thead>
                                 <tr>
                                     <th>ID</th>
@@ -71,26 +77,15 @@ const AdminTransactionList = () => {
                                     </tr>
                                 ))}
                                 </tbody>
-                            </table>
+                            </Table>
 
                             <div className="pagination" style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                                <button
-                                    onClick={() => setPage(page - 1)}
-                                    disabled={page === 0}
-                                    style={{ padding: '5px 10px' }}
-                                >
-                                    ❮ Trước
-                                </button>
-                                <span style={{padding: '5px 10px'}}>
-                                            Trang {page + 1} / {totalPages}
-                                        </span>
-                                <button
-                                    onClick={() => setPage(page + 1)}
-                                    disabled={page >= totalPages - 1}
-                                    style={{padding: '5px 10px'}}
-                                >
-                                    Sau ❯
-                                </button>
+                                <CustomPagination
+                                    currentPage={page}
+                                    totalPages={totalPages}
+                                    onPageChange={handlePageChange}
+                                    maxVisiblePages={5}
+                                />
                             </div>
                         </>
                     )}

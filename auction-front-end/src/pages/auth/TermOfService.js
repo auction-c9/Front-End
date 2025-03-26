@@ -1,5 +1,5 @@
 import React from "react";
-import { Container } from "react-bootstrap";
+import {Container} from "react-bootstrap";
 
 const TermsOfService = () => {
     return (
@@ -35,10 +35,13 @@ const TermsOfService = () => {
                         khởi điểm</strong> của sản phẩm.
                         Tuy nhiên, số tiền đặt cọc tối thiểu là <strong>10.000 VND</strong>, ngay cả khi 10% giá trị
                         khởi điểm thấp hơn mức này.
-                        Khoản đặt cọc sẽ được hoàn lại nếu người dùng không thắng đấu giá hoặc được khấu trừ vào thanh
-                        toán khi chiến thắng phiên đấu giá.
+                        Khoản đặt cọc sẽ được hoàn lại sau 5 ngày làm việc nếu người dùng không thắng đấu giá và không
+                        vi phạm quy định đấu giá của chúng tôi.
                     </p>
-
+                    <p className="text-lg">
+                        3.5 Đối với người bán, cần đặt cọc <strong>20% giá trị khởi điểm</strong> của sản phẩm. Sau khi
+                        kết thúc phiên đấu giá, hệ thống sẽ thu <strong>10% giá bán</strong> làm phí giao dịch.
+                    </p>
                 </div>
             </section>
 

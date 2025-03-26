@@ -176,11 +176,12 @@ const AuctionDetailPage = () => {
             if (redirectUrl) {
                 window.location.href = redirectUrl;
             } else {
-                alert("Không thể tạo giao dịch. Vui lòng thử lại!");
+                toast.error("Không thể tạo giao dịch. Vui lòng thử lại!");
             }
         } catch (err) {
             console.error("❌ [ERROR] Thanh toán cuối cùng thất bại:", err.response?.data || err.message);
             setError("Thanh toán cuối cùng thất bại. Vui lòng thử lại.");
+            toast.error("Thanh toán thất bại!");
         }
     };
 
@@ -194,6 +195,8 @@ const AuctionDetailPage = () => {
             setPaymentSuccess(true);
             setShowFinalPaymentOptions(false); // Ẩn nút thanh toán
             toast.success("Thanh toán thành công!");
+        } else if (paymentStatus === 'FAILED'){
+            toast.error("Thanh toán thất bại!");
         }
     }, []);
 

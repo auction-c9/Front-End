@@ -29,6 +29,7 @@ import "react-toastify/dist/ReactToastify.css";
 import BidHistory from "./pages/profile/BidHistory";
 import UserProfilePage from "./pages/profile/UserProfilePage";
 import PrivateRoute from "./pages/login/PrivateRoute";
+import Contact from "./pages/auth/Contact";
 
 
 
@@ -70,6 +71,7 @@ const App = () => {
                             <Route path="/auction-register" element={<RegisteredAuctionsHistory/>}/>
                             <Route path="/bid-history" element={<BidHistory />} />
                             <Route path="/profile/:accountID" element={<UserProfilePage />} />
+                            <Route path="/contact" element={<Contact/>}/>
                         </Routes>
                     </div>
                     <Footer/>
