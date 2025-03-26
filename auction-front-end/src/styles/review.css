@@ -1,0 +1,42 @@
+/* Star rating styles */
+.rating-stars {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.star-button {
+    padding: 0;
+    border: none;
+    background: none !important;
+    display: inline-flex; /* Thêm dòng này */
+    align-items: center; /* Thêm dòng này */
+}
+
+.star-icon {
+    width: 32px;
+    height: 32px;
+    fill: #ffd700; /* Đổi từ color sang fill */
+    transition: all 0.2s;
+}
+
+.star-icon.filled {
+    fill: #ffc107; /* Đổi từ color sang fill */
+}
+
+.star-button:hover .star-icon {
+    transform: scale(1.2);
+    fill: #ffc107; /* Thêm hiệu ứng hover */
+}
+
+.btn-submit-review {
+    background-color: #EEA019 !important;
+    border-color: #EEA019 !important;
+    color: white !important;
+}
+
+.btn-submit-review:hover {
+    background-color: #D88A00 !important;
+    border-color: #D88A00 !important;
+}

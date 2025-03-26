@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Container, Form, Button, Alert, Card, Row, Col } from 'react-bootstrap';
+import { Container, Form, Button, Card, Row, Col } from 'react-bootstrap';
 import { api } from "../../config/apiConfig";
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
@@ -137,6 +137,9 @@ const Register = () => {
                                 }}
                                 validationSchema={validationSchema}
                                 onSubmit={handleSubmit}
+                                validateOnChange={true}
+                                validateOnBlur={true}
+                                validateOnMount={true}
                             >
                                 {({ handleSubmit, isSubmitting, setFieldValue }) => (
                                     <Form onSubmit={handleSubmit} encType="multipart/form-data">
@@ -233,58 +236,10 @@ const Register = () => {
                                                     />
                                                 </Form.Group>
                                             </Col>
-                                            <Col md={6}>
-                                            <Form.Group>
-                                                <Form.Label>Ngày sinh</Form.Label>
-                                                <Field
-                                                    name="dob"
-                                                    as={Form.Control}
-                                                    type="date"
-                                                    max={new Date().toISOString().split('T')[0]}
-                                                />
-                                                <ErrorMessage
-                                                    name="dob"
-                                                    component="div"
-                                                    className="text-danger small mt-1"
-                                                />
-                                            </Form.Group>
-                                        </Col>
                                         </Row>
 
-                                        {/* Identity Info */}
+                                        {/* Date of Birth & Identity Card */}
                                         <Row className="mb-3">
-                                            <Col md={4}>
-                                                <Form.Group>
-                                                    <Form.Label>Số tài khoản</Form.Label>
-                                                    <Field
-                                                        name="bankAccount"
-                                                        as={Form.Control}
-                                                        type="text"
-                                                        placeholder="1234567890"
-                                                    />
-                                                    <ErrorMessage
-                                                        name="bankAccount"
-                                                        component="div"
-                                                        className="text-danger small mt-1"
-                                                    />
-                                                </Form.Group>
-                                            </Col>
-                                            <Col md={4}>
-                                                <Form.Group>
-                                                    <Form.Label>Tên ngân hàng</Form.Label>
-                                                    <Field
-                                                        name="bankName"
-                                                        as={Form.Control}
-                                                        type="text"
-                                                        placeholder="Vietcombank"
-                                                    />
-                                                    <ErrorMessage
-                                                        name="bankName"
-                                                        component="div"
-                                                        className="text-danger small mt-1"
-                                                    />
-                                                </Form.Group>
-                                            </Col>
                                             <Col md={6}>
                                                 <Form.Group>
                                                     <Form.Label>CMND/CCCD</Form.Label>
@@ -302,6 +257,69 @@ const Register = () => {
                                                 </Form.Group>
                                             </Col>
                                             <Col md={6}>
+                                                <Form.Group>
+                                                    <Form.Label>Ngày sinh</Form.Label>
+                                                    <Field
+                                                        name="dob"
+                                                        as={Form.Control}
+                                                        type="date"
+                                                        max={new Date().toISOString().split('T')[0]}
+                                                    />
+                                                    <ErrorMessage
+                                                        name="dob"
+                                                        component="div"
+                                                        className="text-danger small mt-1"
+                                                    />
+                                                </Form.Group>
+                                            </Col>
+                                        </Row>
+
+                                        {/* Bank Info */}
+                                        <Row className="mb-3">
+                                            <Col md={6}>
+                                                <Form.Group>
+                                                    <Form.Label>Số tài khoản</Form.Label>
+                                                    <Field
+                                                        name="bankAccount"
+                                                        as={Form.Control}
+                                                        type="text"
+                                                        placeholder="1234567890"
+                                                    />
+                                                    <ErrorMessage
+                                                        name="bankAccount"
+                                                        component="div"
+                                                        className="text-danger small mt-1"
+                                                    />
+                                                </Form.Group>
+                                            </Col>
+                                            <Col md={6}>
+                                                <Form.Group>
+                                                    <Form.Label>Tên ngân hàng</Form.Label>
+                                                    <Field as="select" name="bankName" className="form-control">
+                                                        <option value="">Chọn ngân hàng</option>
+                                                        <option value="Vietcombank">Vietcombank</option>
+                                                        <option value="Techcombank">Techcombank</option>
+                                                        <option value="ACB">ACB</option>
+                                                        <option value="BIDV">BIDV</option>
+                                                        <option value="Agribank">Agribank</option>
+                                                        <option value="Sacombank">Sacombank</option>
+                                                        <option value="VPBank">VPBank</option>
+                                                        <option value="MB Bank">MB Bank</option>
+                                                        <option value="Shinhan Bank">Shinhan Bank</option>
+                                                        <option value="OCB">OCB</option>
+                                                    </Field>
+                                                    <ErrorMessage
+                                                        name="bankName"
+                                                        component="div"
+                                                        className="text-danger small mt-1"
+                                                    />
+                                                </Form.Group>
+                                            </Col>
+                                        </Row>
+
+                                        {/* Address */}
+                                        <Row className="mb-3">
+                                            <Col md={12}>
                                                 <Form.Group>
                                                     <Form.Label>Địa chỉ</Form.Label>
                                                     <Field

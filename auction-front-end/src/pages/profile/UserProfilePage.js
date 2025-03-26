@@ -3,6 +3,8 @@ import {useParams} from 'react-router-dom';
 import {Container, Row, Col, Card, Table, Image, Spinner, Alert, ListGroup, Button} from 'react-bootstrap';
 import {api} from '../../config/apiConfig';
 import "../../styles/profile.css";
+import { useReview } from '../../context/ReviewContext';
+
 
 const UserProfilePage = () => {
     const {accountID} = useParams();
@@ -11,6 +13,10 @@ const UserProfilePage = () => {
     const [error, setError] = useState(null);
     const [reviews, setReviews] = useState([]);
     const [isFollowing, setIsFollowing] = useState(false);
+    const [refreshFlag, setRefreshFlag] = useState(false);
+    const { needsRefresh, setNeedsRefresh } = useReview();
+
+    const currentUsername = localStorage.getItem('username');
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -28,6 +34,10 @@ const UserProfilePage = () => {
     }, [accountID]);
 
     useEffect(() => {
+        if (needsRefresh) {
+            setRefreshFlag(prev => !prev);
+            setNeedsRefresh(false);
+        }
         const fetchReviews = async () => {
             try {
                 const response = await api.get(`/reviews/seller/${accountID}`);
@@ -37,7 +47,7 @@ const UserProfilePage = () => {
             }
         };
         fetchReviews();
-    }, [accountID]);
+    }, [accountID, refreshFlag, needsRefresh]);
 
     useEffect(() => {
         const checkFollowStatus = async () => {
@@ -49,7 +59,7 @@ const UserProfilePage = () => {
             }
         };
         checkFollowStatus();
-    }, [accountID]);
+    }, [accountID]) ;
 
 
     const handleFollow = async () => {
@@ -99,12 +109,14 @@ const UserProfilePage = () => {
                         <Col md={9}>
                             <h2>{profile.fullName}</h2>
                             <p className="text-muted">@{profile.username}</p>
-                            <Button
-                                variant={isFollowing ? "secondary" : "primary"}
-                                onClick={handleFollow}
-                            >
-                                {isFollowing ? "Đã theo dõi" : "Theo dõi"}
-                            </Button>
+                            {profile.username !== currentUsername && (
+                                <Button
+                                    variant={isFollowing ? "secondary" : "primary"}
+                                    onClick={handleFollow}
+                                >
+                                    {isFollowing ? "Đã theo dõi" : "Theo dõi"}
+                                </Button>
+                            )}
                         </Col>
                     </Row>
                 </Card.Body>

@@ -10,7 +10,6 @@ import { motion } from "framer-motion";
 import "../../styles/AuctionDetailPage.css";
 import ImageGallery from "./ImageGallery";
 import { toast, ToastContainer } from "react-toastify";
-import AuctionRanking from "./AuctionRanking";
 import { AiOutlineCreditCard } from "react-icons/ai";
 import { FaPaypal } from "react-icons/fa";
 
@@ -67,7 +66,6 @@ const AuctionDetailPage = () => {
                 const res = await axios.get(`${apiConfig.auctions}/${id}`);
                 setAuction(res.data);
                 // Khởi tạo thời gian còn lại ngay sau khi lấy dữ liệu
-                // (Sau này sẽ được cập nhật liên tục)
                 updateTimeLeft();
             } catch (error) {
                 console.error("Lỗi khi lấy dữ liệu đấu giá:", error);
@@ -221,21 +219,13 @@ const AuctionDetailPage = () => {
 
     return (
         <div className="auction-detail">
-            {/* Hàng đầu tiên: Ảnh nằm ở giữa */}
-            <div className="auction-row">
-                <div className="image-wrapper">
+            <div className="auction-content">
+                {/* Cột 1: Hình ảnh (đã thay thế bảng xếp hạng) */}
+                <div className="image-gallery-column">
                     <ImageGallery
                         images={auction.product?.images}
                         productName={auction.product?.name}
                     />
-                </div>
-            </div>
-
-            {/* Hàng thứ hai: 3 cột (Ranking - Thông tin - Lịch sử) */}
-            <div className="auction-content">
-                {/* Cột 1: Ranking */}
-                <div className="ranking">
-                    <AuctionRanking topBids={topBids} />
                 </div>
 
                 {/* Cột 2: Thông tin sản phẩm & đấu giá */}

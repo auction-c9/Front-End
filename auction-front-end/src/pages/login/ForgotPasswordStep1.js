@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Form, Alert, Card } from 'react-bootstrap';
+import { Button, Form, Alert, Card, Container } from 'react-bootstrap';
 
 export default function ForgotPasswordStep1() {
     const [username, setUsername] = useState('');
@@ -19,13 +19,13 @@ export default function ForgotPasswordStep1() {
             });
 
             if (!response.ok) {
-                const errorData = await response.json(); // <-- Đọc thông báo lỗi từ server
+                const errorData = await response.json(); // Đọc thông báo lỗi từ server
                 throw new Error(errorData.message || 'Có lỗi xảy ra');
             }
 
             navigate('/forgot-password/step2', { state: { username } });
         } catch (err) {
-            console.error("Chi tiết lỗi:", err); // <-- Log đầy đủ lỗi
+            console.error("Chi tiết lỗi:", err); // Log đầy đủ lỗi
             setError(err.message || 'Có lỗi xảy ra khi gửi yêu cầu');
         } finally {
             setIsLoading(false);
@@ -33,32 +33,36 @@ export default function ForgotPasswordStep1() {
     };
 
     return (
-        <Card className="forgot-password-card">
-            <Card.Body>
-                <h3 className="text-center mb-4">Quên mật khẩu</h3>
-                {error && <Alert variant="danger">{error}</Alert>}
+        <Container
+            className="d-flex justify-content-center align-items-center vh-100"
+        >
+            <Card className="p-4 shadow-lg" style={{ width: '30vw', minWidth: '320px' }}>
+                <Card.Body>
+                    <h3 className="text-center mb-4">Quên mật khẩu</h3>
+                    {error && <Alert variant="danger">{error}</Alert>}
 
-                <Form onSubmit={handleSubmit}>
-                    <Form.Group className="mb-3">
-                        <Form.Label>Nhập username của bạn</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            required
-                        />
-                    </Form.Group>
+                    <Form onSubmit={handleSubmit} className="d-flex flex-column align-items-center">
+                        <Form.Group className="mb-3" style={{ width: '25vw', minWidth: '250px' }}>
+                            <Form.Label>Nhập username của bạn</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                            />
+                        </Form.Group>
 
-                    <Button
-                        variant="primary"
-                        type="submit"
-                        disabled={isLoading}
-                        className="w-100"
-                    >
-                        {isLoading ? 'Đang xử lý...' : 'Gửi mã xác nhận'}
-                    </Button>
-                </Form>
-            </Card.Body>
-        </Card>
+                        <Button
+                            variant="primary"
+                            type="submit"
+                            disabled={isLoading}
+                            style={{ width: '12.5vw', minWidth: '125px' }}
+                        >
+                            {isLoading ? 'Đang xử lý...' : 'Gửi mã xác nhận'}
+                        </Button>
+                    </Form>
+                </Card.Body>
+            </Card>
+        </Container>
     );
 }
