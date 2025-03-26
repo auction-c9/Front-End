@@ -6,7 +6,8 @@ import "../../styles/user.css";
 import CustomPagination from "./CustomPagination";
 import ReviewModal from "./ReviewModal";
 import { useReview } from '../../context/ReviewContext';
-
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const BidHistory = () => {
     const [bidHistory, setBidHistory] = useState([]);
@@ -82,45 +83,74 @@ const BidHistory = () => {
         setComment('');
     };
 
-    const handleSubmitReview = async () => {
+    const handleSubmitReview = async (reviewData) => {
         try {
             const token = localStorage.getItem('token');
-            await api.post('/reviews', {
-                bidId: selectedBidId,
-                rating,
-                comment
+
+            // Kiểm tra dữ liệu đầu vào
+            if (!reviewData.rating || !reviewData.comment) {
+                toast.error('Vui lòng điền đầy đủ thông tin đánh giá');
+                return;
+            }
+
+            const response = await api.post('/reviews', {
+                bidId: reviewData.bidId,
+                rating: reviewData.rating,
+                comment: reviewData.comment
             }, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
-            // Cập nhật UI sau khi gửi thành công
-            setBidHistory(prev => prev.map(bid =>
-                bid.bidId === selectedBidId ? { ...bid, hasReviewed: true } : bid
-            ));
-            handleCloseReviewModal();
-            setNeedsRefresh(true);
+
+            // Kiểm tra phản hồi từ server
+            if (response.status === 201) {
+                toast.success('Đánh giá thành công!');
+                // Cập nhật UI
+                setBidHistory(prev => prev.map(bid =>
+                    bid.bidId === selectedBidId ? { ...bid, hasReviewed: true } : bid
+                ));
+                handleCloseReviewModal();
+                setNeedsRefresh(true);
+            }
         } catch (err) {
+            console.error('Lỗi khi gửi đánh giá:', err);
+
+            // Xử lý lỗi cụ thể
             if (err.response?.status === 409) {
-                alert('Bạn đã đánh giá phiên đấu giá này!');
+                toast.error('Bạn đã đánh giá phiên đấu giá này!');
+            } else {
+                toast.error(`Đánh giá thất bại: ${err.message}`);
+            }
+
+            // Cập nhật lại dữ liệu
+            try {
                 const response = await api.get('bids/user', {
-                    params: {
-                        page: currentPage,
-                        size: 5
-                    },
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
-                    }
+                    params: { page: currentPage, size: 5 },
+                    headers: { Authorization: `Bearer ${token}` }
                 });
                 setBidHistory(response.data.content);
-            } else {
-                console.error('Lỗi khi gửi đánh giá:', err);
+            } catch (fetchError) {
+                console.error('Lỗi khi tải lại dữ liệu:', fetchError);
             }
         }
     };
 
     return (
         <div className="user-layout">
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
+
             <div className="user-container">
                 <UserSidebar />
 
@@ -185,7 +215,7 @@ const BidHistory = () => {
             <ReviewModal
                 show={showReviewModal}
                 onClose={handleCloseReviewModal}
-                onSubmit={handleSubmitReview}
+                onSubmit={(data) => handleSubmitReview(data)}
                 bidId={selectedBidId}
             />
         </div>

@@ -3,6 +3,8 @@ import { Modal, Button } from 'react-bootstrap';
 import { StarFill, Star } from 'react-bootstrap-icons';
 import '../../styles/review.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ReviewModal = ({ show, bidId, onClose, onSubmit }) => {
     const [rating, setRating] = useState(0);
@@ -11,6 +13,16 @@ const ReviewModal = ({ show, bidId, onClose, onSubmit }) => {
     const handleSubmit = () => {
         onSubmit({ bidId, rating, comment });
     };
+
+    toast.success('Đánh giá thành công!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+    });
 
     return (
         <Modal show={show} onHide={onClose} centered>
