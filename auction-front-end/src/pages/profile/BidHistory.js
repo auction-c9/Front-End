@@ -86,14 +86,7 @@ const BidHistory = () => {
     const handleSubmitReview = async (reviewData) => {
         try {
             const token = localStorage.getItem('token');
-
-            // Kiểm tra dữ liệu đầu vào
-            if (!reviewData.rating || !reviewData.comment) {
-                toast.error('Vui lòng điền đầy đủ thông tin đánh giá');
-                return;
-            }
-
-            const response = await api.post('/reviews', {
+            await api.post('/reviews', {
                 bidId: reviewData.bidId,
                 rating: reviewData.rating,
                 comment: reviewData.comment
@@ -103,54 +96,32 @@ const BidHistory = () => {
                 }
             });
 
-            // Kiểm tra phản hồi từ server
-            if (response.status === 201) {
-                toast.success('Đánh giá thành công!');
-                // Cập nhật UI
-                setBidHistory(prev => prev.map(bid =>
-                    bid.bidId === selectedBidId ? { ...bid, hasReviewed: true } : bid
-                ));
-                handleCloseReviewModal();
-                setNeedsRefresh(true);
-            }
+            // Cập nhật UI sau khi gửi thành công
+            setBidHistory(prev => prev.map(bid =>
+                bid.bidId === selectedBidId ? { ...bid, hasReviewed: true } : bid
+            ));
+            handleCloseReviewModal();
+            setNeedsRefresh(true);
         } catch (err) {
-            console.error('Lỗi khi gửi đánh giá:', err);
-
-            // Xử lý lỗi cụ thể
             if (err.response?.status === 409) {
-                toast.error('Bạn đã đánh giá phiên đấu giá này!');
-            } else {
-                toast.error(`Đánh giá thất bại: ${err.message}`);
-            }
-
-            // Cập nhật lại dữ liệu
-            try {
                 const response = await api.get('bids/user', {
-                    params: { page: currentPage, size: 5 },
-                    headers: { Authorization: `Bearer ${token}` }
+                    params: {
+                        page: currentPage,
+                        size: 5
+                    },
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
                 });
                 setBidHistory(response.data.content);
-            } catch (fetchError) {
-                console.error('Lỗi khi tải lại dữ liệu:', fetchError);
+            } else {
+                console.error('Lỗi khi gửi đánh giá:', err);
             }
         }
     };
 
     return (
         <div className="user-layout">
-            <ToastContainer
-                position="top-right"
-                autoClose={3000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-            />
-
             <div className="user-container">
                 <UserSidebar />
 
@@ -175,19 +146,8 @@ const BidHistory = () => {
                                 <td>{currentPage * 5 + index + 1}</td>
                                 <td>{bid.auctionId}</td>
                                 <td>{bid.productName || "Không có thông tin"}</td>
-                                <td>{bid.bidAmount.toLocaleString("vi-VN")} VNĐ</td>
-                                <td>
-                                    {new Date(bid.registrationDate).toLocaleString("vi-VN", {
-                                        day: "2-digit",
-                                        month: "2-digit",
-                                        year: "numeric",
-                                    })}{" "}
-                                    {new Date(bid.registrationDate).toLocaleTimeString("vi-VN", {
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                        second: "2-digit",
-                                    })}
-                                </td>
+                                <td>{bid.bidAmount}</td>
+                                <td>{new Date(bid.registrationDate).toLocaleDateString()}</td>
                                 <td>{bid.auctionStatus === "active" ? "Đang đấu giá" : "Đã kết thúc"}</td>
                                 <td className="text-center">
                                     {bid.isWinner ? (
