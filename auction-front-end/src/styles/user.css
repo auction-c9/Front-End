@@ -109,9 +109,8 @@
     align-items: center;
     gap: 10px;
 }
-
 .user-content button {
-    background: #EEA019; /* Cam chủ đạo */
+    background: #EEA019; /* Màu nền ban đầu: Cam chủ đạo */
     color: white;
     border: none;
     padding: 8px 12px;
@@ -119,8 +118,15 @@
     border-radius: 5px;
 }
 
+/* Khi hover, chuyển sang màu cam đậm hơn */
 .user-content button:hover {
     background: #d88a00; /* Cam đậm hơn */
+}
+
+/* Nếu bạn có nút với class btn-primary, đảm bảo hover cũng dùng màu cam đậm */
+.user-content button.btn-primary:hover {
+    background-color: #d88a00 !important;
+    border-color: #d88a00 !important;
 }
 
 .user-content button:disabled {
@@ -134,12 +140,43 @@
 }
 
 .pagination .page-item .page-link:hover {
-    background-color: #D88A00;
+    background-color: #d88a00;
     color: white;
 }
 
 .pagination .page-item.active .page-link {
-    background-color: #D88A00;
+    background-color: #d88a00;
     color: white;
     border: none;
+}
+
+.star-rating {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.star-button {
+    padding: 0 !important;
+    border: none !important;
+    background: none !important;
+    display: inline-flex;
+    align-items: center;
+}
+
+.star-icon {
+    width: 32px;
+    height: 32px;
+    fill: #ffd700;
+    transition: all 0.2s;
+}
+
+.star-icon.filled {
+    fill: #ffc107;
+}
+
+.star-button:hover .star-icon {
+    transform: scale(1.2);
+    fill: #ffc107;
 }

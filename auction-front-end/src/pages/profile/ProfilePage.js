@@ -43,10 +43,6 @@ const ProfilePage = () => {
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        if (!token) {
-            window.location.href = "/login";
-            return;
-        }
         const fetchProfile = async () => {
             try {
                 const response = await api.get('/auth/profile');

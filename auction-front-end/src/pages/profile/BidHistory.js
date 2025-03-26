@@ -2,27 +2,39 @@ import React, { useEffect, useState } from 'react';
 import { Table, Spinner, Alert, Container, Button, Modal, Form } from 'react-bootstrap';
 import { api } from "../../config/apiConfig";
 import UserSidebar from "./UserSidebar"; // Import sidebar
-import "../../styles/user.css"; // Import CSS
+import "../../styles/user.css";
+import CustomPagination from "./CustomPagination";
+import ReviewModal from "./ReviewModal";
+import { useReview } from '../../context/ReviewContext';
+
 
 const BidHistory = () => {
     const [bidHistory, setBidHistory] = useState([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [selectedBidId, setSelectedBidId] = useState(null);
     const [rating, setRating] = useState(5);
     const [comment, setComment] = useState('');
+    const { setNeedsRefresh } = useReview();
 
     useEffect(() => {
         const fetchBidHistory = async () => {
             try {
                 const token = localStorage.getItem('token');
                 const response = await api.get('bids/user', {
+                    params: {
+                        page: currentPage,
+                        size: 5
+                    },
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
                 });
-                setBidHistory(response.data);
+                setBidHistory(response.data.content);
+                setTotalPages(response.data.totalPages);
                 setLoading(false);
             } catch (err) {
                 setError(err.message);
@@ -31,7 +43,7 @@ const BidHistory = () => {
         };
 
         fetchBidHistory();
-    }, []);
+    }, [currentPage]);
 
     if (loading) {
         return (
@@ -56,13 +68,13 @@ const BidHistory = () => {
         return new Date(dateString).toLocaleDateString('vi-VN');
     };
 
-    // Thêm hàm mở modal
+    // Mở modal đánh giá
     const handleOpenReviewModal = (bidId) => {
         setSelectedBidId(bidId);
         setShowReviewModal(true);
     };
 
-    // Thêm hàm đóng modal
+    // Đóng modal đánh giá
     const handleCloseReviewModal = () => {
         setShowReviewModal(false);
         setSelectedBidId(null);
@@ -70,7 +82,6 @@ const BidHistory = () => {
         setComment('');
     };
 
-    // Thêm hàm gửi đánh giá
     const handleSubmitReview = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -85,35 +96,34 @@ const BidHistory = () => {
             });
             // Cập nhật UI sau khi gửi thành công
             setBidHistory(prev => prev.map(bid =>
-                bid.bidId === selectedBidId ? {...bid, hasReviewed: true} : bid
+                bid.bidId === selectedBidId ? { ...bid, hasReviewed: true } : bid
             ));
             handleCloseReviewModal();
+            setNeedsRefresh(true);
         } catch (err) {
             if (err.response?.status === 409) {
                 alert('Bạn đã đánh giá phiên đấu giá này!');
-                // Fetch lại dữ liệu để cập nhật trạng thái
-                const response = await api.get('bids/user');
-                setBidHistory(response.data);
+                const response = await api.get('bids/user', {
+                    params: {
+                        page: currentPage,
+                        size: 5
+                    },
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                setBidHistory(response.data.content);
             } else {
                 console.error('Lỗi khi gửi đánh giá:', err);
             }
         }
     };
 
-    const formatDateTime = (dateTimeString) => {
-
-        const [datePart, timePart] = dateTimeString.split("T");
-        const [month, day, year] = datePart.split("-");
-        return `ngày ${day}/${month}/${year} vào lúc ${timePart}`;
-    };
-
     return (
         <div className="user-layout">
             <div className="user-container">
-                {/* Thêm sidebar */}
                 <UserSidebar />
 
-                {/* Phần nội dung chính */}
                 <div className="user-content">
                     <h1 className="mb-4">Lịch sử đấu giá</h1>
                     <Table striped bordered hover responsive>
@@ -130,15 +140,21 @@ const BidHistory = () => {
                         </tr>
                         </thead>
                         <tbody>
-                        {bidHistory.map((bid, index) => (
+                        {Array.isArray(bidHistory) && bidHistory.map((bid, index) => (
                             <tr key={bid.bidId}>
-                                <td>{index + 1}</td>
+                                <td>{currentPage * 5 + index + 1}</td>
                                 <td>{bid.auctionId}</td>
                                 <td>{bid.productName || "Không có thông tin"}</td>
                                 <td>{bid.bidAmount}</td>
                                 <td>{new Date(bid.registrationDate).toLocaleDateString()}</td>
                                 <td>{bid.auctionStatus === "active" ? "Đang đấu giá" : "Đã kết thúc"}</td>
-                                <td>{bid.isWinner ? 'Thắng' : 'Không thành công'}</td>
+                                <td className="text-center">
+                                    {bid.isWinner ? (
+                                        <span style={{ color: 'green', fontWeight: 'bold', fontSize: '1.2rem' }}>✔️</span>
+                                    ) : (
+                                        <span style={{ color: 'red', fontWeight: 'bold', fontSize: '1.2rem' }}>❌</span>
+                                    )}
+                                </td>
                                 <td>
                                     {bid.auctionStatus === 'ended' && bid.isWinner && (
                                         <Button
@@ -154,51 +170,24 @@ const BidHistory = () => {
                         ))}
                         </tbody>
                     </Table>
-                </div>
 
-                {/* Thêm modal đánh giá */}
-                <Modal show={showReviewModal} onHide={handleCloseReviewModal}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Đánh giá sản phẩm</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <Form>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Điểm đánh giá</Form.Label>
-                                <div>
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                        <Button
-                                            key={star}
-                                            variant={star <= rating ? 'warning' : 'secondary'}
-                                            onClick={() => setRating(star)}
-                                            className="me-2"
-                                        >
-                                            {star}
-                                        </Button>
-                                    ))}
-                                </div>
-                            </Form.Group>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Bình luận</Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    rows={3}
-                                    value={comment}
-                                    onChange={(e) => setComment(e.target.value)}
-                                />
-                            </Form.Group>
-                        </Form>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button variant="secondary" onClick={handleCloseReviewModal}>
-                            Hủy
-                        </Button>
-                        <Button variant="primary" onClick={handleSubmitReview}>
-                            Gửi đánh giá
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
+                    {/* Thanh phân trang được bọc trong div căn giữa */}
+                    <div className="d-flex justify-content-center mt-4">
+                        <CustomPagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+                    </div>
+
+                </div>
             </div>
+            <ReviewModal
+                show={showReviewModal}
+                onClose={handleCloseReviewModal}
+                onSubmit={handleSubmitReview}
+                bidId={selectedBidId}
+            />
         </div>
     );
 };
