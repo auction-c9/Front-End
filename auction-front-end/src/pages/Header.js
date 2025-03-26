@@ -22,8 +22,9 @@ const Header = () => {
     const { user, logout } = useAuth();
     const [showDropdown, setShowDropdown] = useState(false);
     const [notifications, setNotifications] = useState([]);
+    const [showSearch, setShowSearch] = useState(false); // State điều khiển hiển thị thanh tìm kiếm
 
-    // kết nối WebSocket
+    // Kết nối WebSocket
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (!token) return;
@@ -48,20 +49,14 @@ const Header = () => {
                         console.error('Error parsing notification:', error);
                     }
                 });
-
             }
         });
-
 
         client.activate();
         return () => {
             client.deactivate();
         };
     }, [user]);
-    useEffect(() => {
-
-    }, [notifications]);
-
 
     // Fetch thông báo ban đầu khi user đã đăng nhập
     useEffect(() => {
@@ -77,7 +72,6 @@ const Header = () => {
         })
             .then((response) => {
                 if (!response.ok) {
-                    // Đọc nội dung phản hồi để biết thêm chi tiết lỗi
                     return response.text().then(text => {
                         console.error("Error response:", text);
                         throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
@@ -102,7 +96,7 @@ const Header = () => {
 
         const token = localStorage.getItem("token");
         if (!user || !user.customerId) {
-            console.error("User or customerId không tồn tại");
+            console.error("User hoặc customerId không tồn tại");
             return;
         }
         fetch(`http://localhost:8080/api/notifications/${user.customerId}`, {
@@ -141,7 +135,6 @@ const Header = () => {
                 Authorization: `Bearer ${token}`,
             }
         })
-
             .then((response) => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -153,15 +146,13 @@ const Header = () => {
             })
             .catch((error) => console.error("Error updating notifications:", error));
     };
+
     return (
         <header className="header">
             <div className="top-header">
                 <div className="logo">
                     <Link to="/" className="logo-text">C9-Stock</Link>
                 </div>
-
-
-
                 <div className="nav-icons">
                     <Dropdown
                         align="end"
@@ -183,9 +174,14 @@ const Header = () => {
                         />
                     </Dropdown>
 
-                    {/*<Link to="/cart" className="icon-link">*/}
-                    {/*    <ShoppingCart size={22} />*/}
-                    {/*</Link>*/}
+                    {/* Biểu tượng tìm kiếm */}
+                    <div className="icon-link" style={{ cursor: 'pointer' }} onClick={() => setShowSearch(prev => !prev)}>
+                        <Search size={22} />
+                    </div>
+
+                    {/* <Link to="/cart" className="icon-link">
+                        <ShoppingCart size={22} />
+                    </Link> */}
 
                     {user ? (
                         <Dropdown>
@@ -221,11 +217,14 @@ const Header = () => {
                 </div>
             </div>
 
-            <div className="bottom-header">
-                <div style={{display: 'flex', justifyContent: 'center'}}>
-                    <SearchBar/>
+            {/* Thanh tìm kiếm ẩn, chỉ hiển thị khi click vào biểu tượng */}
+            {showSearch && (
+                <div className="bottom-header">
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <SearchBar />
+                    </div>
                 </div>
-            </div>
+            )}
         </header>
     );
 };

@@ -48,8 +48,20 @@ const ProductSchema = Yup.object().shape({
         .positive('Bước giá phải lớn hơn 0')
         .required('Bước giá là bắt buộc'),
     auctionStartTime: dateTimeField,
-    auctionEndTime: dateTimeField,
-    imageFiles: Yup.array().min(1, 'Ít nhất một ảnh sản phẩm là bắt buộc')
+    auctionEndTime: dateTimeField.test(
+        'is-after-startTime',
+        'Thời gian kết thúc đấu giá phải sau thời gian bắt đầu',
+        function (value) {
+            const { auctionStartTime } = this.parent;
+            if (!auctionStartTime || !value) return true;
+            const start = parseDateTime(auctionStartTime);
+            const end = parseDateTime(value);
+            return start && end ? end > start : true;
+        }
+    ),
+    imageFiles: Yup.array()
+        .min(1, 'Ít nhất một ảnh sản phẩm là bắt buộc')
+        .max(10, 'Chỉ được tải lên tối đa 10 ảnh')
 });
 
 const AddProduct = () => {
@@ -274,7 +286,7 @@ const AddProduct = () => {
                                         className="form-control"
                                         placeholder="Nhập mô tả sản phẩm"
                                         maxLength={300}
-                                        style={{ height: '147px' }} // Cùng kích thước với ô thời gian bắt đầu đấu giá
+                                        style={{ height: '147px' }}
                                     />
                                     <ErrorMessage
                                         name="description"
@@ -300,7 +312,7 @@ const AddProduct = () => {
                                             const previews = files.map((file) => URL.createObjectURL(file));
                                             setImagePreviews(previews);
                                         }}
-                                        style={{ height: '38px' }} // Cùng kích thước với ô thời gian kết thúc đấu giá
+                                        style={{ height: '38px' }}
                                     />
                                     <div className="d-flex flex-wrap gap-2 mt-2">
                                         {imagePreviews.map((src, index) => (
@@ -382,4 +394,5 @@ const AddProduct = () => {
         </Container>
     );
 }
+
 export default AddProduct;
