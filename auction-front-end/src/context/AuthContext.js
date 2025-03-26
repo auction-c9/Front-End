@@ -56,6 +56,7 @@ export function AuthProvider({ children }) {
             setUser(newUser); // Cập nhật state user
             console.log("User after login:", newUser); // 🐛 Debug user sau khi cập nhật
             setToken(token);
+            return newUser;
         } catch {
             throw new Error("Đăng nhập thất bại");
         }

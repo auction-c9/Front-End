@@ -306,3 +306,24 @@
     border-radius: 4px;
     cursor: pointer;
 }
+
+.ReactModal__Overlay {
+    z-index: 1050 !important;
+    background-color: rgba(0, 0, 0, 0.5) !important; /* Làm mờ nền */
+}
+
+.ReactModal__Content {
+    z-index: 1100 !important;
+    position: relative;
+}
+
+/* Thêm vào cuối file admin.css */
+.admin-tab-buttons {
+    margin-bottom: 2rem !important; /* 40px */
+    padding-top: 1rem; /* 16px */
+}
+
+.admin-content-container {
+    margin-top: 1.5rem !important; /* 24px */
+    padding-top: 1rem; /* 16px */
+}

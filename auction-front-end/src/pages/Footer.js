@@ -20,7 +20,7 @@ const Footer = () => {
                     <h4>Pháp lý</h4>
                     <ul>
                         <li><Link to="/privacy-policy">Chính sách bảo mật</Link></li>
-                        <li><Link to="/contact">Giấy phép</Link></li>
+                        <li><Link to="">Giấy phép</Link></li>
                     </ul>
                 </div>
 

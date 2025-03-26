@@ -6,7 +6,7 @@ const Home = () => {
         <div className="home-page">
             <div className="home-content">
                 <main className="home-main">
-                    <AuctionListPage />
+                    <AuctionListPage/>
                 </main>
             </div>
         </div>

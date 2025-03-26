@@ -31,8 +31,15 @@ export default function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await login(credentials);
-            navigate('/');
+            const response = await login(credentials);
+            console.log('Login response:', response); // Kiểm tra dữ liệu nhận được
+
+            // Kiểm tra theo cấu trúc response bạn cung cấp
+            if (response?.role === "ROLE_ADMIN") {
+                navigate('/admin');
+            } else {
+                navigate('/');
+            }
         } catch (err) {
             setError('Đăng nhập thất bại. Vui lòng kiểm tra tài khoản và mật khẩu');
         }
