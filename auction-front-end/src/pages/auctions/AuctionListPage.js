@@ -4,12 +4,40 @@ import apiConfig from '../../config/apiConfig';
 import { Link, useLocation } from 'react-router-dom';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 
+// Hàm sắp xếp mảng các phiên đấu giá
+const sortAuctions = (auctions) => {
+    const now = new Date();
+    return auctions.sort((a, b) => {
+        // Nếu cả hai đều có cùng trạng thái
+        if (a.status === b.status) {
+            if (a.status === "pending") {
+                // Tính độ chênh lệch giữa auctionStartTime và thời gian hiện tại
+                const diffA = Math.abs(new Date(a.auctionStartTime) - now);
+                const diffB = Math.abs(new Date(b.auctionStartTime) - now);
+                return diffA - diffB;
+            } else if (a.status === "active") {
+                // Tính độ chênh lệch giữa auctionEndTime và thời gian hiện tại
+                const diffA = Math.abs(new Date(a.auctionEndTime) - now);
+                const diffB = Math.abs(new Date(b.auctionEndTime) - now);
+                return diffA - diffB;
+            } else {
+                // Nếu trạng thái không phải pending hay active, sắp xếp theo auctionId
+                return a.auctionId - b.auctionId;
+            }
+        }
+        // Nếu trạng thái khác nhau, định nghĩa thứ tự ưu tiên:
+        // pending trước, sau đó active, và cuối cùng là ended
+        const statusOrder = { pending: 0, active: 1, ended: 2 };
+        return statusOrder[a.status] - statusOrder[b.status];
+    });
+};
+
 const AuctionListPage = () => {
     const [auctions, setAuctions] = useState([]);
     const [timeLeftMap, setTimeLeftMap] = useState({});
     const location = useLocation();
 
-    // Hàm tính thời gian còn lại
+    // Hàm tính thời gian còn lại cho mỗi phiên đấu giá
     const calculateTimeLeft = (auction) => {
         if (!auction) return { time: 'Đang tải...', highlight: false };
 
@@ -34,22 +62,22 @@ const AuctionListPage = () => {
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff / (1000 * 60)) % 60);
         const seconds = Math.floor((diff / 1000) % 60);
+        // Đánh dấu highlight nếu thời gian còn lại dưới 15 phút
         const highlight = diff < 15 * 60 * 1000;
 
         return { time: `${label}${hours > 0 ? `${hours}g ` : ''}${minutes}p ${seconds}s`, highlight };
     };
 
-    // Hàm tính giá hiện tại của phiên đấu giá
+    // Hàm tính giá hiện tại của phiên đấu giá dựa trên bid cao nhất
     const getCurrentPrice = (auction) => {
         if (auction.bids && auction.bids.length > 0) {
-            // Lấy giá bid cao nhất từ danh sách bids
             const highestBid = Math.max(...auction.bids.map(bid => bid.bidAmount));
             return highestBid;
         }
         return auction.currentPrice;
     };
 
-    // Gọi API và lọc kết quả dựa trên tham số tìm kiếm
+    // Gọi API và lọc kết quả dựa trên các tham số tìm kiếm
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const queryParam = params.get('query');
@@ -98,6 +126,8 @@ const AuctionListPage = () => {
                     );
                 }
 
+                // Sắp xếp các phiên đấu giá theo logic ưu tiên
+                auctionsData = sortAuctions(auctionsData);
                 setAuctions(auctionsData);
 
                 const initialTimeLeft = {};
@@ -109,6 +139,7 @@ const AuctionListPage = () => {
             .catch(error => console.error('Lỗi khi tải phiên đấu giá:', error));
     }, [location.search]);
 
+    // Cập nhật thời gian còn lại cho mỗi phiên đấu giá mỗi giây
     useEffect(() => {
         const interval = setInterval(() => {
             setTimeLeftMap(prevMap => {
@@ -160,7 +191,6 @@ const AuctionListPage = () => {
                                         >
                                             {timeLeftMap[auction.auctionId]?.time || 'Đang tải...'}
                                         </Card.Text>
-
                                     </Card.Body>
                                 </Card>
                             </Link>

@@ -110,7 +110,7 @@ const UserProfilePage = () => {
                 </Card.Body>
             </Card>
 
-            <h3 className="mb-3">Auction History</h3>
+            <h3 className="mb-3">Lịch sử đăng bài</h3>
 
             {profile.auctions && profile.auctions.length === 0 ? (
                 <Alert variant="info">No auctions found</Alert>
@@ -118,12 +118,12 @@ const UserProfilePage = () => {
                 <Table striped bordered hover responsive>
                     <thead>
                     <tr>
-                        <th>Product</th>
-                        <th>Start Time</th>
-                        <th>End Time</th>
-                        <th>Base Price</th>
-                        <th>Highest Bid</th>
-                        <th>Status</th>
+                        <th>Sản phẩm</th>
+                        <th>Thời gian bắt đầu</th>
+                        <th>Thời gian kết thúc</th>
+                        <th>Giá khởi điểm</th>
+                        <th>Giá hiện tại </th>
+                        <th>Trạng thái</th>
                     </tr>
                     </thead>
                     <tbody>
