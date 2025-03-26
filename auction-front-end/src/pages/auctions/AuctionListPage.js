@@ -191,17 +191,6 @@ const AuctionListPage = () => {
                                         >
                                             {timeLeftMap[auction.auctionId]?.time || 'Đang tải...'}
                                         </Card.Text>
-                                        <Link
-                                            to={`/auction/${auction.auctionId}`}
-                                            className="btn btn-sm mt-2"
-                                            style={{
-                                                backgroundColor: '#965E00',
-                                                color: 'white',
-                                                border: 'none'
-                                            }}
-                                        >
-                                            Xem chi tiết
-                                        </Link>
                                     </Card.Body>
                                 </Card>
                             </Link>

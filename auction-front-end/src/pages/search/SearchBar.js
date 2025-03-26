@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../config/apiConfig';
-import CategoryMultiSelect from './CategoryMultiSelect';
+import CategoryMultiSelect from './CategoryMultiSelect'; // file ở trên
 
 const SearchBar = () => {
     const navigate = useNavigate();
@@ -23,29 +23,50 @@ const SearchBar = () => {
 
     const handleSearch = () => {
         const params = new URLSearchParams();
-        if (query.trim() !== '') params.append('query', query.trim());
-        if (selectedCategories.length > 0) params.append('categories', selectedCategories.join(','));
-        if (selectedPrice) params.append('price', selectedPrice);
-        if (selectedStatus) params.append('status', selectedStatus);
-        console.log('Search parameters:', { query, selectedCategories, price: selectedPrice, status: selectedStatus });
+
+        if (query.trim() !== '') {
+            params.append('query', query.trim());
+        }
+        if (selectedCategories.length > 0) {
+            params.append('categories', selectedCategories.join(','));
+        }
+        if (selectedPrice) {
+            params.append('price', selectedPrice);
+        }
+        if (selectedStatus) {
+            params.append('status', selectedStatus);
+        }
+        console.log('Search parameters:', {
+            query: query.trim(),
+            categories: selectedCategories,
+            price: selectedPrice,
+            status: selectedStatus,
+        });
         navigate(`/auctions?${params.toString()}`);
     };
 
     return (
-        <div className="search-bar container my-4" >
-            <div className="d-flex flex-wrap justify-content-between align-items-center gap-2">
-                {/* Ô tìm kiếm */}
+        <div className="search-bar container my-4">
+            <div className="input-group mb-3">
                 <input
                     type="text"
-                    className="form-control flex-grow-1"
+                    className="form-control"
                     placeholder="Tìm kiếm"
-                    style={{ minWidth: '200px', maxWidth: '250px', fontSize: '14px' }}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                 />
+                <button
+                    className="btn"
+                    style={{ backgroundColor: '#CC8400', color: '#fff' }}
+                    onClick={handleSearch}
+                >
+                    Tìm Kiếm
+                </button>
+            </div>
 
+            <div className="row">
                 {/* Danh mục */}
-                <div className="flex-grow-1" style={{ minWidth: '200px', maxWidth: '250px' }}>
+                <div className="col-md-4 mb-2">
                     <CategoryMultiSelect
                         categories={categories}
                         selectedCategories={selectedCategories}
@@ -54,40 +75,33 @@ const SearchBar = () => {
                 </div>
 
                 {/* Mức giá */}
-                <select
-                    className="form-select flex-grow-1"
-                    style={{ minWidth: '150px', maxWidth: '200px' }}
-                    value={selectedPrice}
-                    onChange={(e) => setSelectedPrice(e.target.value)}
-                >
-                    <option value="">Mức giá</option>
-                    <option value="1">Dưới 1 triệu</option>
-                    <option value="2">1 - 3 triệu</option>
-                    <option value="3">3 - 5 triệu</option>
-                    <option value="4">Trên 5 triệu</option>
-                </select>
+                <div className="col-md-4 mb-2">
+                    <select
+                        className="form-select"
+                        value={selectedPrice}
+                        onChange={(e) => setSelectedPrice(e.target.value)}
+                    >
+                        <option value="">Mức giá</option>
+                        <option value="1">Dưới 1 triệu</option>
+                        <option value="2">1 - 3 triệu</option>
+                        <option value="3">3 - 5 triệu</option>
+                        <option value="4">Trên 5 triệu</option>
+                    </select>
+                </div>
 
                 {/* Trạng thái */}
-                <select
-                    className="form-select flex-grow-1"
-                    style={{ minWidth: '150px', maxWidth: '200px' }}
-                    value={selectedStatus}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
-                >
-                    <option value="">Trạng thái</option>
-                    <option value="upcoming">Sắp Diễn ra</option>
-                    <option value="ongoing">Đang Diễn ra</option>
-                    <option value="ending">Sắp kết thúc</option>
-                </select>
-
-                {/* Nút tìm kiếm */}
-                <button
-                    className="btn"
-                    style={{ backgroundColor: '#CC8400', color: '#fff', minWidth: '120px' }}
-                    onClick={handleSearch}
-                >
-                    Tìm Kiếm
-                </button>
+                <div className="col-md-4 mb-2">
+                    <select
+                        className="form-select"
+                        value={selectedStatus}
+                        onChange={(e) => setSelectedStatus(e.target.value)}
+                    >
+                        <option value="">Trạng thái</option>
+                        <option value="upcoming">Sắp Diễn ra</option>
+                        <option value="ongoing">Đang Diễn ra</option>
+                        <option value="ending">Sắp kết thúc</option>
+                    </select>
+                </div>
             </div>
         </div>
     );
