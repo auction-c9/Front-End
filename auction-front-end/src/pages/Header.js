@@ -85,6 +85,37 @@ const Header = () => {
             .catch((error) => console.error("Error fetching notifications:", error));
     }, [user]);
 
+    useEffect(() => {
+        const handleGlobalClick = () => {
+            if (!user || !user.customerId) return;
+            const token = localStorage.getItem("token");
+            fetch(`http://localhost:8080/api/notifications/${user.customerId}`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    setNotifications(data);
+                })
+                .catch((error) => console.error("Error fetching notifications:", error));
+        };
+
+        document.addEventListener("click", handleGlobalClick);
+
+        // Clean up event listener khi component unmount
+        return () => {
+            document.removeEventListener("click", handleGlobalClick);
+        };
+    }, [user]);
+
+
     const handleSearch = (values, { resetForm }) => {
         navigate(`/search?query=${values.query}`);
         resetForm();
