@@ -52,8 +52,8 @@ const Register = () => {
             .required('Ảnh đại diện là bắt buộc')
             .test(
                 'fileType',
-                'Chỉ chấp nhận ảnh (JPEG, PNG)',
-                value => value && ['image/jpeg', 'image/png'].includes(value.type)
+                'Chỉ chấp nhận ảnh (JPEG, PNG, JPG, GIF, BMP)',
+                value => value && value.type.startsWith('image/')
             )
     });
 

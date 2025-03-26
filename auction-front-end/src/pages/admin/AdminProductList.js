@@ -104,7 +104,7 @@ const AdminProductList = () => {
 
     const handleDeleteProduct = async () => {
         if (!selectedProduct) return;
-
+        toast.info("Đang xóa sản phẩm...");
         try {
             await adminService.deleteProduct(selectedProduct.productId);
             toast.success("Sản phẩm đã bị xóa thành công! Email đã gửi đến người đăng bài.");
