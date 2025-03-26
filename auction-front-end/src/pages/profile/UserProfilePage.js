@@ -1,13 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {useParams} from 'react-router-dom';
-import {Container, Row, Col, Card, Table, Image, Spinner, Alert, ListGroup, Button} from 'react-bootstrap';
-import {api} from '../../config/apiConfig';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Container, Row, Col, Card, Table, Image, Spinner, Alert, ListGroup, Button } from 'react-bootstrap';
+import { api } from '../../config/apiConfig';
 import "../../styles/profile.css";
 import { useReview } from '../../context/ReviewContext';
 
-
 const UserProfilePage = () => {
-    const {accountID} = useParams();
+    const { accountID } = useParams();
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -16,22 +15,47 @@ const UserProfilePage = () => {
     const [refreshFlag, setRefreshFlag] = useState(false);
     const { needsRefresh, setNeedsRefresh } = useReview();
 
-    const currentUsername = localStorage.getItem('username');
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        let hours = date.getHours();
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const period = hours < 12 ? 'sáng' : 'chiều';
+        hours = hours % 12 || 12;
+        return `${day}/${month}/${year} vào lúc ${hours}:${minutes} ${period}`;
+    };
+
+    const formatCurrency = (amount) => {
+        return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    };
 
     useEffect(() => {
         const fetchProfile = async () => {
             try {
                 const response = await api.get(`/auctions/profile/${accountID}`);
-                setProfile(response.data);
+                const profileData = response.data;
+
+                if (!response.data.averageRating) {
+                    console.warn("Average rating is missing in response");
+                }
+
+                const reviewsResponse = await api.get(`/reviews/seller/${accountID}`);
+                setReviews(reviewsResponse.data);
+                setProfile({
+                    ...profileData,
+                    averageRating: profileData.averageRating || 0
+                });
             } catch (err) {
-                setError(err.response?.data?.message || 'Error loading profile');
+                setError(err.response?.data?.message || 'Lỗi khi tải trang cá nhân');
             } finally {
                 setLoading(false);
             }
         };
 
         fetchProfile();
-    }, [accountID]);
+    }, [accountID, refreshFlag]);
 
     useEffect(() => {
         if (needsRefresh) {
@@ -59,8 +83,7 @@ const UserProfilePage = () => {
             }
         };
         checkFollowStatus();
-    }, [accountID]) ;
-
+    }, [accountID]);
 
     const handleFollow = async () => {
         try {
@@ -103,13 +126,13 @@ const UserProfilePage = () => {
                                 src={profile.avatarUrl || '/placeholder-avatar.png'}
                                 roundedCircle
                                 fluid
-                                style={{width: '150px', height: '150px', objectFit: 'cover'}}
+                                style={{ width: '150px', height: '150px', objectFit: 'cover' }}
                             />
                         </Col>
                         <Col md={9}>
                             <h2>{profile.fullName}</h2>
                             <p className="text-muted">@{profile.username}</p>
-                            {profile.username !== currentUsername && (
+                            {profile.username && (
                                 <Button
                                     variant={isFollowing ? "secondary" : "primary"}
                                     onClick={handleFollow}
@@ -130,35 +153,33 @@ const UserProfilePage = () => {
                 <Table striped bordered hover responsive>
                     <thead>
                     <tr>
-                        <th>Sản phẩm</th>
-                        <th>Thời gian bắt đầu</th>
-                        <th>Thời gian kết thúc</th>
-                        <th>Giá khởi điểm</th>
-                        <th>Giá hiện tại </th>
-                        <th>Trạng thái</th>
+                        <th style={{ backgroundColor: '#EEA019', color: 'white' }}>Sản phẩm</th>
+                        <th style={{ backgroundColor: '#EEA019', color: 'white' }}>Thời gian bắt đầu</th>
+                        <th style={{ backgroundColor: '#EEA019', color: 'white' }}>Thời gian kết thúc</th>
+                        <th style={{ backgroundColor: '#EEA019', color: 'white' }}>Giá khởi điểm</th>
+                        <th style={{ backgroundColor: '#EEA019', color: 'white' }}>Giá hiện tại</th>
+                        <th style={{ backgroundColor: '#EEA019', color: 'white' }}>Trạng thái</th>
                     </tr>
                     </thead>
                     <tbody>
                     {profile.auctions.map((auction, index) => (
                         <tr key={index}>
                             <td>{auction.productName}</td>
-                            <td>{new Date(auction.auctionStartTime).toLocaleString()}</td>
-                            <td>{new Date(auction.auctionEndTime).toLocaleString()}</td>
-                            <td>{auction.basePrice} VND</td>
-                            <td>{auction.highestBid} VND</td>
+                            <td>{formatDate(auction.auctionStartTime)}</td>
+                            <td>{formatDate(auction.auctionEndTime)}</td>
+                            <td>{formatCurrency(auction.basePrice)} VND</td>
+                            <td>{formatCurrency(auction.highestBid)} VND</td>
                             <td>
-                    <span
-                        className={`badge ${
-                            auction.status === 'active' ? 'bg-success' :
-                                auction.status === 'ended' ? 'bg-secondary' :
-                                    auction.status === 'canceled' ? 'bg-dang0er' :
-                                        'bg-warning'
-                        }`}
-                    >
-                        {auction.status === 'pending' && 'Chờ đấu giá'}
-                        {auction.status === 'active' && 'Đang diễn ra'}
-                        {auction.status === 'ended' && 'Đã kết thúc'}
-                    </span>
+                                    <span className={`badge ${
+                                        auction.status === 'active' ? 'bg-success' :
+                                            auction.status === 'ended' ? 'bg-secondary' :
+                                                auction.status === 'canceled' ? 'bg-danger' :
+                                                    'bg-warning'
+                                    }`}>
+                                        {auction.status === 'pending' && 'Chờ đấu giá'}
+                                        {auction.status === 'active' && 'Đang diễn ra'}
+                                        {auction.status === 'ended' && 'Đã kết thúc'}
+                                    </span>
                             </td>
                         </tr>
                     ))}

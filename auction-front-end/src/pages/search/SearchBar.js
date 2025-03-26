@@ -99,7 +99,7 @@ const SearchBar = () => {
                         <option value="">Trạng thái</option>
                         <option value="upcoming">Sắp Diễn ra</option>
                         <option value="ongoing">Đang Diễn ra</option>
-                        <option value="ending">Sắp kết thúc</option>
+                        <option value="ending">Đã kết thúc</option>
                     </select>
                 </div>
             </div>

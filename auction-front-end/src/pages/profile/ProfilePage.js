@@ -134,7 +134,7 @@ const ProfilePage = () => {
                             pauseOnFocusLoss
                             draggable
                             pauseOnHover
-                            theme="colored"/>
+                            theme="light"/>
                         <Card.Body>
                             <h2 className="mb-4">Quản lý hồ sơ cá nhân</h2>
                             {error && <Alert variant="danger">{error}</Alert>}
@@ -225,11 +225,19 @@ const ProfilePage = () => {
 
                                             <div className="col-md-6">
                                                 <label htmlFor="bankName">Tên ngân hàng</label>
-                                                <Field
-                                                    name="bankName"
-                                                    className="form-control"
-                                                    placeholder="Nhập tên ngân hàng"
-                                                />
+                                                <Field as="select" name="bankName" className="form-control">
+                                                    <option value="">Chọn ngân hàng</option>
+                                                    <option value="Vietcombank">Vietcombank</option>
+                                                    <option value="Techcombank">Techcombank</option>
+                                                    <option value="ACB">ACB</option>
+                                                    <option value="BIDV">BIDV</option>
+                                                    <option value="Agribank">Agribank</option>
+                                                    <option value="Sacombank">Sacombank</option>
+                                                    <option value="VPBank">VPBank</option>
+                                                    <option value="MB Bank">MB Bank</option>
+                                                    <option value="Shinhan Bank">Shinhan Bank</option>
+                                                    <option value="OCB">OCB</option>
+                                                </Field>
                                                 <ErrorMessage name="bankName" component="div" className="text-danger"/>
                                             </div>
 

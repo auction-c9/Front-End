@@ -6,7 +6,8 @@ import "../../styles/user.css";
 import CustomPagination from "./CustomPagination";
 import ReviewModal from "./ReviewModal";
 import { useReview } from '../../context/ReviewContext';
-
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const BidHistory = () => {
     const [bidHistory, setBidHistory] = useState([]);
@@ -82,18 +83,19 @@ const BidHistory = () => {
         setComment('');
     };
 
-    const handleSubmitReview = async () => {
+    const handleSubmitReview = async (reviewData) => {
         try {
             const token = localStorage.getItem('token');
             await api.post('/reviews', {
-                bidId: selectedBidId,
-                rating,
-                comment
+                bidId: reviewData.bidId,
+                rating: reviewData.rating,
+                comment: reviewData.comment
             }, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
+
             // Cập nhật UI sau khi gửi thành công
             setBidHistory(prev => prev.map(bid =>
                 bid.bidId === selectedBidId ? { ...bid, hasReviewed: true } : bid
@@ -102,7 +104,6 @@ const BidHistory = () => {
             setNeedsRefresh(true);
         } catch (err) {
             if (err.response?.status === 409) {
-                alert('Bạn đã đánh giá phiên đấu giá này!');
                 const response = await api.get('bids/user', {
                     params: {
                         page: currentPage,
@@ -196,7 +197,7 @@ const BidHistory = () => {
             <ReviewModal
                 show={showReviewModal}
                 onClose={handleCloseReviewModal}
-                onSubmit={handleSubmitReview}
+                onSubmit={(data) => handleSubmitReview(data)}
                 bidId={selectedBidId}
             />
         </div>
